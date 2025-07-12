@@ -739,22 +739,16 @@ paths:
       parameters:
         - in: query
           name: startDate
+          required: true
           schema:
             type: string
             format: date
         - in: query
           name: endDate
+          required: true
           schema:
             type: string
             format: date
-        - in: query
-          name: levelId
-          schema:
-            type: number
-        - in: query
-          name: groupId
-          schema:
-            type: number
       security:
         - auth: [ ]
       responses:
@@ -849,9 +843,9 @@ components:
           items:
             $ref: '#/components/schemas/GroupDTO'
         teacher:
-          $ref: '#/components/schemas/MinimalTeacherDTO'
+          $ref: '#/components/schemas/TeacherDTO'
         teachingUnit:
-          $ref: '#/components/schemas/MinimalTeachingUnitDTO'
+          $ref: '#/components/schemas/TeachingUnitDTO'
         room:
           $ref: '#/components/schemas/RoomDTO'
         start:
@@ -870,11 +864,9 @@ components:
         name:
           type:
             string
-        levelIds:
-          type: array
-          items:
-            type: number
-      required: [ abbreviation, name, levelIds ]
+        levelId:
+          type: number
+      required: [ abbreviation, name, levelId ]
 
     CreateTeachingUnitDTO:
       type: object
@@ -884,23 +876,9 @@ components:
         name:
           type:
             string
-        levelIds:
-          type: array
-          items:
-            type: number
-      required: [ abbreviation, name, levelIds ]
-
-    MinimalTeachingUnitDTO:
-      type: object
-      properties:
-        id:
+        levelId:
           type: number
-        abbreviation:
-          type: string
-        name:
-          type:
-            string
-      required: [ id, abbreviation, name ]
+      required: [ abbreviation, name, levelId ]
     
     TeachingUnitDTO:
       type: object
@@ -912,16 +890,16 @@ components:
         name:
           type:
             string
-        levels:
-          type: array
-          items:
-            $ref: '#/components/schemas/LevelDTO'
-      required: [ id, abbreviation, name, levels ]
+        level:
+          $ref: '#/components/schemas/LevelDTO'
+      required: [ id, abbreviation, name, level ]
 
     UpdateRoomDTO:
       type: object
       properties:
         name:
+          type: string
+        abbreviation:
           type: string
         size:
           type: number
@@ -931,6 +909,8 @@ components:
       type: object
       properties:
         name:
+          type: string
+        abbreviation:
           type: string
         size:
           type: number
@@ -943,6 +923,8 @@ components:
           type: number
         name:
           type: string
+        abbreviation:
+          type: string
         size:
           type: number
       required: [ id, name, size ]
@@ -950,46 +932,31 @@ components:
     UpdateTeacherDTO:
       type: object
       properties:
-        lastName:
-          type: string
-        firstName:
+        name:
           type: string
         abbreviation:
           type: string
-      required: [ abbreviation, firstName, lastName ]
+      required: [ abbreviation, name ]
 
     CreateTeacherDTO:
       type: object
       properties:
-        lastName:
-          type: string
-        firstName:
+        name:
           type: string
         abbreviation:
           type: string
-      required: [ abbreviation, firstName, lastName ]
-
-    MinimalTeacherDTO:
-      type: object
-      properties:
-        id:
-          type: number
-        abbreviation:
-          type: string
-      required: [ id, abbreviation ]
+      required: [ abbreviation, name ]
 
     TeacherDTO:
       type: object
       properties:
         id:
           type: number
-        lastName:
-          type: string
-        firstName:
+        name:
           type: string
         abbreviation:
           type: string
-      required: [ id, abbreviation, firstName, lastName ]
+      required: [ id, abbreviation, name ]
 
     CreateGroupDTO:
       type: object
@@ -1038,12 +1005,16 @@ components:
       properties:
         name:
           type: string
-      required: [ name ]
+        abbreviation:
+          type: string
+      required: [ name, abbreviation ]
 
     UpdateLevelDTO:
       type: object
       properties:
         name:
+          type: string
+        abbreviation:
           type: string
       required: [ name ]
 
@@ -1053,6 +1024,8 @@ components:
         id:
           type: number
         name:
+          type: string
+        abbreviation:
           type: string
       required: [ id, name ]
 

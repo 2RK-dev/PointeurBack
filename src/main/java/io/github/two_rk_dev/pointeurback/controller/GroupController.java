@@ -2,6 +2,7 @@ package io.github.two_rk_dev.pointeurback.controller;
 
 import io.github.two_rk_dev.pointeurback.dto.GroupDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateGroupDTO;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +20,9 @@ public class GroupController {
     }
 
     @PutMapping("/{groupId}")
-    public ResponseEntity<GroupDTO> updateGroup(@PathVariable Long levelId, @PathVariable Long groupId, @RequestBody UpdateGroupDTO dto) {
+    public ResponseEntity<GroupDTO> updateGroup(@PathVariable Long levelId,
+                                                @PathVariable Long groupId,
+                                                @Valid @RequestBody UpdateGroupDTO dto) {
         throw new UnsupportedOperationException("Not implemented");
     }
 }
-

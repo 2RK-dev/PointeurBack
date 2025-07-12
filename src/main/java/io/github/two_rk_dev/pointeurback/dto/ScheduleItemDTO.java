@@ -5,11 +5,10 @@ import java.util.List;
 public record ScheduleItemDTO(
         Long id,
         List<GroupDTO> groups,
-        MinimalTeacherDTO teacher,
-        MinimalTeachingUnitDTO teachingUnit,
+        TeacherDTO teacher,
+        TeachingUnitDTO teachingUnit,
         RoomDTO room,
         String start,
         String end
 ) {
 }
-

@@ -3,6 +3,7 @@ package io.github.two_rk_dev.pointeurback.controller;
 import io.github.two_rk_dev.pointeurback.dto.CreateRoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.RoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateRoomDTO;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ public class RoomController {
     }
 
     @PostMapping
-    public ResponseEntity<RoomDTO> createRoom(@RequestBody CreateRoomDTO dto) {
+    public ResponseEntity<RoomDTO> createRoom(@Valid @RequestBody CreateRoomDTO dto) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -28,7 +29,7 @@ public class RoomController {
     }
 
     @PutMapping("/{roomId}")
-    public ResponseEntity<RoomDTO> updateRoom(@PathVariable Long roomId, @RequestBody UpdateRoomDTO dto) {
+    public ResponseEntity<RoomDTO> updateRoom(@PathVariable Long roomId, @Valid @RequestBody UpdateRoomDTO dto) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
