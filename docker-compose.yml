@@ -1,0 +1,10 @@
+services:
+    postgres:
+        image: postgres:latest
+        container_name: pointeur-postgres
+        environment:
+            POSTGRES_DB: pointeur-db
+            POSTGRES_USER: ${DOCKER_DB_USER}
+            POSTGRES_PASSWORD: ${DOCKER_DB_PASSWORD}
+        ports:
+            -   '5432:5432'
