@@ -27,8 +27,8 @@ application, providing RESTful APIs and database management.
 
 ### Prerequisites
 
-- Java 17 or higher
-- Gradle 7+
+- Java 21 or higher
+- Gradle 8+
 - Docker (for containerized deployment)
 
 ### Installation and Configuration
