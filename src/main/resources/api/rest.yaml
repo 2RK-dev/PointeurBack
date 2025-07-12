@@ -1,0 +1,1046 @@
+openapi: 3.1.0
+info:
+  title: Pointeur Backend API specification
+  description: Pointeur Backend API specification
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080/api/v1'
+    description: Development server
+
+paths:
+  /levels:
+    post:
+      description: Create a new level
+      security:
+        - auth: [ ]
+      requestBody:
+        description: Information about the level
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLevelDTO'
+      responses:
+        201:
+          description: The Level was successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LevelDTO'
+
+        400:
+          description: Validation error (the provided level name is blank)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+        409:
+          description: The name of the level already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    get:
+      description: Fetch all the existing levels
+      security:
+        - auth: [ ]
+      responses:
+        200:
+          description: A list of the levels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LevelDTO'
+
+  /levels/{levelId}:
+    get:
+      description: Get the informations of a level
+      security:
+        - auth: [ ]
+      parameters:
+        - in: path
+          name: levelId
+          description: the identifier of the level
+          schema:
+            type: number
+          required: true
+      responses:
+        200:
+          description: The level's name and ID, along its groups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LevelDetailsDTO'
+    put:
+      description: Change the infos of a level
+      security:
+        - auth: [ ]
+      parameters:
+        - in: path
+          name: levelId
+          description: the identifier of the level
+          schema:
+            type: number
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLevelDTO'
+      responses:
+        200:
+          description: Successfully updated the level
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LevelDTO'
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+        404:
+          description: Level does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        409:
+          description: The new name of the level is already taken
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    delete:
+      description: Deletes a specified level
+      parameters:
+        - in: path
+          name: levelId
+          description: the identifier of the level
+          schema:
+            type: number
+          required: true
+      security:
+        - auth: [ ]
+      responses:
+        204:
+          description: The level was deleted, or it didn't exist to begin with
+
+  /levels/{levelId}/groups:
+    get:
+      description: Fetches the groups in this level
+      parameters:
+        - in: path
+          name: levelId
+          description: the identifier of the level
+          schema:
+            type: number
+          required: true
+      security:
+        - auth: [ ]
+      responses:
+        200:
+          description: A list of the groups in this level
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupDTO'
+        404:
+          description: The queried level does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    post:
+      description: Create a new group in this level
+      parameters:
+        - in: path
+          name: levelId
+          description: the identifier of the level
+          schema:
+            type: number
+          required: true
+      security:
+        - auth: [ ]
+      requestBody:
+        description: The infos of the new group
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupDTO'
+      responses:
+        201:
+          description: Group successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupDTO'
+        400:
+          description: Validation error (blank group name or group size less than 1)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+        404:
+          description: The queried level does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /levels/{levelId}/groups/{groupId}:
+    get:
+      description: Fetch a group's infos
+      parameters:
+        - in: path
+          name: levelId
+          description: the identifier of the level
+          schema:
+            type: number
+          required: true
+        - in: path
+          name: groupId
+          description: the identifier of the group, among those of the same level as it
+          required: true
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      responses:
+        200:
+          description: Infos of the group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupDTO'
+        404:
+          description: The queried group does not exist in the level, or the level itself doesn't
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    put:
+      description: Update the infos of a group (cannot change levels)
+      parameters:
+        - in: path
+          name: levelId
+          description: the identifier of the level
+          schema:
+            type: number
+          required: true
+        - in: path
+          name: groupId
+          description: the identifier of the group, among those of the same level as it
+          required: true
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      requestBody:
+        description: New infos of the group
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGroupDTO'
+      responses:
+        200:
+          description: Group successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupDTO'
+        400:
+          description: Validation error (blank group name or group size less than 1)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+        404:
+          description: The queried group does not exist in the level, or the level itself doesn't
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    delete:
+      description: Delete a group
+      parameters:
+        - in: path
+          name: levelId
+          description: the identifier of the level
+          schema:
+            type: number
+          required: true
+        - in: path
+          name: groupId
+          description: the identifier of the group, among those of the same level as it
+          required: true
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      responses:
+        204:
+          description: The group was deleted, or it didn't exist to begin with
+
+  /teachers:
+    get:
+      description: Fetch all the registered teachers
+      security:
+        - auth: [ ]
+      responses:
+        200:
+          description: List of all the registered teachers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeacherDTO'
+    post:
+      description: Register (not create :P) a new teacher
+      security:
+        - auth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeacherDTO'
+      responses:
+        201:
+          description: New teacher successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeacherDTO'
+        400:
+          description: Validation error (the provided teacher's name or abbreviation is blank)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+        409:
+          description: The abbreviation is already taken by an existing teacher
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /teachers/{teacherId}:
+    get:
+      description: Fetch the infos about a teacher
+      parameters:
+        - in: path
+          name: teacherId
+          required: true
+          description: The identifier of the teacher
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      responses:
+        200:
+          description: The requested teacher's informations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeacherDTO'
+        404:
+          description: No teacher with the provided ID exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    put:
+      description: Update the infos of a teacher
+      parameters:
+        - in: path
+          name: teacherId
+          required: true
+          description: The identifier of the teacher
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTeacherDTO'
+      responses:
+        200:
+          description: The teacher's info was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeacherDTO'
+        400:
+          description: Validation error (the provided teacher's name or abbreviation is blank)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+        404:
+          description: No teacher with the provided ID exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        409:
+          description: The abbreviation is already taken by an existing teacher
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    delete:
+      description: Delete a teacher
+      parameters:
+        - in: path
+          name: teacherId
+          required: true
+          description: The identifier of the teacher
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      responses:
+        204:
+          description: The teacher was deleted, or it didn't exist to begin with
+
+  /rooms:
+    get:
+      description: Fetch all the teaching rooms
+      security:
+        - auth: [ ]
+      responses:
+        200:
+          description: A list of all the existing teaching rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoomDTO'
+    post:
+      description: Create a new teaching room
+      security:
+        - auth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRoomDTO'
+      responses:
+        201:
+          description: Room created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomDTO'
+        400:
+          description: Validation error (room size less than 1)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+        409:
+          description: The room name is already taken (already exists)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /rooms/{roomId}:
+    get:
+      description: Fetch the infos about a teaching room
+      parameters:
+        - in: path
+          name: roomId
+          description: Identifier of the room
+          required: true
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      responses:
+        200:
+          description: The requested room's info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomDTO'
+        404:
+          description: No room with the provided identifier exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    put:
+      description: Alter a teaching room's info
+      parameters:
+        - in: path
+          name: roomId
+          description: Identifier of the room
+          required: true
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoomDTO'
+      responses:
+        200:
+          description: The room's info was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomDTO'
+        400:
+          description: Validation error (room size less than 1)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+        404:
+          description: No room with the provided identifier exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        409:
+          description: The room name is already taken (already exists)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    delete:
+      description: Delete a teaching room
+      parameters:
+        - in: path
+          name: roomId
+          description: Identifier of the room
+          required: true
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      responses:
+        204:
+          description: The room was deleted, or it didn't exist to begin with
+
+  /teachingUnits:
+    get:
+      description: Fetch all teaching units
+      security:
+        - auth: [ ]
+      responses:
+        200:
+          description: A list of all the existing teaching units across all levels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeachingUnitDTO'
+    post:
+      description: Create a new teaching unit
+      security:
+        - auth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeachingUnitDTO'
+      responses:
+        201:
+          description: Teaching unit successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeachingUnitDTO'
+        400:
+          description: Validation error (teaching unit name or abbreviation is blank, some of the provided levels do not exist)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+        409:
+          description: The abbreviation is already associated with an existing teaching unit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /teachingUnits/{unitId}:
+    get:
+      description: Get the infos of a teaching unit
+      parameters:
+        - in: path
+          name: unitId
+          description: the identifier of the teaching unit
+          required: true
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      responses:
+        200:
+          description: the infos about the queried teaching unit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeachingUnitDTO'
+        404:
+          description: No teaching unit with the provided identifier exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    put:
+      description: update the infos of a teaching unit
+      parameters:
+        - in: path
+          name: unitId
+          description: the identifier of the teaching unit
+          required: true
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      responses:
+        200:
+          description: Successfully updated the teaching unit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeachingUnitDTO'
+        400:
+          description: Validation error (teaching unit name or abbreviation is blank, some of the provided levels do not exist)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+        404:
+          description: No teaching unit with the provided identifier exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        409:
+          description: The abbreviation is already associated with an existing teaching unit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    delete:
+      description: Delete a teaching unit
+      parameters:
+        - in: path
+          name: unitId
+          description: the identifier of the teaching unit
+          required: true
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      responses:
+        204:
+          description: The teaching unit was successfully deleted, or it did not exist
+
+  /levels/{levelId}/teachingUnits:
+    get:
+      description: Fetch the teaching units taught to this level
+      parameters:
+        - in: path
+          name: levelId
+          description: the identifier of the level
+          schema:
+            type: number
+          required: true
+      security:
+        - auth: [ ]
+      responses:
+        200:
+          description: List of all the teaching units taught to the queried level
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeachingUnitDTO'
+        404:
+          description: The queried level does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /schedule:
+    get:
+      summary: Fetch the schedule, time slots
+      description: "If groupId does not belong to the level, will return a bad request status. If groupId is not provided,
+                    will return the schedule items of all the groups in the level. If levelId is not provided but 
+                    groupId is, will return that group's time table."
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: levelId
+          schema:
+            type: number
+        - in: query
+          name: groupId
+          schema:
+            type: number
+      security:
+        - auth: [ ]
+      responses:
+        200:
+          description: List of the schedule items in between startDate and endDate, scheduled for the groupId of levelId.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleItemDTO'
+        400:
+          description: Bad request, the requested group does not belong to the provided level
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+
+  /levels/{levelId}/schedule:
+    post:
+      description: Add a schedule item to the schedule of a level
+      security:
+        - auth: [ ]
+      parameters:
+        - in: path
+          name: levelId
+          required: true
+          schema:
+            type: number
+      requestBody:
+        description: Infos about the room, teacher, group, start, end, and teaching unit
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScheduleItemDTO'
+      responses:
+        201:
+          description: Item successfully added to the level's schedule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleItemDTO'
+        400:
+          description: Validation error (nonexistent group, teacher, teaching unit, room, overlap)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+        404:
+          description: The queried level does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+components:
+  securitySchemes:
+    auth:
+      type: http
+      description: Access token to authenticate and authorize requests
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    CreateScheduleItemDTO:
+      type: object
+      properties:
+        groupIds:
+          type: array
+          items:
+            type: number
+        teacherId:
+          type: number
+        teachingUnitId:
+          type: number
+        roomId:
+          type: number
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+      required: [ groupIds, teacherId, teachingUnitId, roomId, start, end ]
+
+    ScheduleItemDTO:
+      type: object
+      properties:
+        id:
+          type: number
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupDTO'
+        teacher:
+          $ref: '#/components/schemas/MinimalTeacherDTO'
+        teachingUnit:
+          $ref: '#/components/schemas/MinimalTeachingUnitDTO'
+        room:
+          $ref: '#/components/schemas/RoomDTO'
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+      required: [ id, groups, teacher, teachingUnit, room, start, end ]
+
+    UpdateTeachingUnitDTO:
+      type: object
+      properties:
+        abbreviation:
+          type: string
+        name:
+          type:
+            string
+        levelIds:
+          type: array
+          items:
+            type: number
+      required: [ abbreviation, name, levelIds ]
+
+    CreateTeachingUnitDTO:
+      type: object
+      properties:
+        abbreviation:
+          type: string
+        name:
+          type:
+            string
+        levelIds:
+          type: array
+          items:
+            type: number
+      required: [ abbreviation, name, levelIds ]
+
+    MinimalTeachingUnitDTO:
+      type: object
+      properties:
+        id:
+          type: number
+        abbreviation:
+          type: string
+        name:
+          type:
+            string
+      required: [ id, abbreviation, name ]
+    
+    TeachingUnitDTO:
+      type: object
+      properties:
+        id:
+          type: number
+        abbreviation:
+          type: string
+        name:
+          type:
+            string
+        levels:
+          type: array
+          items:
+            $ref: '#/components/schemas/LevelDTO'
+      required: [ id, abbreviation, name, levels ]
+
+    UpdateRoomDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        size:
+          type: number
+      required: [ name, size ]
+
+    CreateRoomDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        size:
+          type: number
+      required: [ name, size ]
+
+    RoomDTO:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        size:
+          type: number
+      required: [ id, name, size ]
+
+    UpdateTeacherDTO:
+      type: object
+      properties:
+        lastName:
+          type: string
+        firstName:
+          type: string
+        abbreviation:
+          type: string
+      required: [ abbreviation, firstName, lastName ]
+
+    CreateTeacherDTO:
+      type: object
+      properties:
+        lastName:
+          type: string
+        firstName:
+          type: string
+        abbreviation:
+          type: string
+      required: [ abbreviation, firstName, lastName ]
+
+    MinimalTeacherDTO:
+      type: object
+      properties:
+        id:
+          type: number
+        abbreviation:
+          type: string
+      required: [ id, abbreviation ]
+
+    TeacherDTO:
+      type: object
+      properties:
+        id:
+          type: number
+        lastName:
+          type: string
+        firstName:
+          type: string
+        abbreviation:
+          type: string
+      required: [ id, abbreviation, firstName, lastName ]
+
+    CreateGroupDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        size:
+          type: number
+      required: [ name, size ]
+
+    UpdateGroupDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        size:
+          type: number
+      required: [ name, size ]
+
+    LevelDetailsDTO:
+      type: object
+      properties:
+        level:
+          $ref: "#/components/schemas/LevelDTO"
+        groups:
+          type: array
+          items:
+            $ref: "#/components/schemas/GroupDTO"
+      required: [ level ]
+
+    GroupDTO:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        size:
+          type: number
+        level:
+          $ref: '#/components/schemas/LevelDTO'
+      required: [ id, name, size, level ]
+
+    CreateLevelDTO:
+      type: object
+      properties:
+        name:
+          type: string
+      required: [ name ]
+
+    UpdateLevelDTO:
+      type: object
+      properties:
+        name:
+          type: string
+      required: [ name ]
+
+    LevelDTO:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+      required: [ id, name ]
+
+    ErrorDetails:
+      description: Error details
+      type: object
+      properties:
+        timestamp:
+          type: string
+        message:
+          type: string
+        errorCode:
+          type: string
+      required: [ timestamp, errorCode ]
+
+    ValidationErrorDetails:
+      description: Details of validation errors
+      type: object
+      properties:
+        timestamp:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              error:
+                type: string
+        errorCode:
+          type: string
+      required: [ timestamp, errors, errorCode ]
