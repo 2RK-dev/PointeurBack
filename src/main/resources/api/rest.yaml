@@ -1022,9 +1022,11 @@ components:
           type: string
         message:
           type: string
+        details:
+          type: string
         errorCode:
           type: string
-      required: [ timestamp, errorCode ]
+      required: [ timestamp, message, errorCode ]
 
     ValidationErrorDetails:
       description: Details of validation errors
