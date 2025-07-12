@@ -458,6 +458,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
 
+  /rooms/available:
+    get:
+      summary: Get available rooms in a time range
+      description: Returns rooms that are unoccupied between the specified start and end times.
+      parameters:
+        - name: start
+          in: query
+          required: true
+          description: Start datetime (ISO 8601 format)
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          required: true
+          description: End datetime (ISO 8601 format)
+          schema:
+            type: string
+            format: date-time
+        - name: size
+          in: query
+          required: false
+          description: Minimum room capacity required
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: List of available rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoomDTO'
+        400:
+          description: Invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorDetails'
+
   /rooms/{roomId}:
     get:
       description: Fetch the infos about a teaching room
