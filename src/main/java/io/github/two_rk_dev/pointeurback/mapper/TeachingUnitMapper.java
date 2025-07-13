@@ -7,15 +7,19 @@ import io.github.two_rk_dev.pointeurback.model.Level;
 import io.github.two_rk_dev.pointeurback.model.TeachingUnit;
 import org.mapstruct.*;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", uses = {LevelMapper.class})
 public interface TeachingUnitMapper {
 
     // Conversion de base TeachingUnit -> TeachingUnitDTO
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "abbreviation", source = "abbreviation")
-    @Mapping(target = "name", source = "name")
+//    @Mapping(target = "id", source = "id")
+//    @Mapping(target = "abbreviation", source = "abbreviation")
+//    @Mapping(target = "name", source = "name")
     @Mapping(target = "level", source = "level")
     TeachingUnitDTO toDto(TeachingUnit entity);
+
+    List<TeachingUnitDTO> toDto(List<TeachingUnit> entity);
 
     // Conversion CreateTeachingUnitDTO -> TeachingUnit
     @Mapping(target = "id", ignore = true)

@@ -5,34 +5,42 @@ import io.github.two_rk_dev.pointeurback.dto.LevelDTO;
 import io.github.two_rk_dev.pointeurback.dto.LevelDetailsDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateLevelDTO;
 import io.github.two_rk_dev.pointeurback.model.Level;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {GroupMapper.class})
 public interface LevelMapper {
 
-    // Conversion de base Level -> LevelDTO
+    // Basic conversions
     LevelDTO toDto(Level entity);
 
-    // Conversion de base LevelDTO -> Level
-    Level toEntity(LevelDTO dto);
+    @MappingQualifier.LevelToDtoWithoutGroups
+    default LevelDTO toDtoWithoutGroups(Level entity) {
+        if (entity == null) return null;
+        return new LevelDTO(entity.getId(), entity.getName(), entity.getAbbreviation());
+    }
 
-    // Conversion détaillée avec les groupes
+    // Detailed conversion with groups
+    @Mapping(target = "level", source = ".")
     @Mapping(target = "groups", source = "groups")
     LevelDetailsDTO toDetailsDto(Level entity);
 
-    // Pour CreateLevelDTO
+    // Create operations
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "groups", ignore = true)
     Level fromCreateDto(CreateLevelDTO dto);
 
-    // Pour UpdateLevelDTO
+    // Update operations
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "groups", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromUpdateDto(UpdateLevelDTO dto, @MappingTarget Level entity);
 
-    // Méthode utilitaire pour la conversion
+    // Collection mappings
+    List<LevelDTO> toDtoList(List<Level> entities);
+
+    // Utility methods
     default void updateLevel(UpdateLevelDTO updateDto, Level level) {
         if (updateDto == null) {
             return;

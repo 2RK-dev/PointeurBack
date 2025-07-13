@@ -5,21 +5,24 @@ import io.github.two_rk_dev.pointeurback.dto.GroupDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateGroupDTO;
 import io.github.two_rk_dev.pointeurback.model.Group;
 import io.github.two_rk_dev.pointeurback.model.Level;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {LevelMapper.class})
 public interface GroupMapper {
 
     // Conversion de base Group -> GroupDTO
-    @Mapping(target = "level", source = "level")
+    @Named("toDto")
+    @Mapping(target = "level", qualifiedBy = MappingQualifier.LevelToDtoWithoutGroups.class)
     GroupDTO toDto(Group entity);
 
-    // Conversion de base GroupDTO -> Group
-    @Mapping(target = "schedules", ignore = true)
-    @Mapping(target = "level.groups", ignore = true) // Évite la référence circulaire
-    Group toEntity(GroupDTO dto);
+    // For avoiding circular references when used by LevelMapper
+    // Méthode alternative sans le niveau
+    @Named("toDtoWithoutLevel")
+    @MappingQualifier.GroupToDtoWithoutLevel
+    @Mapping(target = "level", ignore = true)
+    GroupDTO toDtoWithoutLevel(Group entity);
 
     // Pour CreateGroupDTO
     @Mapping(target = "id", ignore = true)
@@ -47,5 +50,9 @@ public interface GroupMapper {
         }
         updateFromUpdateDto(updateDto, group);
     }
+
+    // Collection mappings
+    @IterableMapping(qualifiedByName = "toDto")
+    List<GroupDTO> toDtoList(List<Group> entities);
 
 }

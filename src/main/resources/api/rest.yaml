@@ -461,7 +461,7 @@ paths:
   /rooms/available:
     get:
       summary: Get available rooms in a time range
-      description: Returns rooms that are unoccupied between the specified start and end times.
+      description: Returns rooms that are unoccupied between the specified start and endTime times.
       parameters:
         - name: start
           in: query
@@ -470,7 +470,7 @@ paths:
           schema:
             type: string
             format: date-time
-        - name: end
+        - name: endTime
           in: query
           required: true
           description: End datetime (ISO 8601 format)
@@ -828,10 +828,10 @@ components:
         start:
           type: string
           format: date-time
-        end:
+        endTime:
           type: string
           format: date-time
-      required: [ groupIds, teacherId, teachingUnitId, roomId, start, end ]
+      required: [ groupIds, teacherId, teachingUnitId, roomId, start, endTime ]
 
     ScheduleItemDTO:
       type: object
@@ -851,10 +851,10 @@ components:
         start:
           type: string
           format: date-time
-        end:
+        endTime:
           type: string
           format: date-time
-      required: [ id, groups, teacher, teachingUnit, room, start, end ]
+      required: [ id, groups, teacher, teachingUnit, room, start, endTime ]
 
     UpdateTeachingUnitDTO:
       type: object

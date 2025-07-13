@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface LevelRepository extends JpaRepository<Level, Long> {
     // Recherche par nom de niveau
     Optional<Level> findByName(String name);
+
 }

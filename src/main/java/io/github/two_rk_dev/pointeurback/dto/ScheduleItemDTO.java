@@ -9,6 +9,6 @@ public record ScheduleItemDTO(
         TeachingUnitDTO teachingUnit,
         RoomDTO room,
         String start,
-        String end
+        String endTime
 ) {
 }

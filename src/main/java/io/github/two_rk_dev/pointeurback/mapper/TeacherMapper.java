@@ -6,14 +6,18 @@ import io.github.two_rk_dev.pointeurback.dto.UpdateTeacherDTO;
 import io.github.two_rk_dev.pointeurback.model.Teacher;
 import org.mapstruct.*;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface TeacherMapper {
 
     // Conversion de base Teacher -> TeacherDTO
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "abbreviation", source = "abbreviation")
+//    @Mapping(target = "id", source = "id")
+//    @Mapping(target = "name", source = "name")
+//    @Mapping(target = "abbreviation", source = "abbreviation")
     TeacherDTO toDto(Teacher entity);
+
+    List<TeacherDTO> toDTOList(List<Teacher> entities);
 
     // Conversion CreateTeacherDTO -> Teacher
     @Mapping(target = "id", ignore = true)

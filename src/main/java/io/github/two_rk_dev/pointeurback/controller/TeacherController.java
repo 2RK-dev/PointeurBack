@@ -3,7 +3,9 @@ package io.github.two_rk_dev.pointeurback.controller;
 import io.github.two_rk_dev.pointeurback.dto.CreateTeacherDTO;
 import io.github.two_rk_dev.pointeurback.dto.TeacherDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeacherDTO;
+import io.github.two_rk_dev.pointeurback.service.implementation.TeacherServiceImpl;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,29 +14,40 @@ import java.util.List;
 @RestController
 @RequestMapping("/teachers")
 public class TeacherController {
+
+    @Autowired
+    public TeacherServiceImpl teacherService;
+
     @GetMapping
     public ResponseEntity<List<TeacherDTO>> getAllTeachers() {
-        throw new UnsupportedOperationException("Not implemented");
+        List<TeacherDTO> teachers = teacherService.getAll();
+        return ResponseEntity.ok(teachers);
     }
 
     @PostMapping
     public ResponseEntity<TeacherDTO> createTeacher(@Valid @RequestBody CreateTeacherDTO dto) {
-        throw new UnsupportedOperationException("Not implemented");
+        TeacherDTO createdTeacher = teacherService.createTeacher(dto);
+        return ResponseEntity.ok(createdTeacher);
     }
 
     @GetMapping("/{teacherId}")
     public ResponseEntity<TeacherDTO> getTeacher(@PathVariable Long teacherId) {
-        throw new UnsupportedOperationException("Not implemented");
+        TeacherDTO teacher = teacherService.getTeacher(teacherId);
+        return ResponseEntity.ok(teacher);
     }
 
     @PutMapping("/{teacherId}")
-    public ResponseEntity<TeacherDTO> updateTeacher(@PathVariable Long teacherId, @Valid @RequestBody UpdateTeacherDTO dto) {
-        throw new UnsupportedOperationException("Not implemented");
+    public ResponseEntity<TeacherDTO> updateTeacher(
+            @PathVariable Long teacherId,
+            @Valid @RequestBody UpdateTeacherDTO dto) {
+        TeacherDTO updatedTeacher = teacherService.updateTeacher(teacherId, dto);
+        return ResponseEntity.ok(updatedTeacher);
     }
 
     @DeleteMapping("/{teacherId}")
     public ResponseEntity<Void> deleteTeacher(@PathVariable Long teacherId) {
-        throw new UnsupportedOperationException("Not implemented");
+        teacherService.deleteTeacher(teacherId);
+        return ResponseEntity.noContent().build();
     }
 }
 

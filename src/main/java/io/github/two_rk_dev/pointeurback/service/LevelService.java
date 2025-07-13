@@ -12,6 +12,7 @@ public interface LevelService {
     Void deleteLevel (Long id);
     List<GroupDTO> getGroup(Long id);
     List<TeachingUnitDTO> getTeachingUnit(Long id);
-    ScheduleItemDTO getSchedule(Long id);
-    GroupDTO createGroup(CreateGroupDTO dto);
+    List<ScheduleItemDTO> getSchedule(Long id);
+    GroupDTO createGroup(Long id,CreateGroupDTO dto);
+
 }

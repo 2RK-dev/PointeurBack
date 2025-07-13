@@ -8,15 +8,14 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface RoomMapper {
 
-    // Conversion de base Room -> RoomDTO
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "abbreviation", source = "abbreviation")
-    @Mapping(target = "size", source = "size")
     RoomDTO toDto(Room entity);
+
+    List<RoomDTO> toDtoList(List<Room> entities);
 
     // Conversion CreateRoomDTO -> Room
     @Mapping(target = "id", ignore = true)

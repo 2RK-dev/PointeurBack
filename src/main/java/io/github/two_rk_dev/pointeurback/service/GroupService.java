@@ -6,5 +6,5 @@ import io.github.two_rk_dev.pointeurback.dto.UpdateGroupDTO;
 public interface GroupService {
     GroupDTO getGroupByLevel(Long levelId, Long groupId);
     GroupDTO updateGroup(Long levelId, Long groupId, UpdateGroupDTO dto);
-    Void deleteGroup(Long levelId, Long groupId);
+    void deleteGroup(Long levelId, Long groupId);
 }

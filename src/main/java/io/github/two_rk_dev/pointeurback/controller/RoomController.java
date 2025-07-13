@@ -3,7 +3,9 @@ package io.github.two_rk_dev.pointeurback.controller;
 import io.github.two_rk_dev.pointeurback.dto.CreateRoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.RoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateRoomDTO;
+import io.github.two_rk_dev.pointeurback.service.implementation.RoomServiceImpl;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,36 +15,49 @@ import java.util.List;
 @RestController
 @RequestMapping("/rooms")
 public class RoomController {
+
+    @Autowired
+    private RoomServiceImpl roomService;
+
     @GetMapping
     public ResponseEntity<List<RoomDTO>> getAllRooms() {
-        throw new UnsupportedOperationException("Not implemented");
+        List<RoomDTO> rooms = roomService.getAll();
+        return ResponseEntity.ok(rooms);
     }
 
     @PostMapping
     public ResponseEntity<RoomDTO> createRoom(@Valid @RequestBody CreateRoomDTO dto) {
-        throw new UnsupportedOperationException("Not implemented");
+        RoomDTO createdRoom = roomService.createRoom(dto);
+        return ResponseEntity.ok(createdRoom);
     }
 
     @GetMapping("/{roomId}")
     public ResponseEntity<RoomDTO> getRoom(@PathVariable Long roomId) {
-        throw new UnsupportedOperationException("Not implemented");
+        RoomDTO room = roomService.getRoom(roomId);
+        return ResponseEntity.ok(room);
     }
 
     @PutMapping("/{roomId}")
-    public ResponseEntity<RoomDTO> updateRoom(@PathVariable Long roomId, @Valid @RequestBody UpdateRoomDTO dto) {
-        throw new UnsupportedOperationException("Not implemented");
+    public ResponseEntity<RoomDTO> updateRoom(@PathVariable Long roomId,
+                                              @Valid @RequestBody UpdateRoomDTO dto) {
+        RoomDTO updatedRoom = roomService.updateRoom(roomId, dto);
+        return ResponseEntity.ok(updatedRoom);
     }
 
     @DeleteMapping("/{roomId}")
     public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId) {
-        throw new UnsupportedOperationException("Not implemented");
+        roomService.deleteRoom(roomId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/available")
-    public ResponseEntity<List<RoomDTO>> getAvailableRooms(@RequestParam LocalDateTime start,
-                                                           @RequestParam LocalDateTime end,
-                                                           @RequestParam(required = false) int size) {
-        throw new UnsupportedOperationException("Not implemented");
+    public ResponseEntity<List<RoomDTO>> getAvailableRooms(
+            @RequestParam LocalDateTime start,
+            @RequestParam LocalDateTime endTime,
+            @RequestParam(required = false, defaultValue = "1") int size) {
+
+        List<RoomDTO> availableRooms = roomService.getAvailableRooms(start, endTime, size);
+        return ResponseEntity.ok(availableRooms);
     }
 }
 
