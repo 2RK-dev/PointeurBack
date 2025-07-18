@@ -9,7 +9,7 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {GroupMapper.class})
+@Mapper(componentModel = "spring")
 public interface LevelMapper {
 
     // Basic conversions
