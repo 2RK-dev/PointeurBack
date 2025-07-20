@@ -11,26 +11,19 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface TeacherMapper {
 
-    // Conversion de base Teacher -> TeacherDTO
-//    @Mapping(target = "id", source = "id")
-//    @Mapping(target = "name", source = "name")
-//    @Mapping(target = "abbreviation", source = "abbreviation")
     TeacherDTO toDto(Teacher entity);
 
     List<TeacherDTO> toDTOList(List<Teacher> entities);
 
-    // Conversion CreateTeacherDTO -> Teacher
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "schedules", ignore = true)
     Teacher fromCreateDto(CreateTeacherDTO dto);
 
-    // Mise à jour depuis UpdateTeacherDTO
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "schedules", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromDto(UpdateTeacherDTO dto, @MappingTarget Teacher entity);
 
-    // Méthodes utilitaires
     default Teacher createTeacherFromDto(CreateTeacherDTO dto) {
         if (dto == null) return null;
         return fromCreateDto(dto);

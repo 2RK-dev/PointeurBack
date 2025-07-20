@@ -9,9 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface TeacherRepository extends JpaRepository<Teacher, Long> {
-    // Recherche par abréviation
+
     Optional<Teacher> findByAbbreviation(String abbreviation);
 
-    // Recherche par nom
     List<Teacher> findByNameContainingIgnoreCase(String name);
 }

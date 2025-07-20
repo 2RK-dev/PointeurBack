@@ -5,18 +5,22 @@ import io.github.two_rk_dev.pointeurback.dto.TeacherDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeacherDTO;
 import io.github.two_rk_dev.pointeurback.service.implementation.TeacherServiceImpl;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
 @RequestMapping("/teachers")
 public class TeacherController {
 
-    @Autowired
-    public TeacherServiceImpl teacherService;
+    public final TeacherServiceImpl teacherService;
+
+    public TeacherController(TeacherServiceImpl teacherService) {
+        this.teacherService = teacherService;
+    }
 
     @GetMapping
     public ResponseEntity<List<TeacherDTO>> getAllTeachers() {
@@ -27,7 +31,11 @@ public class TeacherController {
     @PostMapping
     public ResponseEntity<TeacherDTO> createTeacher(@Valid @RequestBody CreateTeacherDTO dto) {
         TeacherDTO createdTeacher = teacherService.createTeacher(dto);
-        return ResponseEntity.ok(createdTeacher);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{teacherId}")
+                .buildAndExpand(createdTeacher.id())
+                .toUri();
+        return ResponseEntity.created(location).body(createdTeacher);
     }
 
     @GetMapping("/{teacherId}")

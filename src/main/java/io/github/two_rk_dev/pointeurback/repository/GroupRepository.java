@@ -8,14 +8,8 @@ import java.util.List;
 
 @Repository
 public interface GroupRepository extends JpaRepository<Group, Long> {
-    // Recherche par niveau
     List<Group> findByLevelId(Long levelId);
-
-    // Recherche par nom
     Group findByName(String name);
-
-
-    // Recherche par niveau et id
     Group findByLevelIdAndId(Long levelId, Long groupId);
 
 }

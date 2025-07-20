@@ -3,25 +3,31 @@ package io.github.two_rk_dev.pointeurback.controller;
 import io.github.two_rk_dev.pointeurback.dto.*;
 import io.github.two_rk_dev.pointeurback.service.implementation.LevelServiceImpl;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
 @RequestMapping("/levels")
 public class LevelController {
 
-    @Autowired
-    private LevelServiceImpl levelService;
+    private final LevelServiceImpl levelService;
 
-
+    public LevelController(LevelServiceImpl levelService) {
+        this.levelService = levelService;
+    }
 
     @PostMapping
     public ResponseEntity<LevelDTO> createLevel(@Valid @RequestBody CreateLevelDTO dto) {
         LevelDTO createdLevel = levelService.createLevel(dto);
-        return ResponseEntity.ok(createdLevel);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{levelId}")
+                .buildAndExpand(createdLevel.id())
+                .toUri();
+        return ResponseEntity.created(location).body(createdLevel);
     }
 
     @GetMapping
@@ -50,25 +56,35 @@ public class LevelController {
 
     @GetMapping("/{levelId}/groups")
     public ResponseEntity<List<GroupDTO>> getGroups(@PathVariable Long levelId) {
-        List<GroupDTO> groups = levelService.getGroup(levelId);
+        List<GroupDTO> groups = levelService.getGroups(levelId);
         return ResponseEntity.ok(groups);
     }
 
     @PostMapping("/{levelId}/groups")
     public ResponseEntity<GroupDTO> createGroup(@PathVariable Long levelId, @Valid @RequestBody CreateGroupDTO dto) {
         GroupDTO createdGroup = levelService.createGroup(levelId, dto);
-        return ResponseEntity.ok(createdGroup);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{groupId}")
+                .buildAndExpand(createdGroup.id())
+                .toUri();
+        return ResponseEntity.created(location).body(createdGroup);
     }
 
     @GetMapping("/{levelId}/teachingUnits")
     public ResponseEntity<List<TeachingUnitDTO>> getTeachingUnits(@PathVariable Long levelId) {
-        List<TeachingUnitDTO> teachingUnits = levelService.getTeachingUnit(levelId);
+        List<TeachingUnitDTO> teachingUnits = levelService.getTeachingUnits(levelId);
         return ResponseEntity.ok(teachingUnits);
     }
 
     @PostMapping("/{levelId}/schedule")
-    public ResponseEntity<ScheduleItemDTO> addScheduleItem(@PathVariable Long levelId, @Valid @RequestBody CreateScheduleItemDTO dto) {
-        ScheduleItemDTO createdSchedule = levelService.addScheduleItem(levelId,dto);
-        return ResponseEntity.ok(createdSchedule);
+    public ResponseEntity<ScheduleItemDTO> addScheduleItem(
+            @PathVariable Long levelId,
+            @Valid @RequestBody CreateScheduleItemDTO dto) {
+        ScheduleItemDTO createdSchedule = levelService.addScheduleItem(levelId, dto);
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/levels/{levelId}/schedule/{schedule_item_id}")
+                .buildAndExpand(levelId, createdSchedule.id())
+                .toUri();
+        return ResponseEntity.created(location).body(createdSchedule);
     }
 }

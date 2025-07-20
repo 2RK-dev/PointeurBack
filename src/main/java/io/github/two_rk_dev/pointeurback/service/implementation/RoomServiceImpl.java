@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -61,16 +62,15 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Void deleteRoom(Long id) {
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RoomNotFoundException("Room not found with id: " + id));
+    public void deleteRoom(Long id) {
+        Optional<Room> room = roomRepository.findById(id);
 
-        if (!room.getSchedules().isEmpty()) {
+
+        if (!room.get().getSchedules().isEmpty()) {
             throw new IllegalStateException("Cannot delete room with associated schedules");
         }
 
-        roomRepository.delete(room);
-        return null;
+        roomRepository.delete(room.get());
     }
 
     @Override
@@ -79,7 +79,7 @@ public class RoomServiceImpl implements RoomService {
             throw new IllegalArgumentException("Start and end time must be specified");
         }
         if (endTime.isBefore(start)) {
-            throw new IllegalArgumentException("End time cannot be before start time");
+            throw new IllegalArgumentException("End time cannot be before startTime time");
         }
         if (size <= 0) {
             throw new IllegalArgumentException("Room size must be positive");

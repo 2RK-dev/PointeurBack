@@ -1,6 +1,7 @@
 package io.github.two_rk_dev.pointeurback.service.implementation;
 
 import io.github.two_rk_dev.pointeurback.dto.*;
+import io.github.two_rk_dev.pointeurback.exception.GroupNotFoundException;
 import io.github.two_rk_dev.pointeurback.exception.LevelNotFoundException;
 import io.github.two_rk_dev.pointeurback.mapper.GroupMapper;
 import io.github.two_rk_dev.pointeurback.mapper.LevelMapper;
@@ -11,7 +12,6 @@ import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
 import io.github.two_rk_dev.pointeurback.model.TeachingUnit;
 import io.github.two_rk_dev.pointeurback.repository.*;
 import io.github.two_rk_dev.pointeurback.service.LevelService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,34 +20,27 @@ import java.util.stream.Collectors;
 @Service
 public class LevelServiceImpl implements LevelService {
 
-    @Autowired
-    private LevelRepository levelRepository;
+    private final LevelRepository levelRepository;
+    private final GroupRepository groupRepository;
+    private final RoomRepository roomRepository;
+    private final TeacherRepository teacherRepository;
+    private final TeachingUnitRepository teachingUnitRepository;
+    private final ScheduleItemRepository scheduleItemRepository;
+    private final LevelMapper levelMapper;
+    private final GroupMapper groupMapper;
+    private final ScheduleItemMapper scheduleItemMapper;
 
-    @Autowired
-    private GroupRepository groupRepository;
-
-    @Autowired
-    private RoomRepository roomRepository;
-
-    @Autowired
-    private TeacherRepository teacherRepository;
-
-
-    @Autowired
-    private TeachingUnitRepository teachingUnitRepository;
-
-    @Autowired
-    private ScheduleItemRepository scheduleItemRepository;
-
-    @Autowired
-    private LevelMapper levelMapper;
-
-    @Autowired
-    private GroupMapper groupMapper;
-
-    @Autowired
-    private ScheduleItemMapper scheduleItemMapper;
-
+    public LevelServiceImpl(LevelRepository levelRepository, GroupRepository groupRepository, RoomRepository roomRepository, TeacherRepository teacherRepository, TeachingUnitRepository teachingUnitRepository, ScheduleItemRepository scheduleItemRepository, LevelMapper levelMapper, GroupMapper groupMapper, ScheduleItemMapper scheduleItemMapper) {
+        this.levelRepository = levelRepository;
+        this.groupRepository = groupRepository;
+        this.roomRepository = roomRepository;
+        this.teacherRepository = teacherRepository;
+        this.teachingUnitRepository = teachingUnitRepository;
+        this.scheduleItemRepository = scheduleItemRepository;
+        this.levelMapper = levelMapper;
+        this.groupMapper = groupMapper;
+        this.scheduleItemMapper = scheduleItemMapper;
+    }
     @Override
     public LevelDTO createLevel(CreateLevelDTO dto) {
         // Validation du DTO
@@ -118,7 +111,7 @@ public class LevelServiceImpl implements LevelService {
     }
 
     @Override
-    public Void deleteLevel(Long id) {
+    public void deleteLevel(Long id) {
         // 1. Vérification existence
         Level existing = levelRepository.findById(id)
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + id));
@@ -130,10 +123,10 @@ public class LevelServiceImpl implements LevelService {
 
         // 3. Suppression
         levelRepository.delete(existing);
-        return null;
     }
 
-    public List<GroupDTO> getGroup(Long levelId){
+    @Override
+    public List<GroupDTO> getGroups(Long levelId){
         // 1. Vérification existence niveau
         if (!levelRepository.existsById(levelId)) {
             throw new LevelNotFoundException("Level not found with id: " + levelId);
@@ -153,7 +146,7 @@ public class LevelServiceImpl implements LevelService {
     };
 
     @Override
-    public List<TeachingUnitDTO> getTeachingUnit(Long levelId){
+    public List<TeachingUnitDTO> getTeachingUnits(Long levelId){
         // 1. Vérification existence niveau
         if (!levelRepository.existsById(levelId)) {
             throw new LevelNotFoundException("Level not found with id: " + levelId);
@@ -189,38 +182,21 @@ public class LevelServiceImpl implements LevelService {
 
 
     };
+
     @Override
     public GroupDTO createGroup(Long levelId,CreateGroupDTO dto) {
-        // 1. Validation du DTO
         if (dto == null) {
             throw new IllegalArgumentException("CreateGroupDTO cannot be null");
         }
-
-        // 2. Validation des champs obligatoires
-        if (dto.name() == null || dto.name().isBlank()) {
-            throw new IllegalStateException("Group name cannot be empty");
-        }
-        if (dto.size() <= 0) {
-            throw new IllegalStateException("Group size must be positive");
-        }
-
-        // 3. Vérification de l'existence du niveau associé
         Level level = levelRepository.findById(levelId)
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + levelId));
-
-        // 4. Conversion via le mapper
         Group newGroup = groupMapper.fromCreateDto(dto, level);
-
-        // 5. Validation métier supplémentaire
-        if (groupRepository.findByName(dto.name()) == null) {
-            throw new RuntimeException("Group name already exists for this level");
+        if (groupRepository.findByName(dto.name()) != null) {
+            Group savedGroup = groupRepository.save(newGroup);
+            return groupMapper.toDto(savedGroup);
+        } else {
+            throw new GroupNotFoundException("Group name already exists for this level");
         }
-
-        // 6. Persistance
-        Group savedGroup = groupRepository.save(newGroup);
-
-        // 7. Conversion en DTO pour la réponse
-        return groupMapper.toDto(savedGroup);
     }
 
     public ScheduleItemDTO addScheduleItem(Long levelId, CreateScheduleItemDTO dto){
@@ -244,7 +220,7 @@ public class LevelServiceImpl implements LevelService {
 
         // 4 .Vérification des conflits d'horaire
         List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
-                newItem.getStart(),
+                newItem.getStartTime(),
                 newItem.getEndTime(),
                 newItem.getRoom().getId(),
                 newItem.getTeacher().getId(),

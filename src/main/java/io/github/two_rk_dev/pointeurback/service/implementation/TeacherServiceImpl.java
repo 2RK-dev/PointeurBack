@@ -8,7 +8,6 @@ import io.github.two_rk_dev.pointeurback.mapper.TeacherMapper;
 import io.github.two_rk_dev.pointeurback.model.Teacher;
 import io.github.two_rk_dev.pointeurback.repository.TeacherRepository;
 import io.github.two_rk_dev.pointeurback.service.TeacherService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,11 +15,12 @@ import java.util.List;
 @Service
 public class TeacherServiceImpl implements TeacherService {
 
-    @Autowired
-    private TeacherRepository teacherRepository;
-
-    @Autowired
-    private TeacherMapper teacherMapper;
+    private final TeacherRepository teacherRepository;
+    private final TeacherMapper teacherMapper;
+    public TeacherServiceImpl(TeacherRepository teacherRepository, TeacherMapper teacherMapper) {
+        this.teacherRepository = teacherRepository;
+        this.teacherMapper = teacherMapper;
+    }
 
     @Override
     public List<TeacherDTO> getAll() {
@@ -61,7 +61,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public Void deleteTeacher(Long id) {
+    public void deleteTeacher(Long id) {
         Teacher teacher = teacherRepository.findById(id)
                 .orElseThrow(() -> new TeacherNotFoundException("Teacher not found with id: " + id));
 
@@ -70,6 +70,5 @@ public class TeacherServiceImpl implements TeacherService {
         }
 
         teacherRepository.delete(teacher);
-        return null;
     }
 }

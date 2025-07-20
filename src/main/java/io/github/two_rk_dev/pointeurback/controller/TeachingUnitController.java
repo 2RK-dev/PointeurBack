@@ -5,18 +5,22 @@ import io.github.two_rk_dev.pointeurback.dto.TeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.service.implementation.TeachingUnitServiceImpl;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
 @RequestMapping("/teachingUnits")
 public class TeachingUnitController {
 
-    @Autowired
-    private TeachingUnitServiceImpl teachingUnitService;
+    private final TeachingUnitServiceImpl teachingUnitService;
+
+    public TeachingUnitController(TeachingUnitServiceImpl teachingUnitService) {
+        this.teachingUnitService = teachingUnitService;
+    }
 
     @GetMapping
     public ResponseEntity<List<TeachingUnitDTO>> getAllTeachingUnits() {
@@ -27,7 +31,11 @@ public class TeachingUnitController {
     @PostMapping
     public ResponseEntity<TeachingUnitDTO> createTeachingUnit(@Valid @RequestBody CreateTeachingUnitDTO dto) {
         TeachingUnitDTO createdUnit = teachingUnitService.createTeachingUnit(dto);
-        return ResponseEntity.ok(createdUnit);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{unitId}")
+                .buildAndExpand(createdUnit.id())
+                .toUri();
+        return ResponseEntity.created(location).body(createdUnit);
     }
 
     @GetMapping("/{unitId}")

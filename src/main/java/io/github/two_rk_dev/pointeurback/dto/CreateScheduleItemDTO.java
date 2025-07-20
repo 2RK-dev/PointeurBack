@@ -7,7 +7,7 @@ public record CreateScheduleItemDTO(
         Long teacherId,
         Long teachingUnitId,
         Long roomId,
-        String start,
+        String startTime,
         String endTime
 ) {
 }

@@ -4,7 +4,6 @@ import io.github.two_rk_dev.pointeurback.dto.ScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.service.implementation.ScheduleServiceImpl;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +13,12 @@ import java.util.List;
 @RequestMapping("/schedule")
 public class ScheduleController {
 
-    @Autowired
-    private ScheduleServiceImpl scheduleService;
+    private final ScheduleServiceImpl scheduleService;
+
+    public ScheduleController(ScheduleServiceImpl scheduleService) {
+        this.scheduleService = scheduleService;
+    }
+
     @GetMapping
     public ResponseEntity<List<ScheduleItemDTO>> getSchedule(
             @RequestParam String startDate,

@@ -12,7 +12,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface LevelMapper {
 
-    // Basic conversions
     LevelDTO toDto(Level entity);
 
     @MappingQualifier.LevelToDtoWithoutGroups
@@ -37,7 +36,6 @@ public interface LevelMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromUpdateDto(UpdateLevelDTO dto, @MappingTarget Level entity);
 
-    // Collection mappings
     List<LevelDTO> toDtoList(List<Level> entities);
 
     // Utility methods

@@ -17,17 +17,14 @@ public interface RoomMapper {
 
     List<RoomDTO> toDtoList(List<Room> entities);
 
-    // Conversion CreateRoomDTO -> Room
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "schedules", ignore = true)
     Room fromCreateDto(CreateRoomDTO dto);
 
-    // Mise à jour depuis UpdateRoomDTO
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "schedules", ignore = true)
     void updateFromDto(UpdateRoomDTO dto, @MappingTarget Room entity);
 
-    // Méthode utilitaire pour la création
     default Room createRoomFromDto(CreateRoomDTO dto) {
         if (dto == null) {
             return null;
@@ -35,7 +32,6 @@ public interface RoomMapper {
         return fromCreateDto(dto);
     }
 
-    // Méthode utilitaire pour la mise à jour
     default void updateRoom(UpdateRoomDTO updateDto, Room room) {
         if (updateDto != null) {
             updateFromDto(updateDto, room);

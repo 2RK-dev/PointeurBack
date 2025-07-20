@@ -23,42 +23,38 @@ public interface ScheduleItemMapper {
 
     DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    // Conversion de base ScheduleItem -> ScheduleItemDTO
     @Mapping(target = "id", source = "id")
     @Mapping(target = "groups", source = "groups") // Conversion automatique via GroupMapper
     @Mapping(target = "teacher", source = "teacher")
     @Mapping(target = "teachingUnit", source = "teachingUnit")
     @Mapping(target = "room", source = "room")
-    @Mapping(target = "start", expression = "java(entity.getStart().format(DATE_TIME_FORMATTER))")
+    @Mapping(target = "startTime", expression = "java(entity.getStartTime().format(DATE_TIME_FORMATTER))")
     @Mapping(target = "endTime", expression = "java(entity.getEndTime().format(DATE_TIME_FORMATTER))")
     ScheduleItemDTO toDto(ScheduleItem entity);
 
     List<ScheduleItemDTO> toDtoList(List<ScheduleItem> entity);
 
-    // Conversion CreateScheduleItemDTO -> ScheduleItem
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "groups", ignore = true) // Géré manuellement
     @Mapping(target = "teacher", ignore = true) // Géré manuellement
     @Mapping(target = "teachingUnit", ignore = true) // Géré manuellement
     @Mapping(target = "room", ignore = true) // Géré manuellement
-    @Mapping(target = "start", expression = "java(parseDateTime(dto.start()))")
+    @Mapping(target = "startTime", expression = "java(parseDateTime(dto.startTime()))")
     @Mapping(target = "endTime", expression = "java(parseDateTime(dto.endTime()))")
     ScheduleItem fromCreateDto(CreateScheduleItemDTO dto);
 
-    // Mise à jour depuis UpdateScheduleItemDTO
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "groups", ignore = true) // Même approche que dans fromCreateDto
     @Mapping(target = "teacher", ignore = true) // Même approche que dans fromCreateDto
     @Mapping(target = "teachingUnit", ignore = true) // Même approche que dans fromCreateDto
     @Mapping(target = "room", ignore = true) // Même approche que dans fromCreateDto
-    @Mapping(target = "start",
-            expression = "java(dto.start() != null ? parseDateTime(dto.start()) : entity.getStart())")
+    @Mapping(target = "startTime",
+            expression = "java(dto.startTime() != null ? parseDateTime(dto.startTime()) : entity.getStartTime())")
     @Mapping(target = "endTime", // Garde la même nomenclature que toDto
             expression = "java(dto.endTime() != null ? parseDateTime(dto.endTime()) : entity.getEndTime())")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromDto(UpdateScheduleItemDTO dto, @MappingTarget ScheduleItem entity);
 
-    // Méthode pour parser les dates
     default LocalDateTime parseDateTime(String dateTimeStr) {
         if (dateTimeStr == null) return null;
         return LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER);
@@ -69,14 +65,7 @@ public interface ScheduleItemMapper {
                                        @NotNull Function<Long, Teacher> teacherProvider,
                                        @NotNull Function<Long, TeachingUnit> teachingUnitProvider,
                                        @NotNull Function<Long, Room> roomProvider) {
-        // Validation des paramètres
-        Objects.requireNonNull(dto, "CreateScheduleItemDTO cannot be null");
-        Objects.requireNonNull(groupProvider, "Group provider cannot be null");
-        Objects.requireNonNull(teacherProvider, "Teacher provider cannot be null");
-        Objects.requireNonNull(teachingUnitProvider, "TeachingUnit provider cannot be null");
-        Objects.requireNonNull(roomProvider, "Room provider cannot be null");
 
-        // Résolution des entités associées
         List<Group> groups = dto.groupIds().stream()
                 .map(groupId -> {
                     Group group = groupProvider.apply(groupId);
@@ -102,7 +91,6 @@ public interface ScheduleItemMapper {
             throw new RoomNotFoundException("Room not found with id: " + dto.roomId());
         }
 
-        // Création de l'entité ScheduleItem
         ScheduleItem item = fromCreateDto(dto);
         item.setGroups(groups); // Adaptation à votre modèle actuel (ManyToOne)
         item.setTeacher(teacher);
@@ -110,11 +98,11 @@ public interface ScheduleItemMapper {
         item.setRoom(room);
 
         // Validation des contraintes métier
-        if (item.getStart() == null || item.getEndTime() == null) {
+        if (item.getStartTime() == null || item.getEndTime() == null) {
             throw new IllegalStateException("Start and end times must be specified");
         }
-        if (item.getEndTime().isBefore(item.getStart())) {
-            throw new IllegalStateException("End time cannot be before start time");
+        if (item.getEndTime().isBefore(item.getStartTime())) {
+            throw new IllegalStateException("End time cannot be before startTime time");
         }
 
         return item;
@@ -128,19 +116,16 @@ public interface ScheduleItemMapper {
                                @NotNull Function<Long, TeachingUnit> teachingUnitProvider,
                                @NotNull Function<Long, Room> roomProvider) {
 
-        // 1. Validation des paramètres
-        Objects.requireNonNull(dto, "UpdateScheduleItemDTO cannot be null");
         Objects.requireNonNull(entity, "Entity cannot be null");
 
-        // 2. Mise à jour des champs simples
-        if (dto.start() != null) {
-            entity.setStart(parseDateTime(dto.start()));
+
+        if (dto.startTime() != null) {
+            entity.setStartTime(parseDateTime(dto.startTime()));
         }
         if (dto.endTime() != null) {
             entity.setEndTime(parseDateTime(dto.endTime())); // Cohérent avec votre entité
         }
 
-        // 3. Mise à jour des relations (uniquement si fournies dans le DTO)
         if (dto.groupIds() != null) {
             List<Group> groups = groupProvider.apply(dto.groupIds());
             if (groups.size() != dto.groupIds().size()) {
@@ -173,9 +158,8 @@ public interface ScheduleItemMapper {
             entity.setRoom(room);
         }
 
-        // 4. Validation métier après mise à jour
-        if (entity.getEndTime().isBefore(entity.getStart())) {
-            throw new IllegalStateException("End time cannot be before start time");
+        if (entity.getEndTime().isBefore(entity.getStartTime())) {
+            throw new IllegalStateException("End time cannot be before startTime time");
         }
     }
 }

@@ -7,27 +7,29 @@ import io.github.two_rk_dev.pointeurback.mapper.ScheduleItemMapper;
 import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
 import io.github.two_rk_dev.pointeurback.repository.*;
 import io.github.two_rk_dev.pointeurback.service.ScheduleService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
 
-    @Autowired
-    private ScheduleItemRepository scheduleItemRepository;
-    @Autowired
-    private GroupRepository groupRepository;
-    @Autowired
-    private TeacherRepository teacherRepository;
-    @Autowired
-    private TeachingUnitRepository teachingUnitRepository;
-    @Autowired
-    private RoomRepository roomRepository;
-    @Autowired
-    private ScheduleItemMapper scheduleItemMapper;
+    private final ScheduleItemRepository scheduleItemRepository;
+    private final GroupRepository groupRepository;
+    private final TeacherRepository teacherRepository;
+    private final TeachingUnitRepository teachingUnitRepository;
+    private final RoomRepository roomRepository;
+    private final ScheduleItemMapper scheduleItemMapper;
+    public ScheduleServiceImpl(ScheduleItemRepository scheduleItemRepository, GroupRepository groupRepository, TeacherRepository teacherRepository, TeachingUnitRepository teachingUnitRepository, RoomRepository roomRepository, ScheduleItemMapper scheduleItemMapper) {
+        this.scheduleItemRepository = scheduleItemRepository;
+        this.groupRepository = groupRepository;
+        this.teacherRepository = teacherRepository;
+        this.teachingUnitRepository = teachingUnitRepository;
+        this.roomRepository = roomRepository;
+        this.scheduleItemMapper = scheduleItemMapper;
+    }
 
     @Override
     public List<ScheduleItemDTO> getSchedule(String start, String endTime) {
@@ -49,7 +51,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         // Vérification des conflits avant mise à jour
         List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
-                existingItem.getStart(),
+                existingItem.getStartTime(),
                 existingItem.getEndTime(),
                 existingItem.getRoom().getId(),
                 existingItem.getTeacher().getId(),
@@ -73,12 +75,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     };
 
     @Override
-    public Void deleteScheduleItem(Long id) {
-        ScheduleItem item = scheduleItemRepository.findById(id)
-                .orElseThrow(() -> new ScheduleItemNotFoundException("Schedule item not found with id: " + id));
-
-        scheduleItemRepository.delete(item);
-        return null;
+    public void deleteScheduleItem(Long id) {
+        Optional<ScheduleItem> item = scheduleItemRepository.findById(id);
+        scheduleItemRepository.delete(item.get());
     };
 
 

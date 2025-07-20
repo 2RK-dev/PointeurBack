@@ -5,10 +5,11 @@ import io.github.two_rk_dev.pointeurback.dto.RoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateRoomDTO;
 import io.github.two_rk_dev.pointeurback.service.implementation.RoomServiceImpl;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,8 +17,11 @@ import java.util.List;
 @RequestMapping("/rooms")
 public class RoomController {
 
-    @Autowired
-    private RoomServiceImpl roomService;
+    private final RoomServiceImpl roomService;
+
+    public RoomController(RoomServiceImpl roomService) {
+        this.roomService = roomService;
+    }
 
     @GetMapping
     public ResponseEntity<List<RoomDTO>> getAllRooms() {
@@ -28,7 +32,11 @@ public class RoomController {
     @PostMapping
     public ResponseEntity<RoomDTO> createRoom(@Valid @RequestBody CreateRoomDTO dto) {
         RoomDTO createdRoom = roomService.createRoom(dto);
-        return ResponseEntity.ok(createdRoom);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{roomId}")
+                .buildAndExpand(createdRoom.id())
+                .toUri();
+        return ResponseEntity.created(location).body(createdRoom);
     }
 
     @GetMapping("/{roomId}")
@@ -52,11 +60,11 @@ public class RoomController {
 
     @GetMapping("/available")
     public ResponseEntity<List<RoomDTO>> getAvailableRooms(
-            @RequestParam LocalDateTime start,
+            @RequestParam LocalDateTime startTime,
             @RequestParam LocalDateTime endTime,
             @RequestParam(required = false, defaultValue = "1") int size) {
 
-        List<RoomDTO> availableRooms = roomService.getAvailableRooms(start, endTime, size);
+        List<RoomDTO> availableRooms = roomService.getAvailableRooms(startTime, endTime, size);
         return ResponseEntity.ok(availableRooms);
     }
 }

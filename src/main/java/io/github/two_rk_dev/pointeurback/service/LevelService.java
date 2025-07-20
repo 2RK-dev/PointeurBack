@@ -9,9 +9,9 @@ public interface LevelService {
     List<LevelDTO> getAll();
     LevelDetailsDTO getDetails(Long Id);
     LevelDTO updateLevel(Long id, UpdateLevelDTO dto);
-    Void deleteLevel (Long id);
-    List<GroupDTO> getGroup(Long id);
-    List<TeachingUnitDTO> getTeachingUnit(Long id);
+    void deleteLevel (Long id);
+    List<GroupDTO> getGroups(Long id);
+    List<TeachingUnitDTO> getTeachingUnits(Long id);
     List<ScheduleItemDTO> getSchedule(Long id);
     GroupDTO createGroup(Long id,CreateGroupDTO dto);
 

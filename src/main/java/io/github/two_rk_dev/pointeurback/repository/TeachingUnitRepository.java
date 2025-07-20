@@ -9,12 +9,9 @@ import java.util.Optional;
 
 @Repository
 public interface TeachingUnitRepository extends JpaRepository<TeachingUnit, Long> {
-    // Recherche par niveau
     List<TeachingUnit> findByLevelId(Long LevelId);
 
-    // Recherche par abréviation
     Optional<TeachingUnit> findByAbbreviation(String abbreviation);
 
-    // Recherche par nom
     List<TeachingUnit> findByNameContainingIgnoreCase(String name);
 }
