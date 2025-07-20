@@ -40,7 +40,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new IllegalArgumentException("Start and end times must be provided");
         }
 
-        List<ScheduleItem> items = scheduleItemRepository.findByStartBetween(startDateTime, endDateTime);
+        List<ScheduleItem> items = scheduleItemRepository.findByStartTimeBetween(startDateTime, endDateTime);
         return scheduleItemMapper.toDtoList(items);
     }
 

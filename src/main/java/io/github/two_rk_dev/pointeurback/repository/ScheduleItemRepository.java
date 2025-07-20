@@ -24,14 +24,14 @@ public interface ScheduleItemRepository extends JpaRepository<ScheduleItem, Long
     @Query("SELECT DISTINCT si FROM ScheduleItem si " +
             "LEFT JOIN si.groups g " +
             "WHERE ((si.room.id = :roomId OR si.teacher.id = :teacherId OR g.id IN :groupIds) " +
-            "AND (si.startTime < :end AND si.endTime > :startTime))")
+            "AND (si.startTime < :endTime AND si.endTime > :startTime))")
     List<ScheduleItem> findConflictingSchedule(
-            @Param("startTime") LocalDateTime start,
-            @Param("end") LocalDateTime end,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime,
             @Param("roomId") Long roomId,
             @Param("teacherId") Long teacherId,
             @Param("groupIds") List<Long> groupIds);
 
-    List<ScheduleItem> findByStartBetween(LocalDateTime start, LocalDateTime endTime);
+    List<ScheduleItem> findByStartTimeBetween(LocalDateTime startTime, LocalDateTime endTime);
 }
 
