@@ -461,16 +461,16 @@ paths:
   /rooms/available:
     get:
       summary: Get available rooms in a time range
-      description: Returns rooms that are unoccupied between the specified start and end times.
+      description: Returns rooms that are unoccupied between the specified startTime and endTime times.
       parameters:
-        - name: start
+        - name: startTime
           in: query
           required: true
-          description: Start datetime (ISO 8601 format)
+          description: startTime datetime (ISO 8601 format)
           schema:
             type: string
             format: date-time
-        - name: end
+        - name: endTime
           in: query
           required: true
           description: End datetime (ISO 8601 format)
@@ -779,7 +779,7 @@ paths:
           schema:
             type: number
       requestBody:
-        description: Infos about the room, teacher, group, start, end, and teaching unit
+        description: Infos about the room, teacher, group, startTime, endTime, and teaching unit
         content:
           application/json:
             schema:
@@ -825,13 +825,13 @@ components:
           type: number
         roomId:
           type: number
-        start:
+        startTime:
           type: string
           format: date-time
-        end:
+        endTime:
           type: string
           format: date-time
-      required: [ groupIds, teacherId, teachingUnitId, roomId, start, end ]
+      required: [ groupIds, teacherId, teachingUnitId, roomId, startTime, endTime ]
 
     ScheduleItemDTO:
       type: object
@@ -848,13 +848,13 @@ components:
           $ref: '#/components/schemas/TeachingUnitDTO'
         room:
           $ref: '#/components/schemas/RoomDTO'
-        start:
+        startTime:
           type: string
           format: date-time
-        end:
+        endTime:
           type: string
           format: date-time
-      required: [ id, groups, teacher, teachingUnit, room, start, end ]
+      required: [ id, groups, teacher, teachingUnit, room, startTime, endTime ]
 
     UpdateTeachingUnitDTO:
       type: object

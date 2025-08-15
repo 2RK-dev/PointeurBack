@@ -117,6 +117,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(ScheduleItemNotFoundException.class)
+    public ResponseEntity<ErrorDetails> handleScheduleItemNotFoundException(@NotNull ScheduleItemNotFoundException ex, @NotNull WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                OffsetDateTime.now(ZoneOffset.UTC),
+                ex.getMessage(),
+                request.getDescription(false),
+                "SCHEDULE_ITEM_NOT_FOUND"
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetails> handleGlobalException(@NotNull Exception ex, @NotNull WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(
