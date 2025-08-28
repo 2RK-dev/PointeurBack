@@ -18,7 +18,7 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(GroupNotFoundException.class)
+    @ExceptionHandler(ScheduleConfictException.class)
     public ResponseEntity<ErrorDetails> handleScheduleConfictException(@NotNull ScheduleConfictException ex, @NotNull WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(
                 OffsetDateTime.now(ZoneOffset.UTC),
