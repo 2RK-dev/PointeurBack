@@ -19,6 +19,17 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(GroupNotFoundException.class)
+    public ResponseEntity<ErrorDetails> handleScheduleConfictException(@NotNull ScheduleConfictException ex, @NotNull WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                OffsetDateTime.now(ZoneOffset.UTC),
+                ex.getMessage(),
+                request.getDescription(false),
+                "SCHEDULE_CONFLICT"
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(GroupNotFoundException.class)
     public ResponseEntity<ErrorDetails> handleGroupNotFoundException(@NotNull GroupNotFoundException ex, @NotNull WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(
                 OffsetDateTime.now(ZoneOffset.UTC),
