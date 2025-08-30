@@ -8,7 +8,6 @@ import io.github.two_rk_dev.pointeurback.mapper.RoomMapper;
 import io.github.two_rk_dev.pointeurback.model.Room;
 import io.github.two_rk_dev.pointeurback.repository.RoomRepository;
 import io.github.two_rk_dev.pointeurback.service.RoomService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,16 +17,19 @@ import java.util.Optional;
 @Service
 public class RoomServiceImpl implements RoomService {
 
-    @Autowired
-    private RoomRepository roomRepository;
-    @Autowired
-    private RoomMapper roomMapper;
+    private final RoomRepository roomRepository;
+    private final RoomMapper roomMapper;
+
+    public RoomServiceImpl(RoomRepository roomRepository, RoomMapper roomMapper) {
+        this.roomRepository = roomRepository;
+        this.roomMapper = roomMapper;
+    }
 
     @Override
     public List<RoomDTO> getAll(){
         List<Room> existing = roomRepository.findAll();
         return roomMapper.toDtoList(existing);
-    };
+    }
 
     @Override
     public RoomDTO createRoom(CreateRoomDTO dto) {
@@ -64,7 +66,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public void deleteRoom(Long id) {
         Optional<Room> room = roomRepository.findById(id);
-
+        if (room.isEmpty()) return;
 
         if (!room.get().getSchedules().isEmpty()) {
             throw new IllegalStateException("Cannot delete room with associated schedules");

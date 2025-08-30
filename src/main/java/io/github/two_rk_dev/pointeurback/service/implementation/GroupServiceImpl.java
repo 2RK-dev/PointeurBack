@@ -53,8 +53,6 @@ public class GroupServiceImpl implements GroupService {
         return groupMapper.toDto(updated);
     }
 
-    ;
-
     @Override
     @Transactional
     public void deleteGroup(Long levelId, Long groupId) {

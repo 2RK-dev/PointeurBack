@@ -118,7 +118,7 @@ public class LevelServiceImpl implements LevelService {
 
         // 2. Vérification des contraintes
         if (!existing.getGroups().isEmpty()) {
-            throw new RuntimeException("Impossible à Supprimmer");
+            throw new RuntimeException("Impossible à Supprimer");
         }
 
         // 3. Suppression
@@ -143,7 +143,7 @@ public class LevelServiceImpl implements LevelService {
                         group.getSize(),
                         null)) // Pas de LevelDTO pour éviter les références circulaires
                 .toList();
-    };
+    }
 
     @Override
     public List<TeachingUnitDTO> getTeachingUnits(Long levelId){
@@ -163,7 +163,7 @@ public class LevelServiceImpl implements LevelService {
                         teachingUnit.getName(),
                         null)) // Pas de LevelDTO pour éviter les références circulaires
                 .toList();
-    };
+    }
 
     @Override
     public List<ScheduleItemDTO> getSchedule(Long levelId){
@@ -181,7 +181,7 @@ public class LevelServiceImpl implements LevelService {
                 .collect(Collectors.toList());
 
 
-    };
+    }
 
     @Override
     public GroupDTO createGroup(Long levelId,CreateGroupDTO dto) {
@@ -201,8 +201,8 @@ public class LevelServiceImpl implements LevelService {
 
     public ScheduleItemDTO addScheduleItem(Long levelId, CreateScheduleItemDTO dto){
         // 1. Vérification de l'existence du niveau
-        Level level = levelRepository.findById(levelId)
-                .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + levelId));
+        if (!levelRepository.existsById(levelId))
+            throw new LevelNotFoundException("Level not found with id: " + levelId);
 
         // 2. Validation du DTO
         if (dto == null) {
@@ -235,5 +235,5 @@ public class LevelServiceImpl implements LevelService {
 
         // 6. Conversion en DTO
         return scheduleItemMapper.toDto(savedItem);
-    };
+    }
 }

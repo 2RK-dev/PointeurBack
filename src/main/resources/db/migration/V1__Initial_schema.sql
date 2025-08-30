@@ -78,6 +78,21 @@ CREATE TABLE schedule_item (
         ON DELETE CASCADE
 );
 
+-- Création de la table many-to-many ScheduleItem <-> Group
+CREATE TABLE schedule_item_groups
+(
+    schedule_item_id BIGINT NOT NULL,
+    group_id         BIGINT NOT NULL,
+    CONSTRAINT fk_schedule_item_groups_group
+        FOREIGN KEY (group_id)
+            REFERENCES "group" (id)
+            ON DELETE CASCADE,
+    CONSTRAINT fk_schedule_item_groups_schedule_item
+        FOREIGN KEY (schedule_item_id)
+            REFERENCES schedule_item (id)
+            ON DELETE CASCADE
+);
+
 -- Création des index pour améliorer les performances
 CREATE INDEX idx_teaching_unit_level_id ON teaching_unit(level_id);
 CREATE INDEX idx_group_level_id ON "group"(level_id);
