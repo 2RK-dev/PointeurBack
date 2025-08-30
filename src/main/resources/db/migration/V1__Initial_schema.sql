@@ -1,6 +1,6 @@
 -- Création de la table Level
 CREATE TABLE level (
-    id BIGSERIAL PRIMARY KEY,
+                       level_id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     abbreviation VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -9,7 +9,7 @@ CREATE TABLE level (
 
 -- Création de la table Teacher
 CREATE TABLE teacher (
-    id BIGSERIAL PRIMARY KEY,
+                         teacher_id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     abbreviation VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -18,7 +18,7 @@ CREATE TABLE teacher (
 
 -- Création de la table Room
 CREATE TABLE room (
-    id BIGSERIAL PRIMARY KEY,
+                      room_id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     size INTEGER NOT NULL,
     abbreviation VARCHAR(50) NOT NULL,
@@ -28,35 +28,35 @@ CREATE TABLE room (
 
 -- Création de la table TeachingUnit
 CREATE TABLE teaching_unit (
-    id BIGSERIAL PRIMARY KEY,
+                               teaching_unit_id BIGSERIAL PRIMARY KEY,
     level_id BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
     abbreviation VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_teaching_unit_level 
-        FOREIGN KEY (level_id) 
-        REFERENCES level(id) 
+                               CONSTRAINT fk_teaching_unit_level
+                                   FOREIGN KEY (level_id)
+                                       REFERENCES level (level_id)
         ON DELETE CASCADE
 );
 
 -- Création de la table Group
 CREATE TABLE "group" (
-    id BIGSERIAL PRIMARY KEY,
+                         group_id BIGSERIAL PRIMARY KEY,
     level_id BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
     size INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_group_level 
-        FOREIGN KEY (level_id) 
-        REFERENCES level(id) 
+                         CONSTRAINT fk_group_level
+                             FOREIGN KEY (level_id)
+                                 REFERENCES level (level_id)
         ON DELETE CASCADE
 );
 
 -- Création de la table Scheduler
 CREATE TABLE schedule_item (
-    id BIGSERIAL PRIMARY KEY,
+                               schedule_item_id BIGSERIAL PRIMARY KEY,
     teacher_id BIGINT NOT NULL,
     teaching_unit_id BIGINT NOT NULL,
     room_id BIGINT NOT NULL,
@@ -64,18 +64,34 @@ CREATE TABLE schedule_item (
     end_time TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_scheduler_teacher 
-        FOREIGN KEY (teacher_id) 
-        REFERENCES teacher(id) 
+                               CONSTRAINT fk_scheduler_teacher
+                                   FOREIGN KEY (teacher_id)
+                                       REFERENCES teacher (teacher_id)
         ON DELETE CASCADE,
-    CONSTRAINT fk_scheduler_teaching_unit 
-        FOREIGN KEY (teaching_unit_id) 
-        REFERENCES teaching_unit(id) 
+                               CONSTRAINT fk_scheduler_teaching_unit
+                                   FOREIGN KEY (teaching_unit_id)
+                                       REFERENCES teaching_unit (teaching_unit_id)
         ON DELETE CASCADE,
-    CONSTRAINT fk_scheduler_room 
-        FOREIGN KEY (room_id) 
-        REFERENCES room(id) 
+                               CONSTRAINT fk_scheduler_room
+                                   FOREIGN KEY (room_id)
+                                       REFERENCES room (room_id)
         ON DELETE CASCADE
+);
+
+-- Création de la table many-to-many ScheduleItem <-> Group
+CREATE TABLE schedule_item_groups
+(
+    schedule_item_id BIGINT NOT NULL,
+    group_id         BIGINT NOT NULL,
+    CONSTRAINT fk_schedule_item_groups_group
+        FOREIGN KEY (group_id)
+            REFERENCES "group" (group_id)
+            ON DELETE CASCADE,
+    CONSTRAINT fk_schedule_item_groups_schedule_item
+        FOREIGN KEY (schedule_item_id)
+            REFERENCES schedule_item (schedule_item_id)
+            ON DELETE CASCADE,
+    CONSTRAINT pk_schedule_item_groups PRIMARY KEY (schedule_item_id, group_id)
 );
 
 -- Création des index pour améliorer les performances

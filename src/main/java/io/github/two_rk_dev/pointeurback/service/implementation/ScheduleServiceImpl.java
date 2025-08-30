@@ -25,7 +25,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final TeachingUnitRepository teachingUnitRepository;
     private final RoomRepository roomRepository;
     private final ScheduleItemMapper scheduleItemMapper;
-
     public ScheduleServiceImpl(ScheduleItemRepository scheduleItemRepository, GroupRepository groupRepository, TeacherRepository teacherRepository, TeachingUnitRepository teachingUnitRepository, RoomRepository roomRepository, ScheduleItemMapper scheduleItemMapper) {
         this.scheduleItemRepository = scheduleItemRepository;
         this.groupRepository = groupRepository;
@@ -60,7 +59,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         ScheduleItem existingItem = scheduleItemRepository.findById(id)
                 .orElseThrow(() -> new ScheduleItemNotFoundException("Schedule item not found with id: " + id));
 
-        // Vérification des conflits avant mise à jour
         List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
                 existingItem.getStartTime(),
                 existingItem.getEndTime(),

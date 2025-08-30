@@ -24,7 +24,7 @@ public interface ScheduleItemMapper {
     DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     @Mapping(target = "id", source = "id")
-    @Mapping(target = "groups", source = "groups") // Conversion automatique via GroupMapper
+    @Mapping(target = "groups", source = "groups")
     @Mapping(target = "teacher", source = "teacher")
     @Mapping(target = "teachingUnit", source = "teachingUnit")
     @Mapping(target = "room", source = "room")
@@ -35,22 +35,22 @@ public interface ScheduleItemMapper {
     List<ScheduleItemDTO> toDtoList(List<ScheduleItem> entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "groups", ignore = true) // Géré manuellement
-    @Mapping(target = "teacher", ignore = true) // Géré manuellement
-    @Mapping(target = "teachingUnit", ignore = true) // Géré manuellement
-    @Mapping(target = "room", ignore = true) // Géré manuellement
+    @Mapping(target = "groups", ignore = true)
+    @Mapping(target = "teacher", ignore = true)
+    @Mapping(target = "teachingUnit", ignore = true)
+    @Mapping(target = "room", ignore = true)
     @Mapping(target = "startTime", expression = "java(parseDateTime(dto.startTime()))")
     @Mapping(target = "endTime", expression = "java(parseDateTime(dto.endTime()))")
     ScheduleItem fromCreateDto(CreateScheduleItemDTO dto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "groups", ignore = true) // Même approche que dans fromCreateDto
-    @Mapping(target = "teacher", ignore = true) // Même approche que dans fromCreateDto
-    @Mapping(target = "teachingUnit", ignore = true) // Même approche que dans fromCreateDto
-    @Mapping(target = "room", ignore = true) // Même approche que dans fromCreateDto
+    @Mapping(target = "groups", ignore = true)
+    @Mapping(target = "teacher", ignore = true)
+    @Mapping(target = "teachingUnit", ignore = true)
+    @Mapping(target = "room", ignore = true)
     @Mapping(target = "startTime",
             expression = "java(dto.startTime() != null ? parseDateTime(dto.startTime()) : entity.getStartTime())")
-    @Mapping(target = "endTime", // Garde la même nomenclature que toDto
+    @Mapping(target = "endTime",
             expression = "java(dto.endTime() != null ? parseDateTime(dto.endTime()) : entity.getEndTime())")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromDto(UpdateScheduleItemDTO dto, @MappingTarget ScheduleItem entity);
@@ -92,12 +92,11 @@ public interface ScheduleItemMapper {
         }
 
         ScheduleItem item = fromCreateDto(dto);
-        item.setGroups(groups); // Adaptation à votre modèle actuel (ManyToOne)
+        item.setGroups(groups);
         item.setTeacher(teacher);
         item.setTeachingUnit(teachingUnit);
         item.setRoom(room);
 
-        // Validation des contraintes métier
         if (item.getStartTime() == null || item.getEndTime() == null) {
             throw new IllegalStateException("Start and end times must be specified");
         }
@@ -108,7 +107,6 @@ public interface ScheduleItemMapper {
         return item;
     }
 
-    // Méthode utilitaire pour la mise à jour
     default void updateFromDto(@NotNull UpdateScheduleItemDTO dto,
                                @MappingTarget ScheduleItem entity,
                                @NotNull Function<List<Long>, List<Group>> groupProvider,
@@ -123,7 +121,7 @@ public interface ScheduleItemMapper {
             entity.setStartTime(parseDateTime(dto.startTime()));
         }
         if (dto.endTime() != null) {
-            entity.setEndTime(parseDateTime(dto.endTime())); // Cohérent avec votre entité
+            entity.setEndTime(parseDateTime(dto.endTime()));
         }
 
         if (dto.groupIds() != null) {

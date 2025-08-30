@@ -12,7 +12,6 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {LevelMapper.class})
 public interface GroupMapper {
 
-    // Conversion  Group -> GroupDTO
     @Named("toDto")
     @Mapping(target = "level", qualifiedBy = MappingQualifier.LevelToDtoWithoutGroups.class)
     GroupDTO toDto(Group entity);
@@ -23,7 +22,7 @@ public interface GroupMapper {
     GroupDTO toDtoWithoutLevel(Group entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "level", ignore = true) // À définir séparément
+    @Mapping(target = "level", ignore = true)
     @Mapping(target = "schedules", ignore = true)
     Group fromCreateDto(CreateGroupDTO dto);
 
