@@ -1,12 +1,15 @@
 package io.github.two_rk_dev.pointeurback.controller;
 
+import io.github.two_rk_dev.pointeurback.dto.CreateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.ScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.service.implementation.ScheduleServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -22,10 +25,28 @@ public class ScheduleController {
     @GetMapping
     public ResponseEntity<List<ScheduleItemDTO>> getSchedule(
             @RequestParam String startDate,
-            @RequestParam String endDate) {
-        List<ScheduleItemDTO> schedule = scheduleService.getSchedule(startDate, endDate);
+            @RequestParam String endDate,
+            @RequestParam(required = false) Long levelId,
+            @RequestParam(required = false) Long groupId) {
+        List<ScheduleItemDTO> schedule = scheduleService.getSchedule(levelId, groupId, startDate, endDate);
         return ResponseEntity.ok(schedule);
     }
+
+    @GetMapping("/{scheduleId}")
+    public ResponseEntity<ScheduleItemDTO> getSchedule(@PathVariable Long scheduleId) {
+        return ResponseEntity.ok(scheduleService.getScheduleById(scheduleId));
+    }
+
+    @PostMapping
+    public ResponseEntity<ScheduleItemDTO> addScheduleItem(@Valid @RequestBody CreateScheduleItemDTO dto) {
+        ScheduleItemDTO createdSchedule = scheduleService.addScheduleItem(dto);
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/schedule/{schedule_item_id}")
+                .buildAndExpand(createdSchedule.id())
+                .toUri();
+        return ResponseEntity.created(location).body(createdSchedule);
+    }
+
 
     @PutMapping("/{schedule_item_id}")
     public ResponseEntity<ScheduleItemDTO> updateSchedule(
