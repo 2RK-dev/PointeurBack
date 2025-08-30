@@ -31,6 +31,7 @@ dependencies {
     implementation 'org.flywaydb:flyway-database-postgresql'
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
     implementation 'org.mapstruct:mapstruct:1.6.3'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

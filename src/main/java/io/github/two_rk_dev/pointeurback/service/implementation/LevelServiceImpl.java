@@ -10,8 +10,12 @@ import io.github.two_rk_dev.pointeurback.model.Group;
 import io.github.two_rk_dev.pointeurback.model.Level;
 import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
 import io.github.two_rk_dev.pointeurback.model.TeachingUnit;
-import io.github.two_rk_dev.pointeurback.repository.*;
+import io.github.two_rk_dev.pointeurback.repository.GroupRepository;
+import io.github.two_rk_dev.pointeurback.repository.LevelRepository;
+import io.github.two_rk_dev.pointeurback.repository.ScheduleItemRepository;
+import io.github.two_rk_dev.pointeurback.repository.TeachingUnitRepository;
 import io.github.two_rk_dev.pointeurback.service.LevelService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,10 +54,11 @@ public class LevelServiceImpl implements LevelService {
         return levelMapper.toDto(savedLevel);
     }
 
+    @Transactional
     @Override
-    public List<LevelDTO> getAll() {
+    public List<LevelDetailsDTO> getAll() {
         List<Level> existing = levelRepository.findAll();
-        return levelMapper.toDtoList(existing);
+        return existing.stream().map(levelMapper::toDetailsDto).toList();
     }
 
     @Override
