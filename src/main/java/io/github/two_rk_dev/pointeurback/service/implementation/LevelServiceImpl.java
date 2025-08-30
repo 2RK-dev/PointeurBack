@@ -10,7 +10,10 @@ import io.github.two_rk_dev.pointeurback.model.Group;
 import io.github.two_rk_dev.pointeurback.model.Level;
 import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
 import io.github.two_rk_dev.pointeurback.model.TeachingUnit;
-import io.github.two_rk_dev.pointeurback.repository.*;
+import io.github.two_rk_dev.pointeurback.repository.GroupRepository;
+import io.github.two_rk_dev.pointeurback.repository.LevelRepository;
+import io.github.two_rk_dev.pointeurback.repository.ScheduleItemRepository;
+import io.github.two_rk_dev.pointeurback.repository.TeachingUnitRepository;
 import io.github.two_rk_dev.pointeurback.service.LevelService;
 import org.springframework.stereotype.Service;
 
@@ -22,19 +25,15 @@ public class LevelServiceImpl implements LevelService {
 
     private final LevelRepository levelRepository;
     private final GroupRepository groupRepository;
-    private final RoomRepository roomRepository;
-    private final TeacherRepository teacherRepository;
     private final TeachingUnitRepository teachingUnitRepository;
     private final ScheduleItemRepository scheduleItemRepository;
     private final LevelMapper levelMapper;
     private final GroupMapper groupMapper;
     private final ScheduleItemMapper scheduleItemMapper;
 
-    public LevelServiceImpl(LevelRepository levelRepository, GroupRepository groupRepository, RoomRepository roomRepository, TeacherRepository teacherRepository, TeachingUnitRepository teachingUnitRepository, ScheduleItemRepository scheduleItemRepository, LevelMapper levelMapper, GroupMapper groupMapper, ScheduleItemMapper scheduleItemMapper) {
+    public LevelServiceImpl(LevelRepository levelRepository, GroupRepository groupRepository, TeachingUnitRepository teachingUnitRepository, ScheduleItemRepository scheduleItemRepository, LevelMapper levelMapper, GroupMapper groupMapper, ScheduleItemMapper scheduleItemMapper) {
         this.levelRepository = levelRepository;
         this.groupRepository = groupRepository;
-        this.roomRepository = roomRepository;
-        this.teacherRepository = teacherRepository;
         this.teachingUnitRepository = teachingUnitRepository;
         this.scheduleItemRepository = scheduleItemRepository;
         this.levelMapper = levelMapper;
@@ -198,42 +197,4 @@ public class LevelServiceImpl implements LevelService {
             throw new GroupNotFoundException("Group name already exists for this level");
         }
     }
-
-    public ScheduleItemDTO addScheduleItem(Long levelId, CreateScheduleItemDTO dto){
-        // 1. Vérification de l'existence du niveau
-        Level level = levelRepository.findById(levelId)
-                .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + levelId));
-
-        // 2. Validation du DTO
-        if (dto == null) {
-            throw new IllegalArgumentException("CreateScheduleItemDTO cannot be null");
-        }
-
-        // 3. Création de l'entité ScheduleItem avec les dépendances
-        ScheduleItem newItem = scheduleItemMapper.createFromDto(
-                dto,
-                groupId -> groupRepository.findById(groupId).orElse(null),
-                teacherId -> teacherRepository.findById(teacherId).orElse(null),
-                teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
-                roomId -> roomRepository.findById(roomId).orElse(null)
-        );
-
-        // 4 .Vérification des conflits d'horaire
-        List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
-                newItem.getStartTime(),
-                newItem.getEndTime(),
-                newItem.getRoom().getId(),
-                newItem.getTeacher().getId(),
-                dto.groupIds()
-        );
-        if (!conflictingItems.isEmpty()) {
-            throw new IllegalStateException("Schedule conflict detected");
-        }
-
-        // 5. Sauvegarde
-        ScheduleItem savedItem = scheduleItemRepository.save(newItem);
-
-        // 6. Conversion en DTO
-        return scheduleItemMapper.toDto(savedItem);
-    };
 }
