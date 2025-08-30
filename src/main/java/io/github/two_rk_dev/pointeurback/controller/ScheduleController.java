@@ -25,8 +25,10 @@ public class ScheduleController {
     @GetMapping
     public ResponseEntity<List<ScheduleItemDTO>> getSchedule(
             @RequestParam String startDate,
-            @RequestParam String endDate) {
-        List<ScheduleItemDTO> schedule = scheduleService.getSchedule(startDate, endDate);
+            @RequestParam String endDate,
+            @RequestParam(required = false) Long levelId,
+            @RequestParam(required = false) Long groupId) {
+        List<ScheduleItemDTO> schedule = scheduleService.getSchedule(levelId, groupId, startDate, endDate);
         return ResponseEntity.ok(schedule);
     }
 

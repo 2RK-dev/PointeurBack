@@ -733,7 +733,7 @@ paths:
   /schedule:
     get:
       summary: Fetch the schedule, time slots
-      description: "If groupId does not belong to the level, will return a bad request status. If groupId is not provided,
+      description: "If groupId does not belong to the level, will return a not found status. If groupId is not provided,
                     will return the schedule items of all the groups in the level. If levelId is not provided but 
                     groupId is, will return that group's time table."
       parameters:
@@ -749,6 +749,14 @@ paths:
           schema:
             type: string
             format: date
+        - in: query
+          name: levelId
+          schema:
+            type: number
+        - in: query
+          name: groupId
+          schema:
+            type: number
       security:
         - auth: [ ]
       responses:
@@ -760,7 +768,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ScheduleItemDTO'
-        400:
+        404:
           description: Bad request, the requested group does not belong to the provided level
           content:
             application/json:

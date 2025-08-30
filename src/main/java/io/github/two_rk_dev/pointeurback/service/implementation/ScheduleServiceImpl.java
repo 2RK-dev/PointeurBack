@@ -3,11 +3,13 @@ package io.github.two_rk_dev.pointeurback.service.implementation;
 import io.github.two_rk_dev.pointeurback.dto.CreateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.ScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateScheduleItemDTO;
+import io.github.two_rk_dev.pointeurback.exception.GroupNotFoundException;
 import io.github.two_rk_dev.pointeurback.exception.ScheduleItemNotFoundException;
 import io.github.two_rk_dev.pointeurback.mapper.ScheduleItemMapper;
 import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
 import io.github.two_rk_dev.pointeurback.repository.*;
 import io.github.two_rk_dev.pointeurback.service.ScheduleService;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,6 +25,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final TeachingUnitRepository teachingUnitRepository;
     private final RoomRepository roomRepository;
     private final ScheduleItemMapper scheduleItemMapper;
+
     public ScheduleServiceImpl(ScheduleItemRepository scheduleItemRepository, GroupRepository groupRepository, TeacherRepository teacherRepository, TeachingUnitRepository teachingUnitRepository, RoomRepository roomRepository, ScheduleItemMapper scheduleItemMapper) {
         this.scheduleItemRepository = scheduleItemRepository;
         this.groupRepository = groupRepository;
@@ -33,15 +36,22 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<ScheduleItemDTO> getSchedule(String start, String endTime) {
+    public List<ScheduleItemDTO> getSchedule(@Nullable Long levelId, @Nullable Long groupId, String start, String endTime) {
         LocalDateTime startDateTime = scheduleItemMapper.parseDateTime(start);
         LocalDateTime endDateTime = scheduleItemMapper.parseDateTime(endTime);
 
         if (startDateTime == null || endDateTime == null) {
             throw new IllegalArgumentException("Start and end times must be provided");
         }
-
-        List<ScheduleItem> items = scheduleItemRepository.findByStartTimeBetween(startDateTime, endDateTime);
+        List<ScheduleItem> items;
+        if (groupId != null) {
+            if (levelId != null && !groupRepository.existsGroupByLevel_IdIs(levelId)) {
+                throw new GroupNotFoundException("Group with id " + groupId + " not found in level " + levelId);
+            }
+            items = scheduleItemRepository.findByGroupsId(groupId);
+        } else if (levelId != null) {
+            items = scheduleItemRepository.findByLevelId(levelId);
+        } else items = scheduleItemRepository.findByStartTimeBetween(startDateTime, endDateTime);
         return scheduleItemMapper.toDtoList(items);
     }
 
@@ -65,7 +75,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleItemMapper.updateFromDto(
                 dto,
                 existingItem,
-                groupIds -> groupRepository.findAllById(groupIds),
+                groupRepository::findAllById,
                 teacherId -> teacherRepository.findById(teacherId).orElse(null),
                 teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
                 roomId -> roomRepository.findById(roomId).orElse(null)
@@ -73,13 +83,13 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         ScheduleItem updatedItem = scheduleItemRepository.save(existingItem);
         return scheduleItemMapper.toDto(updatedItem);
-    };
+    }
 
     @Override
     public void deleteScheduleItem(Long id) {
         Optional<ScheduleItem> item = scheduleItemRepository.findById(id);
-        scheduleItemRepository.delete(item.get());
-    };
+        item.ifPresent(scheduleItemRepository::delete);
+    }
 
     public ScheduleItemDTO addScheduleItem(CreateScheduleItemDTO dto) {
         if (dto == null) {
