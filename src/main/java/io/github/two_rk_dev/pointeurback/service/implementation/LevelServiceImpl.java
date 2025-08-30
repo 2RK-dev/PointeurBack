@@ -43,20 +43,13 @@ public class LevelServiceImpl implements LevelService {
     }
     @Override
     public LevelDTO createLevel(CreateLevelDTO dto) {
-        // Validation du DTO
         if (dto == null) {
             throw new IllegalArgumentException("CreateLevelDTO cannot be null");
         }
-
-        // Conversion en entité
         Level newLevel = levelMapper.fromCreateDto(dto);
-
-        // Validation métier supplémentaire
         if (newLevel.getName() == null || newLevel.getName().isBlank()) {
             throw new IllegalStateException("Level name cannot be empty");
         }
-
-        // Sauvegarde
         Level savedLevel = levelRepository.save(newLevel);
         return levelMapper.toDto(savedLevel);
     }
@@ -64,21 +57,15 @@ public class LevelServiceImpl implements LevelService {
     @Override
     public List<LevelDTO> getAll() {
         List<Level> existing = levelRepository.findAll();
-
-        // Utilisation de la méthode du mapper pour la conversion
         return levelMapper.toDtoList(existing);
     }
 
     @Override
     public LevelDetailsDTO getDetails(Long id) {
-        // Recherche avec gestion d'erreur améliorée
         Level existing = levelRepository.findById(id)
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + id));
-
-        // Conversion détaillée avec les groupes
         LevelDetailsDTO detailsDto = levelMapper.toDetailsDto(existing);
 
-        // Optionnel: Chargement supplémentaire si nécessaire
         if (detailsDto.groups() == null) {
             List<Group> groups = groupRepository.findByLevelId(id);
             detailsDto = new LevelDetailsDTO(
@@ -93,94 +80,66 @@ public class LevelServiceImpl implements LevelService {
     }
     @Override
     public LevelDTO updateLevel(Long id, UpdateLevelDTO dto) {
-        // 1. Validation du DTO
         if (dto == null) {
             throw new IllegalArgumentException("UpdateLevelDTO cannot be null");
         }
-
-        // 2. Recherche de l'entité existante
         Level existing = levelRepository.findById(id)
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + id));
-
-        // 3. Mise à jour via le mapper
         levelMapper.updateLevel(dto, existing);
-
-        // 4. Sauvegarde et conversion
         Level updated = levelRepository.save(existing);
         return levelMapper.toDto(updated);
     }
 
     @Override
     public void deleteLevel(Long id) {
-        // 1. Vérification existence
         Level existing = levelRepository.findById(id)
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + id));
-
-        // 2. Vérification des contraintes
         if (!existing.getGroups().isEmpty()) {
             throw new RuntimeException("Impossible à Supprimer");
         }
-
-        // 3. Suppression
         levelRepository.delete(existing);
     }
 
     @Override
     public List<GroupDTO> getGroups(Long levelId){
-        // 1. Vérification existence niveau
         if (!levelRepository.existsById(levelId)) {
             throw new LevelNotFoundException("Level not found with id: " + levelId);
         }
 
-        // 2. Récupération des groupes
         List<Group> groups = groupRepository.findByLevelId(levelId);
-
-        // 3. Conversion via le mapper
         return groups.stream()
                 .map(group -> new GroupDTO(
                         group.getId(),
                         group.getName(),
                         group.getSize(),
-                        null)) // Pas de LevelDTO pour éviter les références circulaires
+                        null))
                 .toList();
     }
 
     @Override
     public List<TeachingUnitDTO> getTeachingUnits(Long levelId){
-        // 1. Vérification existence niveau
         if (!levelRepository.existsById(levelId)) {
             throw new LevelNotFoundException("Level not found with id: " + levelId);
         }
-
-        // 2. Récupération des Matières
         List<TeachingUnit> teachingUnits = teachingUnitRepository.findByLevelId(levelId);
-
-        // 3. Conversion via le mapper
         return teachingUnits.stream()
                 .map(teachingUnit -> new TeachingUnitDTO(
                         teachingUnit.getId(),
                         teachingUnit.getAbbreviation(),
                         teachingUnit.getName(),
-                        null)) // Pas de LevelDTO pour éviter les références circulaires
+                        null))
                 .toList();
     }
 
     @Override
     public List<ScheduleItemDTO> getSchedule(Long levelId){
-        // 1. Vérification existence niveau
         if (!levelRepository.existsById(levelId)) {
             throw new LevelNotFoundException("Level not found with id: " + levelId);
         }
-
-        // 2. Récupération des Matières
         List<ScheduleItem> schedules = scheduleItemRepository.findByLevelId(levelId);
-
-        // 3. Conversion via le mapper
         return schedules.stream()
                 .map(scheduleItemMapper::toDto)
                 .collect(Collectors.toList());
-
-
     }
 
     @Override
@@ -200,16 +159,13 @@ public class LevelServiceImpl implements LevelService {
     }
 
     public ScheduleItemDTO addScheduleItem(Long levelId, CreateScheduleItemDTO dto){
-        // 1. Vérification de l'existence du niveau
         if (!levelRepository.existsById(levelId))
             throw new LevelNotFoundException("Level not found with id: " + levelId);
 
-        // 2. Validation du DTO
         if (dto == null) {
             throw new IllegalArgumentException("CreateScheduleItemDTO cannot be null");
         }
 
-        // 3. Création de l'entité ScheduleItem avec les dépendances
         ScheduleItem newItem = scheduleItemMapper.createFromDto(
                 dto,
                 groupId -> groupRepository.findById(groupId).orElse(null),
@@ -218,7 +174,6 @@ public class LevelServiceImpl implements LevelService {
                 roomId -> roomRepository.findById(roomId).orElse(null)
         );
 
-        // 4 .Vérification des conflits d'horaire
         List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
                 newItem.getStartTime(),
                 newItem.getEndTime(),
@@ -230,10 +185,7 @@ public class LevelServiceImpl implements LevelService {
             throw new IllegalStateException("Schedule conflict detected");
         }
 
-        // 5. Sauvegarde
         ScheduleItem savedItem = scheduleItemRepository.save(newItem);
-
-        // 6. Conversion en DTO
         return scheduleItemMapper.toDto(savedItem);
     }
 }

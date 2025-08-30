@@ -18,12 +18,12 @@ public interface TeachingUnitMapper {
     List<TeachingUnitDTO> toDto(List<TeachingUnit> entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "level", ignore = true) // Géré séparément
+    @Mapping(target = "level", ignore = true)
     @Mapping(target = "schedules", ignore = true)
     TeachingUnit fromCreateDto(CreateTeachingUnitDTO dto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "level", ignore = true) // Géré séparément
+    @Mapping(target = "level", ignore = true)
     @Mapping(target = "schedules", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromDto(UpdateTeachingUnitDTO dto, @MappingTarget TeachingUnit entity);

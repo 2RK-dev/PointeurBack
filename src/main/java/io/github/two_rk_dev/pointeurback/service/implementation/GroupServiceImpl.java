@@ -40,15 +40,12 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupDTO updateGroup(Long levelId, Long groupId, UpdateGroupDTO dto) {
-        // 1. Recherche de l'entité existante
         Group existing = groupRepository.findByLevelIdAndId(levelId, groupId);
         if (existing == null) {
             throw new GroupNotFoundException("Groupe non trouvé pour levelId: " + levelId + " et groupId: " + groupId);
         }
-        // 2. Mise à jour de l'entité
         groupMapper.updateFromUpdateDto(dto, existing);
 
-        // 3. Sauvegarde et retour du DTO
         Group updated = groupRepository.save(existing);
         return groupMapper.toDto(updated);
     }

@@ -17,7 +17,7 @@ public class TeachingUnit {
     @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "teaching_unit_id")
     private Long id;
 
     @Setter
@@ -38,7 +38,6 @@ public class TeachingUnit {
         this.schedules = schedules != null ? schedules : new ArrayList<>();
     }
 
-    // Bidirectional Relationship Management
     public void addScheduleItem(ScheduleItem scheduleItem) {
         if (!schedules.contains(scheduleItem)) {
             schedules.add(scheduleItem);

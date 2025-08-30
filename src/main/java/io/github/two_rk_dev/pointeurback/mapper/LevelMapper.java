@@ -20,17 +20,14 @@ public interface LevelMapper {
         return new LevelDTO(entity.getId(), entity.getName(), entity.getAbbreviation());
     }
 
-    // Detailed conversion with groups
     @Mapping(target = "level", source = ".")
     @Mapping(target = "groups", source = "groups")
     LevelDetailsDTO toDetailsDto(Level entity);
 
-    // Create operations
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "groups", ignore = true)
     Level fromCreateDto(CreateLevelDTO dto);
 
-    // Update operations
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "groups", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -38,7 +35,6 @@ public interface LevelMapper {
 
     List<LevelDTO> toDtoList(List<Level> entities);
 
-    // Utility methods
     default void updateLevel(UpdateLevelDTO updateDto, Level level) {
         if (updateDto == null) {
             return;

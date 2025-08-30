@@ -49,7 +49,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         ScheduleItem existingItem = scheduleItemRepository.findById(id)
                 .orElseThrow(() -> new ScheduleItemNotFoundException("Schedule item not found with id: " + id));
 
-        // Vérification des conflits avant mise à jour
         List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
                 existingItem.getStartTime(),
                 existingItem.getEndTime(),
@@ -64,7 +63,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleItemMapper.updateFromDto(
                 dto,
                 existingItem,
-                groupIds -> groupRepository.findAllById(groupIds),
+                groupRepository::findAllById,
                 teacherId -> teacherRepository.findById(teacherId).orElse(null),
                 teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
                 roomId -> roomRepository.findById(roomId).orElse(null)
@@ -72,13 +71,11 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         ScheduleItem updatedItem = scheduleItemRepository.save(existingItem);
         return scheduleItemMapper.toDto(updatedItem);
-    };
+    }
 
     @Override
     public void deleteScheduleItem(Long id) {
         Optional<ScheduleItem> item = scheduleItemRepository.findById(id);
-        scheduleItemRepository.delete(item.get());
-    };
-
-
+        item.ifPresent(scheduleItemRepository::delete);
+    }
 }

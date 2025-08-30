@@ -18,13 +18,13 @@ public class ScheduleItem {
     @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "schedule_item_id")
     private Long id;
 
     @Setter
-    private LocalDateTime startTime;  // Format ISO 8601: 2025-07-11T08:30:00
+    private LocalDateTime startTime;
     @Setter
-    private LocalDateTime endTime;    // Format ISO 8601: 2025-07-11T10:30:00
+    private LocalDateTime endTime;
 
     @Setter
     @ManyToOne
@@ -54,7 +54,6 @@ public class ScheduleItem {
         this.groups = groups != null ? groups : new ArrayList<>();
     }
 
-    // Bidirectional Relationship Helpers
     public void addGroup(Group group) {
         if (!this.groups.contains(group)) {
             this.groups.add(group);
@@ -68,23 +67,17 @@ public class ScheduleItem {
         }
     }
 
-    // Room relationship synchronization
     public void addRoom(Room newRoom) {
-        // Prevent infinite loop
         if (this.room == newRoom) {
             return;
         }
 
-        // Clear previous room's reference
         Room oldRoom = this.room;
         if (oldRoom != null) {
             oldRoom.getSchedules().remove(this);
         }
 
-        // Set new room
         this.room = newRoom;
-
-        // Add to new room's schedule list
         if (newRoom != null && !newRoom.getSchedules().contains(this)) {
             newRoom.getSchedules().add(this);
         }

@@ -18,7 +18,7 @@ import java.util.Objects;
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "group_id")
     private Long id;
 
     private String name;
