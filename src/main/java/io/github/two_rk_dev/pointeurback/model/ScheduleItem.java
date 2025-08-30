@@ -2,32 +2,41 @@ package io.github.two_rk_dev.pointeurback.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 public class ScheduleItem {
+    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "schedule_item_id")
+    @Column(name = "id")
     private Long id;
 
+    @Setter
     private LocalDateTime startTime;  // Format ISO 8601: 2025-07-11T08:30:00
+    @Setter
     private LocalDateTime endTime;    // Format ISO 8601: 2025-07-11T10:30:00
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "teaching_unit_id")
     private TeachingUnit teachingUnit;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
@@ -40,58 +49,6 @@ public class ScheduleItem {
     )
     private List<Group> groups;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalDateTime start) {
-        this.startTime = start;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public Teacher getTeacher() {
-        return teacher;
-    }
-
-    public void setTeacher(Teacher teacher) {
-        this.teacher = teacher;
-    }
-
-    public TeachingUnit getTeachingUnit() {
-        return teachingUnit;
-    }
-
-    public void setTeachingUnit(TeachingUnit teachingUnit) {
-        this.teachingUnit = teachingUnit;
-    }
-
-    public Room getRoom() {
-        return room;
-    }
-
-    public void setRoom(Room room) {
-        this.room = room;
-    }
-
-    public List<Group> getGroups() {
-        return groups;
-    }
 
     public void setGroups(List<Group> groups) {
         this.groups = groups != null ? groups : new ArrayList<>();

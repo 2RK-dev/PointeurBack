@@ -18,8 +18,8 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ScheduleConfictException.class)
-    public ResponseEntity<ErrorDetails> handleScheduleConfictException(@NotNull ScheduleConfictException ex, @NotNull WebRequest request) {
+    @ExceptionHandler(ScheduleConflictException.class)
+    public ResponseEntity<ErrorDetails> handleScheduleConflictException(@NotNull ScheduleConflictException ex, @NotNull WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(
                 OffsetDateTime.now(ZoneOffset.UTC),
                 ex.getMessage(),
