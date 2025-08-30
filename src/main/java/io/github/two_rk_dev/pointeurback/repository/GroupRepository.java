@@ -12,4 +12,5 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     Group findByName(String name);
     Group findByLevelIdAndId(Long levelId, Long groupId);
 
+    boolean existsGroupByLevel_IdIs(Long levelId);
 }
