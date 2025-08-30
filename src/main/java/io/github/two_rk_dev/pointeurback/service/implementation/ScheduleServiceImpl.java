@@ -1,5 +1,6 @@
 package io.github.two_rk_dev.pointeurback.service.implementation;
 
+import io.github.two_rk_dev.pointeurback.dto.CreateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.ScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.exception.GroupNotFoundException;
@@ -88,5 +89,38 @@ public class ScheduleServiceImpl implements ScheduleService {
     public void deleteScheduleItem(Long id) {
         Optional<ScheduleItem> item = scheduleItemRepository.findById(id);
         item.ifPresent(scheduleItemRepository::delete);
+    }
+
+    public ScheduleItemDTO addScheduleItem(CreateScheduleItemDTO dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("CreateScheduleItemDTO cannot be null");
+        }
+
+        ScheduleItem newItem = scheduleItemMapper.createFromDto(
+                dto,
+                groupId -> groupRepository.findById(groupId).orElse(null),
+                teacherId -> teacherRepository.findById(teacherId).orElse(null),
+                teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
+                roomId -> roomRepository.findById(roomId).orElse(null)
+        );
+
+        List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
+                newItem.getStartTime(),
+                newItem.getEndTime(),
+                newItem.getRoom().getId(),
+                newItem.getTeacher().getId(),
+                dto.groupIds()
+        );
+        if (!conflictingItems.isEmpty()) {
+            throw new IllegalStateException("Schedule conflict detected");
+        }
+
+        ScheduleItem savedItem = scheduleItemRepository.save(newItem);
+        return scheduleItemMapper.toDto(savedItem);
+    }
+
+    @Override
+    public ScheduleItemDTO getScheduleById(Long scheduleId) {
+        return null;
     }
 }

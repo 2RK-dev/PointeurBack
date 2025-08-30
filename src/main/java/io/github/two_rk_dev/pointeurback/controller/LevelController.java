@@ -75,16 +75,4 @@ public class LevelController {
         List<TeachingUnitDTO> teachingUnits = levelService.getTeachingUnits(levelId);
         return ResponseEntity.ok(teachingUnits);
     }
-
-    @PostMapping("/{levelId}/schedule")
-    public ResponseEntity<ScheduleItemDTO> addScheduleItem(
-            @PathVariable Long levelId,
-            @Valid @RequestBody CreateScheduleItemDTO dto) {
-        ScheduleItemDTO createdSchedule = levelService.addScheduleItem(levelId, dto);
-        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/levels/{levelId}/schedule/{schedule_item_id}")
-                .buildAndExpand(levelId, createdSchedule.id())
-                .toUri();
-        return ResponseEntity.created(location).body(createdSchedule);
-    }
 }

@@ -12,4 +12,5 @@ public interface ScheduleService {
     ScheduleItemDTO updateScheduleItem(Long id, UpdateScheduleItemDTO dto);
     void deleteScheduleItem(Long id);
 
+    ScheduleItemDTO getScheduleById(Long scheduleId);
 }
