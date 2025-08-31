@@ -75,11 +75,10 @@ public class TeachingUnitServiceImpl implements TeachingUnitService {
     @Override
     public void deleteTeachingUnit(Long id) {
         Optional<TeachingUnit> teachingUnit = teachingUnitRepository.findById(id);
-        if (teachingUnit.isEmpty()) return;
         if (!teachingUnit.get().getSchedules().isEmpty()) {
-            throw new IllegalStateException("Cannot delete teaching unit with associated schedules");
+            teachingUnit.get().getSchedules().clear();
         }
 
-        teachingUnitRepository.delete(teachingUnit.get());
+        teachingUnit.ifPresent(teachingUnitRepository::delete);;
     }
 }
