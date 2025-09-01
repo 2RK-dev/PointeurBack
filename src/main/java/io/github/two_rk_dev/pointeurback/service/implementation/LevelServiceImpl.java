@@ -91,8 +91,13 @@ public class LevelServiceImpl implements LevelService {
         Level existing = levelRepository.findById(id)
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + id));
         if (!existing.getGroups().isEmpty()) {
-            throw new RuntimeException("Impossible à Supprimer");
-        }
+                for (Group group : existing.getGroups()) {
+                    for (ScheduleItem scheduleItem : group.getSchedules()) {
+                        group.removeScheduleItem(scheduleItem);
+                    }
+                }
+                existing.getGroups().clear();
+            }
         levelRepository.delete(existing);
     }
 

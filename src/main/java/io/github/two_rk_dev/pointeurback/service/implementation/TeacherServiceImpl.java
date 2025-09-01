@@ -11,6 +11,7 @@ import io.github.two_rk_dev.pointeurback.service.TeacherService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
@@ -62,13 +63,10 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public void deleteTeacher(Long id) {
-        Teacher teacher = teacherRepository.findById(id)
-                .orElseThrow(() -> new TeacherNotFoundException("Teacher not found with id: " + id));
-
-        if (!teacher.getSchedules().isEmpty()) {
-            throw new IllegalStateException("Cannot delete teacher with associated schedules");
+        Optional<Teacher> teacher = teacherRepository.findById(id); 
+        if (!teacher.get().getSchedules().isEmpty()) {
+            teacher.get().getSchedules().clear();
         }
-
-        teacherRepository.delete(teacher);
+        teacher.ifPresent(teacherRepository::delete);
     }
 }

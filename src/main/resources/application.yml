@@ -7,17 +7,18 @@ spring:
     password: ${SPRING_DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
   flyway:
-    enabled: true
+    enabled: false
     baseline-on-migrate: true
     locations: classpath:db/migration
 
 server:
+  port: 8081
   servlet:
     context-path: /api/v1
   error:
