@@ -31,8 +31,8 @@ public class LevelController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LevelDTO>> getAllLevels() {
-        List<LevelDTO> levels = levelService.getAll();
+    public ResponseEntity<List<LevelDetailsDTO>> getAllLevels() {
+        List<LevelDetailsDTO> levels = levelService.getAll();
         return ResponseEntity.ok(levels);
     }
 
