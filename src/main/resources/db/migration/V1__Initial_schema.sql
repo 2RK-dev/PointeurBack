@@ -41,7 +41,8 @@ CREATE TABLE teaching_unit (
 );
 
 -- Création de la table Group
-CREATE TABLE "group" (
+CREATE TABLE groups
+(
                          group_id BIGSERIAL PRIMARY KEY,
     level_id BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
@@ -85,7 +86,7 @@ CREATE TABLE schedule_item_groups
     group_id         BIGINT NOT NULL,
     CONSTRAINT fk_schedule_item_groups_group
         FOREIGN KEY (group_id)
-            REFERENCES "group" (group_id)
+            REFERENCES groups (group_id)
             ON DELETE CASCADE,
     CONSTRAINT fk_schedule_item_groups_schedule_item
         FOREIGN KEY (schedule_item_id)
@@ -96,7 +97,7 @@ CREATE TABLE schedule_item_groups
 
 -- Création des index pour améliorer les performances
 CREATE INDEX idx_teaching_unit_level_id ON teaching_unit(level_id);
-CREATE INDEX idx_group_level_id ON "group"(level_id);
+CREATE INDEX idx_group_level_id ON groups (level_id);
 CREATE INDEX idx_scheduler_teacher_id ON schedule_item(teacher_id);
 CREATE INDEX idx_scheduler_teaching_unit_id ON schedule_item(teaching_unit_id);
 CREATE INDEX idx_scheduler_room_id ON schedule_item(room_id);
@@ -107,5 +108,5 @@ COMMENT ON TABLE level IS 'Table des niveaux d''enseignement';
 COMMENT ON TABLE teacher IS 'Table des enseignants';
 COMMENT ON TABLE room IS 'Table des salles de classe';
 COMMENT ON TABLE teaching_unit IS 'Table des unités d''enseignement';
-COMMENT ON TABLE "group" IS 'Table des groupes d''étudiants';
+COMMENT ON TABLE groups IS 'Table des groupes d''étudiants';
 COMMENT ON TABLE schedule_item IS 'Table de planification des cours';
