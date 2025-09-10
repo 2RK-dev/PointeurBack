@@ -9,7 +9,7 @@ services:
     depends_on:
       - postgres
   postgres:
-    image: postgres:14.10
+    image: postgres:16
     container_name: postgres_db
     env_file:
       - .env
