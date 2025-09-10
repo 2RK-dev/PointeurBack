@@ -66,13 +66,10 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public void deleteRoom(Long id) {
         Optional<Room> room = roomRepository.findById(id);
-        if (room.isEmpty()) return;
-
         if (!room.get().getSchedules().isEmpty()) {
-            throw new IllegalStateException("Cannot delete room with associated schedules");
+            room.get().getSchedules().clear();
         }
-
-        roomRepository.delete(room.get());
+        room.ifPresent(roomRepository::delete);
     }
 
     @Override
