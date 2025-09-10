@@ -7,6 +7,6 @@ FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-LABEL authors="Ryan the goat"
+LABEL authors="Ryan"
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
