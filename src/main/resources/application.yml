@@ -27,6 +27,6 @@ server:
     include-message: always
     include-binding-errors: always
 jwt:
-  secret: ${JWT_SECRET_KEY}
-  expiration: ${JWT_EXPIRATION}
+  secret: ${SPRING_JWT_SECRET_KEY}
+  expiration: ${SPRING_JWT_EXPIRATION}
 
