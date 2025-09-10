@@ -3,7 +3,7 @@ services:
     build: .
     container_name: spring_app
     ports:
-      - "${APP_PORT}:8080"
+      - "${APP_PORT}:${APP_PORT}"
     env_file:
       - .env
     depends_on:
