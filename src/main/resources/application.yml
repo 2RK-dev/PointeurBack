@@ -1,24 +1,26 @@
 spring:
   application:
-    name: disc-hard
+    name: SchedulerApp
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:prod}
   datasource:
     url: ${SPRING_DB_URL}
     username: ${SPRING_DB_USERNAME}
     password: ${SPRING_DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${SPRING_HIBERNATE_DDL_AUTO:update}
     show-sql: false
     properties:
       hibernate:
         format_sql: true
   flyway:
-    enabled: false
+    enabled: ${SPRING_FLYWAY_ENABLED:true}
     baseline-on-migrate: true
     locations: classpath:db/migration
 
 server:
-  port: 8081
+  port: ${APP_PORT:8080}
   servlet:
     context-path: /api/v1
   error:
@@ -27,3 +29,4 @@ server:
 jwt:
   secret: ${JWT_SECRET_KEY}
   expiration: ${JWT_EXPIRATION}
+
