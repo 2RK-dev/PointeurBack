@@ -21,7 +21,7 @@ import java.util.function.Function;
         uses = {TeacherMapper.class, TeachingUnitMapper.class, RoomMapper.class, GroupMapper.class})
 public interface ScheduleItemMapper {
 
-    DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "groups", source = "groups")
