@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public interface ScheduleItemRepository extends JpaRepository<ScheduleItem, Long> {
@@ -26,12 +26,12 @@ public interface ScheduleItemRepository extends JpaRepository<ScheduleItem, Long
             "WHERE ((si.room.id = :roomId OR si.teacher.id = :teacherId OR g.id IN :groupIds) " +
             "AND (si.startTime < :endTime AND si.endTime > :startTime))")
     List<ScheduleItem> findConflictingSchedule(
-            @Param("startTime") LocalDateTime startTime,
-            @Param("endTime") LocalDateTime endTime,
+            @Param("startTime") OffsetDateTime startTime,
+            @Param("endTime") OffsetDateTime endTime,
             @Param("roomId") Long roomId,
             @Param("teacherId") Long teacherId,
             @Param("groupIds") List<Long> groupIds);
 
-    List<ScheduleItem> findByStartTimeBetween(LocalDateTime startTime, LocalDateTime endTime);
+    List<ScheduleItem> findByStartTimeBetween(OffsetDateTime startTime, OffsetDateTime endTime);
 }
 

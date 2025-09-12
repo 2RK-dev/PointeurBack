@@ -12,7 +12,7 @@ import io.github.two_rk_dev.pointeurback.service.ScheduleService;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,8 +36,8 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public List<ScheduleItemDTO> getSchedule(@Nullable Long levelId, @Nullable Long groupId, String start, String endTime) {
-        LocalDateTime startDateTime = scheduleItemMapper.parseDateTime(start);
-        LocalDateTime endDateTime = scheduleItemMapper.parseDateTime(endTime);
+        OffsetDateTime startDateTime = scheduleItemMapper.parseDateTime(start);
+        OffsetDateTime endDateTime = scheduleItemMapper.parseDateTime(endTime);
 
         if (startDateTime == null || endDateTime == null) {
             throw new IllegalArgumentException("Start and end times must be provided");
