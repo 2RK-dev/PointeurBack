@@ -11,7 +11,7 @@ import io.github.two_rk_dev.pointeurback.model.*;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -55,9 +55,9 @@ public interface ScheduleItemMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromDto(UpdateScheduleItemDTO dto, @MappingTarget ScheduleItem entity);
 
-    default LocalDateTime parseDateTime(String dateTimeStr) {
+    default OffsetDateTime parseDateTime(String dateTimeStr) {
         if (dateTimeStr == null) return null;
-        return LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER);
+        return OffsetDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER);
     }
 
     default ScheduleItem createFromDto(@NotNull CreateScheduleItemDTO dto,
