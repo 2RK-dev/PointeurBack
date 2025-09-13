@@ -56,7 +56,7 @@ CREATE TABLE groups
     CONSTRAINT fk_group_level
         FOREIGN KEY (level_id)
             REFERENCES level (level_id)
-            ON DELETE SET NULL
+            ON DELETE CASCADE
 );
 
 -- Création de la table Scheduler
