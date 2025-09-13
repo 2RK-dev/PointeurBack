@@ -66,6 +66,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 existingItem.getTeacher().getId(),
                 dto.groupIds()
         );
+        conflictingItems.removeIf(si -> si.getId().equals(existingItem.getId()));
         if (!conflictingItems.isEmpty()) {
             throw new IllegalStateException("Schedule conflict detected");
         }
