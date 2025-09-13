@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -26,7 +25,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<RoomDTO> getAll(){
+    public List<RoomDTO> getAll() {
         List<Room> existing = roomRepository.findAll();
         return roomMapper.toDtoList(existing);
     }
@@ -65,11 +64,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public void deleteRoom(Long id) {
-        Optional<Room> room = roomRepository.findById(id);
-        if (!room.get().getSchedules().isEmpty()) {
-            room.get().getSchedules().clear();
-        }
-        room.ifPresent(roomRepository::delete);
+        roomRepository.deleteById(id);
     }
 
     @Override
