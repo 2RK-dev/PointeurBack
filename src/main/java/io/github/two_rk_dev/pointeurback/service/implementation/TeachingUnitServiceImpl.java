@@ -14,7 +14,6 @@ import io.github.two_rk_dev.pointeurback.service.TeachingUnitService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TeachingUnitServiceImpl implements TeachingUnitService {
@@ -47,9 +46,11 @@ public class TeachingUnitServiceImpl implements TeachingUnitService {
             throw new IllegalArgumentException("CreateTeachingUnitDTO cannot be null");
         }
 
-        Level level = levelRepository.findById(dto.levelId())
-                .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + dto.levelId()));
-
+        Level level = null;
+        if (dto.levelId() != null) {
+            level = levelRepository.findById(dto.levelId())
+                    .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + dto.levelId()));
+        }
         TeachingUnit newTeachingUnit = teachingUnitMapper.createTeachingUnitFromDto(dto, level);
         TeachingUnit savedTeachingUnit = teachingUnitRepository.save(newTeachingUnit);
         return teachingUnitMapper.toDto(savedTeachingUnit);
@@ -64,8 +65,11 @@ public class TeachingUnitServiceImpl implements TeachingUnitService {
         TeachingUnit existingTeachingUnit = teachingUnitRepository.findById(id)
                 .orElseThrow(() -> new TeachingUnitNotFoundException("Teaching unit not found with id: " + id));
 
-        Level level = levelRepository.findById(dto.levelId())
-                .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + dto.levelId()));
+        Level level = null;
+        if (dto.levelId() != null) {
+            level = levelRepository.findById(dto.levelId())
+                    .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + dto.levelId()));
+        }
 
         teachingUnitMapper.updateTeachingUnit(dto, existingTeachingUnit, level);
         TeachingUnit updatedTeachingUnit = teachingUnitRepository.save(existingTeachingUnit);
@@ -74,11 +78,6 @@ public class TeachingUnitServiceImpl implements TeachingUnitService {
 
     @Override
     public void deleteTeachingUnit(Long id) {
-        Optional<TeachingUnit> teachingUnit = teachingUnitRepository.findById(id);
-        if (!teachingUnit.get().getSchedules().isEmpty()) {
-            teachingUnit.get().getSchedules().clear();
-        }
-
-        teachingUnit.ifPresent(teachingUnitRepository::delete);;
+        teachingUnitRepository.deleteById(id);
     }
 }
