@@ -59,9 +59,11 @@ public class ScheduleServiceImpl implements ScheduleService {
         ScheduleItem existingItem = scheduleItemRepository.findById(id)
                 .orElseThrow(() -> new ScheduleItemNotFoundException("Schedule item not found with id: " + id));
 
+        OffsetDateTime newStart = scheduleItemMapper.parseDateTime(dto.startTime());
+        OffsetDateTime newEnd = scheduleItemMapper.parseDateTime(dto.endTime());
         List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
-                existingItem.getStartTime(),
-                existingItem.getEndTime(),
+                newStart,
+                newEnd,
                 existingItem.getRoom().getId(),
                 existingItem.getTeacher().getId(),
                 dto.groupIds()
