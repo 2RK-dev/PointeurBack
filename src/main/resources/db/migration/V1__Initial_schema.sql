@@ -77,7 +77,7 @@ CREATE TABLE schedule_item
     CONSTRAINT fk_scheduler_teaching_unit
         FOREIGN KEY (teaching_unit_id)
             REFERENCES teaching_unit (teaching_unit_id)
-            ON DELETE SET NULL,
+            ON DELETE CASCADE,
     CONSTRAINT fk_scheduler_room
         FOREIGN KEY (room_id)
             REFERENCES room (room_id)
