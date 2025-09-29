@@ -86,9 +86,12 @@ public interface ScheduleItemMapper {
             throw new TeachingUnitNotFoundException("TeachingUnit not found with id: " + dto.teachingUnitId());
         }
 
-        Room room = roomProvider.apply(dto.roomId());
-        if (room == null) {
-            throw new RoomNotFoundException("Room not found with id: " + dto.roomId());
+        Room room = null;
+        if (dto.roomId() != null) {
+            room = roomProvider.apply(dto.roomId());
+            if (room == null) {
+                throw new RoomNotFoundException("Room not found with id: " + dto.roomId());
+            }
         }
 
         ScheduleItem item = fromCreateDto(dto);
@@ -154,7 +157,7 @@ public interface ScheduleItemMapper {
                 throw new RoomNotFoundException("Room not found with id: " + dto.roomId());
             }
             entity.setRoom(room);
-        }
+        } else entity.setRoom(null);
 
         if (entity.getEndTime().isBefore(entity.getStartTime())) {
             throw new IllegalStateException("End time cannot be before startTime time");

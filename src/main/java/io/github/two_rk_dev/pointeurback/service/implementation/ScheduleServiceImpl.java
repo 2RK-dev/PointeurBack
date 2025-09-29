@@ -6,6 +6,7 @@ import io.github.two_rk_dev.pointeurback.dto.UpdateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.exception.GroupNotFoundException;
 import io.github.two_rk_dev.pointeurback.exception.ScheduleItemNotFoundException;
 import io.github.two_rk_dev.pointeurback.mapper.ScheduleItemMapper;
+import io.github.two_rk_dev.pointeurback.model.Room;
 import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
 import io.github.two_rk_dev.pointeurback.repository.*;
 import io.github.two_rk_dev.pointeurback.service.ScheduleService;
@@ -64,7 +65,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
                 newStart,
                 newEnd,
-                existingItem.getRoom().getId(),
+                Optional.ofNullable(existingItem.getRoom()).map(Room::getId).orElse(null),
                 existingItem.getTeacher().getId(),
                 dto.groupIds()
         );
@@ -108,7 +109,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
                 newItem.getStartTime(),
                 newItem.getEndTime(),
-                newItem.getRoom().getId(),
+                Optional.ofNullable(newItem.getRoom()).map(Room::getId).orElse(null),
                 newItem.getTeacher().getId(),
                 dto.groupIds()
         );
