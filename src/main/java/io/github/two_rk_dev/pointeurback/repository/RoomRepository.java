@@ -19,4 +19,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findAvailableRooms(@Param("startTime") LocalDateTime start,
                                   @Param("endTime") LocalDateTime endTime,
                                   @Param("size") int size);
+
+
+    boolean existsByName(String name);
 }

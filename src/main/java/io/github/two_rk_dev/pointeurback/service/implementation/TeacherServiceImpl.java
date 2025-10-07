@@ -69,4 +69,27 @@ public class TeacherServiceImpl implements TeacherService {
         }
         teacher.ifPresent(teacherRepository::delete);
     }
+
+    @Override
+    public void saveTeachers(CreateTeacherDTO[] teachers) {
+        if (teachers == null) {
+            throw new IllegalArgumentException("teachers array cannot be null");
+        }
+
+        List<Teacher> toSave = new java.util.ArrayList<>();
+        for (CreateTeacherDTO dto : teachers) {
+            if (dto == null) continue;
+            Teacher teacher = teacherMapper.createTeacherFromDto(dto);
+            if (teacher == null || teacher.getName() == null) continue;
+            if (teacherRepository.existsByName(teacher.getName()) ||
+                    (teacher.getAbbreviation() != null && teacherRepository.existsByAbbreviation(teacher.getAbbreviation()))) {
+                continue;
+            }
+            toSave.add(teacher);
+        }
+
+        if (!toSave.isEmpty()) {
+            teacherRepository.saveAll(toSave);
+        }
+    }
 }

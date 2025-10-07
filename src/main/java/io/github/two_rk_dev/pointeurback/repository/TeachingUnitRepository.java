@@ -14,4 +14,7 @@ public interface TeachingUnitRepository extends JpaRepository<TeachingUnit, Long
     Optional<TeachingUnit> findByAbbreviation(String abbreviation);
 
     List<TeachingUnit> findByNameContainingIgnoreCase(String name);
+
+    boolean existsByName(String name);
+    boolean existsByAbbreviation(String abbreviation);
 }

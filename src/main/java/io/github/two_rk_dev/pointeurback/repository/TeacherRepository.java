@@ -13,4 +13,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
     Optional<Teacher> findByAbbreviation(String abbreviation);
 
     List<Teacher> findByNameContainingIgnoreCase(String name);
+
+    boolean existsByName(String name);
+    boolean existsByAbbreviation(String abbreviation);
 }

@@ -80,4 +80,31 @@ public class TeachingUnitServiceImpl implements TeachingUnitService {
     public void deleteTeachingUnit(Long id) {
         teachingUnitRepository.deleteById(id);
     }
+
+    @Override
+    public void saveTeachingUnits(CreateTeachingUnitDTO[] teachingUnits) {
+        if (teachingUnits == null) {
+            throw new IllegalArgumentException("teachingUnits array cannot be null");
+        }
+
+        List<TeachingUnit> toSave = new java.util.ArrayList<>();
+        for (CreateTeachingUnitDTO dto : teachingUnits) {
+            if (dto == null) continue;
+            Level level = null;
+            if (dto.levelId() != null) {
+                level = levelRepository.findById(dto.levelId()).orElse(null);
+            }
+            if (dto.name() == null) continue;
+            if (teachingUnitRepository.existsByName(dto.name()) ||
+                    (dto.abbreviation() != null && teachingUnitRepository.existsByAbbreviation(dto.abbreviation()))) {
+                continue;
+            }
+            TeachingUnit tu = teachingUnitMapper.createTeachingUnitFromDto(dto, level);
+            toSave.add(tu);
+        }
+
+        if (!toSave.isEmpty()) {
+            teachingUnitRepository.saveAll(toSave);
+        }
+    }
 }
