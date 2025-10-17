@@ -3,7 +3,7 @@ package io.github.two_rk_dev.pointeurback.controller;
 import io.github.two_rk_dev.pointeurback.dto.CreateTeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.dto.TeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeachingUnitDTO;
-import io.github.two_rk_dev.pointeurback.service.implementation.TeachingUnitServiceImpl;
+import io.github.two_rk_dev.pointeurback.service.TeachingUnitService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +16,9 @@ import java.util.List;
 @RequestMapping("/teachingUnits")
 public class TeachingUnitController {
 
-    private final TeachingUnitServiceImpl teachingUnitService;
+    private final TeachingUnitService teachingUnitService;
 
-    public TeachingUnitController(TeachingUnitServiceImpl teachingUnitService) {
+    public TeachingUnitController(TeachingUnitService teachingUnitService) {
         this.teachingUnitService = teachingUnitService;
     }
 

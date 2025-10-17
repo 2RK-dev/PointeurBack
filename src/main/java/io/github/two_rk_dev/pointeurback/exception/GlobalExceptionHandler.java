@@ -163,4 +163,37 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(validationErrorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(InvalidFileFormatException.class)
+    public ResponseEntity<ErrorDetails> handleInvalidFileCodecException(@NotNull InvalidFileFormatException ex) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                OffsetDateTime.now(ZoneOffset.UTC),
+                ex.getMessage(),
+                ex.getMessage(),
+                "INVALID_FILE_CODEC"
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UnknownEntityException.class)
+    public ResponseEntity<ErrorDetails> handleUnknownEntityException(@NotNull UnknownEntityException ex) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                OffsetDateTime.now(ZoneOffset.UTC),
+                ex.getMessage(),
+                ex.getMessage(),
+                "UNKNOWN_ENTITY"
+        );
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
+
+    @ExceptionHandler(UnsupportedCodecException.class)
+    public ResponseEntity<ErrorDetails> handleUnsupportedCodecException(@NotNull UnsupportedCodecException ex) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                OffsetDateTime.now(ZoneOffset.UTC),
+                ex.getMessage(),
+                ex.getMessage(),
+                "UNSUPPORTED_CODEC"
+        );
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
 }

@@ -5,16 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface TeachingUnitRepository extends JpaRepository<TeachingUnit, Long> {
     List<TeachingUnit> findByLevelId(Long LevelId);
-
-    Optional<TeachingUnit> findByAbbreviation(String abbreviation);
-
-    List<TeachingUnit> findByNameContainingIgnoreCase(String name);
-
     boolean existsByName(String name);
     boolean existsByAbbreviation(String abbreviation);
 }

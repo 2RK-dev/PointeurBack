@@ -12,12 +12,6 @@ public interface ScheduleItemRepository extends JpaRepository<ScheduleItem, Long
 
     List<ScheduleItem> findByGroupsId(Long groupId);
 
-    List<ScheduleItem> findByTeacherId(Long teacherId);
-
-    List<ScheduleItem> findByTeachingUnitId(Long teachingUnitId);
-
-    List<ScheduleItem> findByRoomId(Long roomId);
-
     @Query("SELECT s FROM ScheduleItem s WHERE EXISTS (SELECT 1 FROM s.groups g WHERE g.level.id = :levelId)")
     List<ScheduleItem> findByLevelId(@Param("levelId") Long levelId);
 

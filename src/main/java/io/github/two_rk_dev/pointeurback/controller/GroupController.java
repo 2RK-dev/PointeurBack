@@ -2,7 +2,7 @@ package io.github.two_rk_dev.pointeurback.controller;
 
 import io.github.two_rk_dev.pointeurback.dto.GroupDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateGroupDTO;
-import io.github.two_rk_dev.pointeurback.service.implementation.GroupServiceImpl;
+import io.github.two_rk_dev.pointeurback.service.GroupService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/levels/{levelId}/groups")
 public class  GroupController {
 
-    private final GroupServiceImpl groupService;
+    private final GroupService groupService;
 
-    public GroupController(GroupServiceImpl groupService) {
+    public GroupController(GroupService groupService) {
         this.groupService = groupService;
     }
 

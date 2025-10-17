@@ -3,7 +3,7 @@ package io.github.two_rk_dev.pointeurback.controller;
 import io.github.two_rk_dev.pointeurback.dto.CreateRoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.RoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateRoomDTO;
-import io.github.two_rk_dev.pointeurback.service.implementation.RoomServiceImpl;
+import io.github.two_rk_dev.pointeurback.service.RoomService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +17,9 @@ import java.util.List;
 @RequestMapping("/rooms")
 public class RoomController {
 
-    private final RoomServiceImpl roomService;
+    private final RoomService roomService;
 
-    public RoomController(RoomServiceImpl roomService) {
+    public RoomController(RoomService roomService) {
         this.roomService = roomService;
     }
 

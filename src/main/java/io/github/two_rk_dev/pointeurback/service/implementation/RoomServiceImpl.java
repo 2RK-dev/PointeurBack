@@ -35,7 +35,6 @@ public class RoomServiceImpl implements RoomService {
         if (dto == null) {
             throw new IllegalArgumentException("CreateRoomDTO cannot be null");
         }
-
         Room newRoom = roomMapper.createRoomFromDto(dto);
         Room savedRoom = roomRepository.save(newRoom);
         return roomMapper.toDto(savedRoom);
@@ -53,7 +52,6 @@ public class RoomServiceImpl implements RoomService {
         if (dto == null) {
             throw new IllegalArgumentException("UpdateRoomDTO cannot be null");
         }
-
         Room existingRoom = roomRepository.findById(id)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found with id: " + id));
 

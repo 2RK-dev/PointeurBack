@@ -89,15 +89,14 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public void deleteScheduleItem(Long id) {
-        Optional<ScheduleItem> item = scheduleItemRepository.findById(id);
-        item.ifPresent(scheduleItemRepository::delete);
+        scheduleItemRepository.deleteById(id);
     }
 
+    @Override
     public ScheduleItemDTO addScheduleItem(CreateScheduleItemDTO dto) {
         if (dto == null) {
             throw new IllegalArgumentException("CreateScheduleItemDTO cannot be null");
         }
-
         ScheduleItem newItem = scheduleItemMapper.createFromDto(
                 dto,
                 groupId -> groupRepository.findById(groupId).orElse(null),

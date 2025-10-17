@@ -67,20 +67,5 @@ public class ScheduleItem {
         }
     }
 
-    public void addRoom(Room newRoom) {
-        if (this.room == newRoom) {
-            return;
-        }
-
-        Room oldRoom = this.room;
-        if (oldRoom != null) {
-            oldRoom.getSchedules().remove(this);
-        }
-
-        this.room = newRoom;
-        if (newRoom != null && !newRoom.getSchedules().contains(this)) {
-            newRoom.getSchedules().add(this);
-        }
-    }
 }
 

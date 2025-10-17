@@ -1,32 +1,30 @@
 package io.github.two_rk_dev.pointeurback.controller;
 
-import io.github.two_rk_dev.pointeurback.importService.FileImportContext;
+import io.github.two_rk_dev.pointeurback.exception.InvalidFileFormatException;
+import io.github.two_rk_dev.pointeurback.service.ImportService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/import")
 public class ImportController {
+    private final ImportService importService;
 
-    private final FileImportContext context;
-
-    public ImportController(FileImportContext context) {
-        this.context = context;
+    public ImportController(ImportService importService) {
+        this.importService = importService;
     }
 
     @PostMapping("/{entityType}/upload")
     public ResponseEntity<String> importFile(@PathVariable("entityType") String entityType,
-                                             @RequestParam("file") MultipartFile file,
-                                             @RequestParam(value = "levelId", required = false) Long levelId) {
-        Objects.requireNonNull(file, "file is required");
-        context.importFile(entityType, file);
+                                             @RequestParam("file") MultipartFile file) {
+        try {
+            importService.import_(entityType, file);
+        } catch (IOException e) {
+            throw new InvalidFileFormatException("Corrupted file: %s or wrong content type".formatted(file.getOriginalFilename()), e);
+        }
         return ResponseEntity.ok("File imported for entity: " + entityType);
     }
 }

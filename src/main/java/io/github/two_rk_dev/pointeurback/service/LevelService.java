@@ -7,7 +7,9 @@ import java.util.List;
 public interface LevelService {
     LevelDTO createLevel(CreateLevelDTO dto);
 
-    List<LevelDetailsDTO> getAll();
+    List<LevelDetailsDTO> getAllDetailed();
+
+    List<LevelDTO> getAll();
     LevelDetailsDTO getDetails(Long Id);
     LevelDTO updateLevel(Long id, UpdateLevelDTO dto);
     void deleteLevel (Long id);

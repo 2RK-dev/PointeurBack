@@ -37,13 +37,6 @@ public interface GroupMapper {
     @Mapping(target = "schedules", ignore = true)
     void updateFromUpdateDto(UpdateGroupDTO dto, @MappingTarget Group entity);
 
-    default void updateGroup(UpdateGroupDTO updateDto, Group group) {
-        if (updateDto == null) {
-            return;
-        }
-        updateFromUpdateDto(updateDto, group);
-    }
-
     @IterableMapping(qualifiedByName = "toDto")
     List<GroupDTO> toDtoList(List<Group> entities);
 
