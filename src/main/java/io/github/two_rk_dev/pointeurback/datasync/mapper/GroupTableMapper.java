@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Component("group_table_mapper")
 public class GroupTableMapper implements EntityTableMapper {
-    private static final Map<String, CsvFieldBinding<CreateGroupDTO>> DEFAULT_MAPPING = Utils.buildMapping(CreateGroupDTO.class);
+    private static final Map<String, ColumnFieldBinding<CreateGroupDTO>> DEFAULT_MAPPING = Utils.buildMapping(CreateGroupDTO.class);
     private final GroupService groupService;
     private final ObjectMapper objectMapper;
 

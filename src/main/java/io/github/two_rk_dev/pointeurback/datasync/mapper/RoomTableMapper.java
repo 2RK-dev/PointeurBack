@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Component("room_table_mapper")
 public class RoomTableMapper implements EntityTableMapper {
-    private static final Map<String, CsvFieldBinding<CreateRoomDTO>> DEFAULT_MAPPING = Utils.buildMapping(CreateRoomDTO.class);
+    private static final Map<String, ColumnFieldBinding<CreateRoomDTO>> DEFAULT_MAPPING = Utils.buildMapping(CreateRoomDTO.class);
     private final RoomService roomService;
     private final ObjectMapper objectMapper;
 

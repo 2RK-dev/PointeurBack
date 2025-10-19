@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Component("level_table_mapper")
 public class LevelTableMapper implements EntityTableMapper {
-    private static final Map<String, CsvFieldBinding<CreateLevelDTO>> DEFAULT_MAPPING = Utils.buildMapping(CreateLevelDTO.class);
+    private static final Map<String, ColumnFieldBinding<CreateLevelDTO>> DEFAULT_MAPPING = Utils.buildMapping(CreateLevelDTO.class);
     private final LevelService levelService;
     private final ObjectMapper objectMapper;
 

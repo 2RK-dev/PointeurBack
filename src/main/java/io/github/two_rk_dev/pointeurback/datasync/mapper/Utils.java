@@ -20,7 +20,7 @@ class Utils {
     @SuppressWarnings("unchecked")
     public static <T extends Record> T @NotNull [] parseDTOs(@NotNull TableData data,
                                                              @NotNull Class<T> clazz,
-                                                             Map<String, @NotNull CsvFieldBinding<T>> bindings,
+                                                             Map<String, @NotNull ColumnFieldBinding<T>> bindings,
                                                              ObjectMapper objectMapper) {
         return data.rows().stream()
                 .map(r -> parseDTO(r, data.headers(), clazz, bindings, objectMapper))
@@ -33,14 +33,14 @@ class Utils {
     public static <T extends Record> Optional<T> parseDTO(@NotNull List<String> row,
                                                           @NotNull List<String> headers,
                                                           @NotNull Class<T> clazz,
-                                                          @NotNull Map<String, CsvFieldBinding<T>> bindings,
+                                                          @NotNull Map<String, ColumnFieldBinding<T>> bindings,
                                                           ObjectMapper objectMapper) {
         assert bindings.size() == row.size();
         Object[] args = new Object[bindings.size()];
         for (Iterator<String> rowIt = row.iterator(), headersIt = headers.iterator();
              headersIt.hasNext() && rowIt.hasNext();
         ) {
-            CsvFieldBinding<T> binding = bindings.get(headersIt.next());
+            ColumnFieldBinding<T> binding = bindings.get(headersIt.next());
             args[binding.order()] = objectMapper.convertValue(rowIt.next(), binding.fieldType());
         }
         try {
@@ -73,12 +73,12 @@ class Utils {
                 .toList();
     }
 
-    public static <T extends Record> @NotNull Map<String, CsvFieldBinding<T>> buildMapping(@NotNull Class<T> clazz) {
-        Map<String, CsvFieldBinding<T>> bindings = new HashMap<>();
+    public static <T extends Record> @NotNull Map<String, ColumnFieldBinding<T>> buildMapping(@NotNull Class<T> clazz) {
+        Map<String, ColumnFieldBinding<T>> bindings = new HashMap<>();
         RecordComponent[] recordComponents = clazz.getRecordComponents();
         for (int i = 0; i < recordComponents.length; i++) {
             RecordComponent field = recordComponents[i];
-            CsvField ann = field.getAnnotation(CsvField.class);
+            ColumnField ann = field.getAnnotation(ColumnField.class);
             String header = (ann == null || ann.header().isBlank()) ? field.getName() : ann.header();
             Function<T, String> reader = dto -> {
                 try {
@@ -87,12 +87,12 @@ class Utils {
                     throw new RuntimeException(e);
                 }
             };
-            bindings.put(header, new CsvFieldBinding<>(i, reader, field.getType()));
+            bindings.put(header, new ColumnFieldBinding<>(i, reader, field.getType()));
         }
         return bindings;
     }
 
-    public static <T extends Record> @Unmodifiable @NotNull List<String> getHeaders(@NotNull Map<String, CsvFieldBinding<T>> bindingMap) {
+    public static <T extends Record> @Unmodifiable @NotNull List<String> getHeaders(@NotNull Map<String, ColumnFieldBinding<T>> bindingMap) {
         return bindingMap.entrySet()
                 .stream().sorted(Comparator.comparing(entry -> entry.getValue().order()))
                 .map(Map.Entry::getKey)

@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Component("teacher_table_mapper")
 public class TeacherTableMapper implements EntityTableMapper {
-    private static final Map<String, CsvFieldBinding<CreateTeacherDTO>> DEFAULT_MAPPING = Utils.buildMapping(CreateTeacherDTO.class);
+    private static final Map<String, ColumnFieldBinding<CreateTeacherDTO>> DEFAULT_MAPPING = Utils.buildMapping(CreateTeacherDTO.class);
     private final TeacherService teacherService;
     private final ObjectMapper objectMapper;
 
