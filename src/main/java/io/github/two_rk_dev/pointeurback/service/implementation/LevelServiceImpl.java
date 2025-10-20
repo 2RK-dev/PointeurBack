@@ -56,9 +56,13 @@ public class LevelServiceImpl implements LevelService {
 
     @Transactional
     @Override
-    public List<LevelDetailsDTO> getAll() {
-        List<Level> existing = levelRepository.findAll();
-        return existing.stream().map(levelMapper::toDetailsDto).toList();
+    public List<LevelDetailsDTO> getAllDetailed() {
+        return levelRepository.findAll().stream().map(levelMapper::toDetailsDto).toList();
+    }
+
+    @Override
+    public List<LevelDTO> getAll() {
+        return levelRepository.findAll().stream().map(levelMapper::toDto).toList();
     }
 
     @Override
@@ -76,7 +80,6 @@ public class LevelServiceImpl implements LevelService {
                             .toList()
             );
         }
-
         return detailsDto;
     }
     @Override

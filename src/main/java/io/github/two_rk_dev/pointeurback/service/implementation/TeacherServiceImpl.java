@@ -11,13 +11,14 @@ import io.github.two_rk_dev.pointeurback.service.TeacherService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
 
     private final TeacherRepository teacherRepository;
     private final TeacherMapper teacherMapper;
+
     public TeacherServiceImpl(TeacherRepository teacherRepository, TeacherMapper teacherMapper) {
         this.teacherRepository = teacherRepository;
         this.teacherMapper = teacherMapper;
@@ -52,7 +53,6 @@ public class TeacherServiceImpl implements TeacherService {
         if (dto == null) {
             throw new IllegalArgumentException("UpdateTeacherDTO cannot be null");
         }
-
         Teacher existingTeacher = teacherRepository.findById(id)
                 .orElseThrow(() -> new TeacherNotFoundException("Teacher not found with id: " + id));
 
@@ -63,10 +63,25 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public void deleteTeacher(Long id) {
-        Optional<Teacher> teacher = teacherRepository.findById(id); 
-        if (!teacher.get().getSchedules().isEmpty()) {
-            teacher.get().getSchedules().clear();
+        teacherRepository.deleteById(id);
+    }
+
+    @Override
+    public void saveTeachers(CreateTeacherDTO[] teachers) {
+        Objects.requireNonNull(teachers, "teachers array cannot be null");
+        List<Teacher> toSave = new java.util.ArrayList<>();
+        for (CreateTeacherDTO dto : teachers) {
+            if (dto == null) continue;
+            Teacher teacher = teacherMapper.createTeacherFromDto(dto);
+            if (teacher == null || teacher.getName() == null
+                || teacherRepository.existsByName(teacher.getName())
+                || (teacher.getAbbreviation() != null && teacherRepository.existsByAbbreviation(teacher.getAbbreviation())))
+                continue;
+            toSave.add(teacher);
         }
-        teacher.ifPresent(teacherRepository::delete);
+
+        if (!toSave.isEmpty()) {
+            teacherRepository.saveAll(toSave);
+        }
     }
 }

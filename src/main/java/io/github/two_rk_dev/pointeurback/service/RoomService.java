@@ -14,4 +14,5 @@ public interface RoomService {
     RoomDTO updateRoom(Long id, UpdateRoomDTO dto);
     void deleteRoom(Long id);
     List<RoomDTO> getAvailableRooms(LocalDateTime start, LocalDateTime endTime, int size);
+    void saveRooms(CreateRoomDTO[] rooms);
 }

@@ -1,7 +1,7 @@
 package io.github.two_rk_dev.pointeurback.controller;
 
 import io.github.two_rk_dev.pointeurback.dto.*;
-import io.github.two_rk_dev.pointeurback.service.implementation.LevelServiceImpl;
+import io.github.two_rk_dev.pointeurback.service.LevelService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +14,9 @@ import java.util.List;
 @RequestMapping("/levels")
 public class LevelController {
 
-    private final LevelServiceImpl levelService;
+    private final LevelService levelService;
 
-    public LevelController(LevelServiceImpl levelService) {
+    public LevelController(LevelService levelService) {
         this.levelService = levelService;
     }
 
@@ -32,7 +32,7 @@ public class LevelController {
 
     @GetMapping
     public ResponseEntity<List<LevelDetailsDTO>> getAllLevels() {
-        List<LevelDetailsDTO> levels = levelService.getAll();
+        List<LevelDetailsDTO> levels = levelService.getAllDetailed();
         return ResponseEntity.ok(levels);
     }
 

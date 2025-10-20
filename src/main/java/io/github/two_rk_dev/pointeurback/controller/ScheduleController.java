@@ -3,7 +3,7 @@ package io.github.two_rk_dev.pointeurback.controller;
 import io.github.two_rk_dev.pointeurback.dto.CreateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.ScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateScheduleItemDTO;
-import io.github.two_rk_dev.pointeurback.service.implementation.ScheduleServiceImpl;
+import io.github.two_rk_dev.pointeurback.service.ScheduleService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +16,9 @@ import java.util.List;
 @RequestMapping("/schedule")
 public class ScheduleController {
 
-    private final ScheduleServiceImpl scheduleService;
+    private final ScheduleService scheduleService;
 
-    public ScheduleController(ScheduleServiceImpl scheduleService) {
+    public ScheduleController(ScheduleService scheduleService) {
         this.scheduleService = scheduleService;
     }
 

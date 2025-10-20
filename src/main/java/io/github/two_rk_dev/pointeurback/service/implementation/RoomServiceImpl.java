@@ -35,7 +35,6 @@ public class RoomServiceImpl implements RoomService {
         if (dto == null) {
             throw new IllegalArgumentException("CreateRoomDTO cannot be null");
         }
-
         Room newRoom = roomMapper.createRoomFromDto(dto);
         Room savedRoom = roomRepository.save(newRoom);
         return roomMapper.toDto(savedRoom);
@@ -53,7 +52,6 @@ public class RoomServiceImpl implements RoomService {
         if (dto == null) {
             throw new IllegalArgumentException("UpdateRoomDTO cannot be null");
         }
-
         Room existingRoom = roomRepository.findById(id)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found with id: " + id));
 
@@ -82,4 +80,29 @@ public class RoomServiceImpl implements RoomService {
         List<Room> availableRooms = roomRepository.findAvailableRooms(start, endTime, size);
         return roomMapper.toDtoList(availableRooms);
     }
+
+    public void saveRooms(CreateRoomDTO[] rooms) {
+        if (rooms == null) {
+            throw new IllegalArgumentException("rooms array cannot be null");
+        }
+
+        List<Room> toSave = new java.util.ArrayList<>();
+        for (CreateRoomDTO roomDTO : rooms) {
+            if (roomDTO == null) {
+                continue;
+            }
+            Room room = roomMapper.createRoomFromDto(roomDTO);
+            if (room == null || room.getName() == null) {
+                continue; // skip malformed entries
+            }
+            if (roomRepository.existsByName(room.getName())) {
+                continue; // Skip saving if a room with the same name already exists
+            }
+            toSave.add(room);
+        }
+
+        if (!toSave.isEmpty()) {
+            roomRepository.saveAll(toSave);
+        }
+  }
 }
