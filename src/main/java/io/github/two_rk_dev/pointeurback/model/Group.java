@@ -23,6 +23,10 @@ public class Group {
 
     private String name;
 
+    private String type;
+
+    private String classe;
+
     private Integer size;
 
     @ManyToOne

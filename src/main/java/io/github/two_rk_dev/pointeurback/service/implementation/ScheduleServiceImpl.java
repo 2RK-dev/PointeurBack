@@ -1,5 +1,12 @@
 package io.github.two_rk_dev.pointeurback.service.implementation;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import org.jetbrains.annotations.Nullable;
+import org.springframework.stereotype.Service;
+
 import io.github.two_rk_dev.pointeurback.dto.CreateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.ScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateScheduleItemDTO;
@@ -8,14 +15,12 @@ import io.github.two_rk_dev.pointeurback.exception.ScheduleItemNotFoundException
 import io.github.two_rk_dev.pointeurback.mapper.ScheduleItemMapper;
 import io.github.two_rk_dev.pointeurback.model.Room;
 import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
-import io.github.two_rk_dev.pointeurback.repository.*;
+import io.github.two_rk_dev.pointeurback.repository.GroupRepository;
+import io.github.two_rk_dev.pointeurback.repository.RoomRepository;
+import io.github.two_rk_dev.pointeurback.repository.ScheduleItemRepository;
+import io.github.two_rk_dev.pointeurback.repository.TeacherRepository;
+import io.github.two_rk_dev.pointeurback.repository.TeachingUnitRepository;
 import io.github.two_rk_dev.pointeurback.service.ScheduleService;
-import org.jetbrains.annotations.Nullable;
-import org.springframework.stereotype.Service;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
@@ -92,15 +97,14 @@ public class ScheduleServiceImpl implements ScheduleService {
 
   @Override
   public void deleteScheduleItem(Long id) {
-    Optional<ScheduleItem> item = scheduleItemRepository.findById(id);
-    item.ifPresent(scheduleItemRepository::delete);
+    scheduleItemRepository.deleteById(id);
   }
 
+  @Override
   public ScheduleItemDTO addScheduleItem(CreateScheduleItemDTO dto) {
     if (dto == null) {
       throw new IllegalArgumentException("CreateScheduleItemDTO cannot be null");
     }
-
     ScheduleItem newItem = scheduleItemMapper.createFromDto(
         dto,
         groupId -> groupRepository.findById(groupId).orElse(null),
@@ -118,41 +122,12 @@ public class ScheduleServiceImpl implements ScheduleService {
       throw new IllegalStateException("Schedule conflict detected");
     }
 
-    @Override
-    public void deleteScheduleItem(Long id) {
-        scheduleItemRepository.deleteById(id);
-    }
+    ScheduleItem savedItem = scheduleItemRepository.save(newItem);
+    return scheduleItemMapper.toDto(savedItem);
+  }
 
-    @Override
-    public ScheduleItemDTO addScheduleItem(CreateScheduleItemDTO dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("CreateScheduleItemDTO cannot be null");
-        }
-        ScheduleItem newItem = scheduleItemMapper.createFromDto(
-                dto,
-                groupId -> groupRepository.findById(groupId).orElse(null),
-                teacherId -> teacherRepository.findById(teacherId).orElse(null),
-                teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
-                roomId -> roomRepository.findById(roomId).orElse(null)
-        );
-
-        List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
-                newItem.getStartTime(),
-                newItem.getEndTime(),
-                Optional.ofNullable(newItem.getRoom()).map(Room::getId).orElse(null),
-                newItem.getTeacher().getId(),
-                dto.groupIds()
-        );
-        if (!conflictingItems.isEmpty()) {
-            throw new IllegalStateException("Schedule conflict detected");
-        }
-
-        ScheduleItem savedItem = scheduleItemRepository.save(newItem);
-        return scheduleItemMapper.toDto(savedItem);
-    }
-
-    @Override
-    public ScheduleItemDTO getScheduleById(Long scheduleId) {
-        return null;
-    }
+  @Override
+  public ScheduleItemDTO getScheduleById(Long scheduleId) {
+    return null;
+  }
 }

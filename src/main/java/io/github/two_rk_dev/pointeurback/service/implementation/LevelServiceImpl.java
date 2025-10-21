@@ -76,7 +76,7 @@ public class LevelServiceImpl implements LevelService {
             detailsDto = new LevelDetailsDTO(
                     levelMapper.toDto(existing),
                     groups.stream()
-                            .map(g -> new GroupDTO(g.getId(), g.getName(), g.getSize(), null))
+                            .map(g -> new GroupDTO(g.getId(), g.getName(), g.getType(), g.getClasse(), g.getSize(), null))
                             .toList()
             );
         }
@@ -120,6 +120,8 @@ public class LevelServiceImpl implements LevelService {
                 .map(group -> new GroupDTO(
                         group.getId(),
                         group.getName(),
+                        group.getType(),
+                        group.getClasse(),
                         group.getSize(),
                         null))
                 .toList();

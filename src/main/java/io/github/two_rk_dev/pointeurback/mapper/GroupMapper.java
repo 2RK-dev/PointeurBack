@@ -26,8 +26,6 @@ public interface GroupMapper {
   @Mapping(target = "level", ignore = true)
   GroupDTO toDtoWithoutLevel(Group entity);
 
-  @Mapping(target = "id", ignore = true)
-  @Mapping(target = "level", ignore = true)
   @Mapping(target = "schedules", ignore = true)
   Group fromCreateDto(CreateGroupDTO dto);
 
@@ -37,11 +35,6 @@ public interface GroupMapper {
     return group;
   }
 
-  @Mapping(target = "id", ignore = true)
-  @Mapping(target = "level", ignore = true)
-  @Mapping(target = "schedules", ignore = true)
-  void updateFromUpdateDto(UpdateGroupDTO dto, @MappingTarget Group entity);
-
   default void updateGroup(UpdateGroupDTO updateDto, Group group) {
     if (updateDto == null) {
       return;
@@ -49,12 +42,10 @@ public interface GroupMapper {
     updateFromUpdateDto(updateDto, group);
   }
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "level", ignore = true)
-    @Mapping(target = "schedules", ignore = true)
-    void updateFromUpdateDto(UpdateGroupDTO dto, @MappingTarget Group entity);
+  @Mapping(target = "schedules", ignore = true)
+  void updateFromUpdateDto(UpdateGroupDTO dto, @MappingTarget Group entity);
 
-    @IterableMapping(qualifiedByName = "toDto")
-    List<GroupDTO> toDtoList(List<Group> entities);
+  @IterableMapping(qualifiedByName = "toDto")
+  List<GroupDTO> toDtoList(List<Group> entities);
 
 }
