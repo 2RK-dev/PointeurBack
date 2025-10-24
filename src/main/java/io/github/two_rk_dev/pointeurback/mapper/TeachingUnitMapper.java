@@ -5,11 +5,18 @@ import io.github.two_rk_dev.pointeurback.dto.TeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.model.Level;
 import io.github.two_rk_dev.pointeurback.model.TeachingUnit;
-import org.mapstruct.*;
+
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {LevelMapper.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {LevelMapper.class})
 public interface TeachingUnitMapper {
 
     @Mapping(target = "level", source = "level")
@@ -35,7 +42,8 @@ public interface TeachingUnitMapper {
         return teachingUnit;
     }
 
-    default void updateTeachingUnit(UpdateTeachingUnitDTO updateDto, TeachingUnit teachingUnit, Level level) {
+    default void updateTeachingUnit(
+            UpdateTeachingUnitDTO updateDto, TeachingUnit teachingUnit, Level level) {
         if (updateDto != null) {
             updateFromDto(updateDto, teachingUnit);
             teachingUnit.setLevel(level);
