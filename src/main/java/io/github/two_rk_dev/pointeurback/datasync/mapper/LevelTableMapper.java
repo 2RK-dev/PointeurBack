@@ -23,7 +23,7 @@ public class LevelTableMapper implements EntityTableMapper {
 
     @Override
     public void persist(@NotNull TableData tableData) {
-        CreateLevelDTO[] dtos = Utils.parseDTOs(tableData, CreateLevelDTO.class, DEFAULT_MAPPING, objectMapper);
+        CreateLevelDTO[] dtos = Utils.parseDTOs(tableData, CreateLevelDTO.class, DEFAULT_MAPPING, objectMapper).toArray(CreateLevelDTO[]::new);
         for (CreateLevelDTO dto : dtos) {
             levelService.createLevel(dto);
         }

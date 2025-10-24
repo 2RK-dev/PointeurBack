@@ -8,25 +8,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.RecordComponent;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 @Slf4j
 @UtilityClass
 class Utils {
-    @SuppressWarnings("unchecked")
-    public static <T extends Record> T @NotNull [] parseDTOs(@NotNull TableData data,
-                                                             @NotNull Class<T> clazz,
-                                                             Map<String, @NotNull ColumnFieldBinding<T>> bindings,
-                                                             ObjectMapper objectMapper) {
+    public static <T extends Record> Stream<T> parseDTOs(@NotNull TableData data,
+                                                         @NotNull Class<T> clazz,
+                                                         Map<String, @NotNull ColumnFieldBinding<T>> bindings,
+                                                         ObjectMapper objectMapper) {
         return data.rows().stream()
                 .map(r -> parseDTO(r, data.headers(), clazz, bindings, objectMapper))
                 .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toArray(i -> (T[]) Array.newInstance(clazz, i));
+                .map(Optional::get);
     }
 
     @SuppressWarnings("unchecked")
@@ -35,13 +33,14 @@ class Utils {
                                                           @NotNull Class<T> clazz,
                                                           @NotNull Map<String, ColumnFieldBinding<T>> bindings,
                                                           ObjectMapper objectMapper) {
-        assert bindings.size() == row.size();
         Object[] args = new Object[bindings.size()];
         for (Iterator<String> rowIt = row.iterator(), headersIt = headers.iterator();
              headersIt.hasNext() && rowIt.hasNext();
         ) {
-            ColumnFieldBinding<T> binding = bindings.get(headersIt.next());
-            args[binding.order()] = objectMapper.convertValue(rowIt.next(), binding.fieldType());
+            String header = headersIt.next();
+            String value = rowIt.next();
+            ColumnFieldBinding<T> binding = bindings.get(header);
+            if (binding != null) args[binding.order()] = objectMapper.convertValue(value, binding.fieldType());
         }
         try {
             return Optional.of((T) clazz.getDeclaredConstructors()[0].newInstance(args));

@@ -25,7 +25,7 @@ public class GroupTableMapper implements EntityTableMapper {
 
     @Override
     public void persist(@NotNull TableData tableData) {
-        CreateGroupDTO[] dtos = Utils.parseDTOs(tableData, CreateGroupDTO.class, DEFAULT_MAPPING, objectMapper);
+        CreateGroupDTO[] dtos = Utils.parseDTOs(tableData, CreateGroupDTO.class, DEFAULT_MAPPING, objectMapper).toArray(CreateGroupDTO[]::new);
         Map<Long, List<CreateGroupDTO>> groupedByLevelId = new HashMap<>();
         for (CreateGroupDTO dto : dtos) {
             groupedByLevelId.computeIfAbsent(dto.levelId(), k -> new ArrayList<>()).add(dto);

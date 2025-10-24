@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Component("teaching_unit_table_mapper")
 public class TeachingUnitTableMapper implements EntityTableMapper {
@@ -23,8 +24,8 @@ public class TeachingUnitTableMapper implements EntityTableMapper {
 
     @Override
     public void persist(@NotNull TableData tableData) {
-        CreateTeachingUnitDTO[] dtos = Utils.parseDTOs(tableData, CreateTeachingUnitDTO.class, DEFAULT_MAPPING, objectMapper);
-        teachingUnitService.saveTeachingUnits(dtos);
+        Stream<CreateTeachingUnitDTO> dtos = Utils.parseDTOs(tableData, CreateTeachingUnitDTO.class, DEFAULT_MAPPING, objectMapper);
+        teachingUnitService.saveTeachingUnits(dtos.toArray(CreateTeachingUnitDTO[]::new));
     }
 
     @Override

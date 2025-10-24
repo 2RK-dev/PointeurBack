@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Component("room_table_mapper")
 public class RoomTableMapper implements EntityTableMapper {
@@ -23,8 +24,8 @@ public class RoomTableMapper implements EntityTableMapper {
 
     @Override
     public void persist(@NotNull TableData tableData) {
-        CreateRoomDTO[] dtos = Utils.parseDTOs(tableData, CreateRoomDTO.class, DEFAULT_MAPPING, objectMapper);
-        roomService.saveRooms(dtos);
+        Stream<CreateRoomDTO> dtos = Utils.parseDTOs(tableData, CreateRoomDTO.class, DEFAULT_MAPPING, objectMapper);
+        roomService.saveRooms(dtos.toArray(CreateRoomDTO[]::new));
     }
 
     @Override
