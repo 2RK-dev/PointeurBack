@@ -14,7 +14,7 @@ import java.util.Arrays;
  * Maps between persistence/entities and the {@link TableData} DTO used by data sync.
  * Implementations persist incoming data and retrieve stored data.
  */
-public interface EntityTableMapper {
+public interface EntityTableAdapter {
     /**
      * Persist the provided table data.
      *
@@ -43,7 +43,7 @@ public interface EntityTableMapper {
 
         @Contract(pure = true)
         public @NotNull String beanName() {
-            return entityName + "_table_mapper";
+            return entityName + "_table_adapter";
         }
 
         public static String @NotNull [] supportedEntities() {

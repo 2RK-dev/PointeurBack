@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-@Component("room_table_mapper")
-public class RoomTableMapper implements EntityTableMapper {
+@Component("room_table_adapter")
+public class RoomTableAdapter implements EntityTableAdapter {
     private static final Map<String, ColumnFieldBinding<CreateRoomDTO>> DEFAULT_MAPPING = Utils.buildMapping(CreateRoomDTO.class);
     private final RoomService roomService;
     private final ObjectMapper objectMapper;
 
-    public RoomTableMapper(RoomService roomService, ObjectMapper objectMapper) {
+    public RoomTableAdapter(RoomService roomService, ObjectMapper objectMapper) {
         this.roomService = roomService;
         this.objectMapper = objectMapper;
     }

@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-@Component("teacher_table_mapper")
-public class TeacherTableMapper implements EntityTableMapper {
+@Component("teacher_table_adapter")
+public class TeacherTableAdapter implements EntityTableAdapter {
     private static final Map<String, ColumnFieldBinding<CreateTeacherDTO>> DEFAULT_MAPPING = Utils.buildMapping(CreateTeacherDTO.class);
     private final TeacherService teacherService;
     private final ObjectMapper objectMapper;
 
-    public TeacherTableMapper(TeacherService teacherService, ObjectMapper objectMapper) {
+    public TeacherTableAdapter(TeacherService teacherService, ObjectMapper objectMapper) {
         this.teacherService = teacherService;
         this.objectMapper = objectMapper;
     }

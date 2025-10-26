@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
-@Component("level_table_mapper")
-public class LevelTableMapper implements EntityTableMapper {
+@Component("level_table_adapter")
+public class LevelTableAdapter implements EntityTableAdapter {
     private static final Map<String, ColumnFieldBinding<CreateLevelDTO>> DEFAULT_MAPPING = Utils.buildMapping(CreateLevelDTO.class);
     private final LevelService levelService;
     private final ObjectMapper objectMapper;
 
-    public LevelTableMapper(LevelService levelService, ObjectMapper objectMapper) {
+    public LevelTableAdapter(LevelService levelService, ObjectMapper objectMapper) {
         this.levelService = levelService;
         this.objectMapper = objectMapper;
     }

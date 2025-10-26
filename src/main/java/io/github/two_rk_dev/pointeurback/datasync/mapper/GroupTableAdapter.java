@@ -12,13 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component("group_table_mapper")
-public class GroupTableMapper implements EntityTableMapper {
+@Component("group_table_adapter")
+public class GroupTableAdapter implements EntityTableAdapter {
     private static final Map<String, ColumnFieldBinding<CreateGroupDTO>> DEFAULT_MAPPING = Utils.buildMapping(CreateGroupDTO.class);
     private final GroupService groupService;
     private final ObjectMapper objectMapper;
 
-    public GroupTableMapper(GroupService groupService, ObjectMapper objectMapper) {
+    public GroupTableAdapter(GroupService groupService, ObjectMapper objectMapper) {
         this.groupService = groupService;
         this.objectMapper = objectMapper;
     }
