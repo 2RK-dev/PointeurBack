@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -52,15 +54,15 @@ public class DataSyncService implements ImportService, ExportService {
                 allErrors.addAll(result.errors());
                 totalRows += result.totalRows();
                 successfulRows += result.successfulRows();
-                
+
                 // Update entity summary
-                result.entitySummary().forEach((entity, count) -> 
-                    entitySummary.merge(entity, count, Integer::sum));
-                
+                result.entitySummary().forEach((entity, count) ->
+                        entitySummary.merge(entity, count, Integer::sum));
+
             } catch (IOException e) {
                 log.error("Failed to process file: {}", file.getOriginalFilename(), e);
-                allErrors.add(SyncError.forEntity("SYSTEM", -1, 
-                    "File processing failed: " + e.getMessage(), file.getOriginalFilename()));
+                allErrors.add(SyncError.forEntity("SYSTEM", -1,
+                        "File processing failed: " + e.getMessage(), file.getOriginalFilename()));
             }
         }
 
@@ -75,7 +77,7 @@ public class DataSyncService implements ImportService, ExportService {
 
         FileCodec fileCodec = codecs.get(FileCodec.Type.forInputMediaType(fileContentType).beanName());
         List<@NotNull TableData> decoded = fileCodec.decode(file.getInputStream());
-        
+
         List<SyncError> fileErrors = new ArrayList<>();
         int fileTotalRows = 0;
         int fileSuccessfulRows = 0;
@@ -84,7 +86,7 @@ public class DataSyncService implements ImportService, ExportService {
         for (TableData tableData : decoded) {
             EntityTableMapper.Type entityType = EntityTableMapper.Type.forEntity(tableData.tableName());
             EntityTableMapper mapper = entityMappers.get(entityType.beanName());
-            
+
             try {
                 mapper.persist(tableData);
                 fileSuccessfulRows += tableData.rows().size();
@@ -94,14 +96,14 @@ public class DataSyncService implements ImportService, ExportService {
                 // Add error for each row in the table
                 for (int i = 0; i < tableData.rows().size(); i++) {
                     fileErrors.add(SyncError.forEntity(
-                        tableData.tableName(), 
-                        i, 
-                        "Persistence failed: " + e.getMessage(),
-                        tableData.rows().get(i).toString()
+                            tableData.tableName(),
+                            i,
+                            "Persistence failed: " + e.getMessage(),
+                            tableData.rows().get(i).toString()
                     ));
                 }
             }
-            
+
             fileTotalRows += tableData.rows().size();
         }
 
@@ -120,9 +122,10 @@ public class DataSyncService implements ImportService, ExportService {
     }
 
     private record FileImportResult(
-        int totalRows,
-        int successfulRows,
-        List<SyncError> errors,
-        Map<String, Integer> entitySummary
-    ) {}
+            int totalRows,
+            int successfulRows,
+            List<SyncError> errors,
+            Map<String, Integer> entitySummary
+    ) {
+    }
 }

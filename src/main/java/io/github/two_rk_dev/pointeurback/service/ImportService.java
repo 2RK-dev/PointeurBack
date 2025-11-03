@@ -7,5 +7,6 @@ import java.io.IOException;
 
 public interface ImportService {
     void import_(String entityType, MultipartFile file) throws IOException;
+
     ImportResponse importMultipleFiles(MultipartFile[] files) throws IOException;
 }
