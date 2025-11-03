@@ -1,12 +1,5 @@
 package io.github.two_rk_dev.pointeurback.service.implementation;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-import org.springframework.stereotype.Service;
-
 import io.github.two_rk_dev.pointeurback.dto.CreateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.ScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateScheduleItemDTO;
@@ -15,119 +8,121 @@ import io.github.two_rk_dev.pointeurback.exception.ScheduleItemNotFoundException
 import io.github.two_rk_dev.pointeurback.mapper.ScheduleItemMapper;
 import io.github.two_rk_dev.pointeurback.model.Room;
 import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
-import io.github.two_rk_dev.pointeurback.repository.GroupRepository;
-import io.github.two_rk_dev.pointeurback.repository.RoomRepository;
-import io.github.two_rk_dev.pointeurback.repository.ScheduleItemRepository;
-import io.github.two_rk_dev.pointeurback.repository.TeacherRepository;
-import io.github.two_rk_dev.pointeurback.repository.TeachingUnitRepository;
+import io.github.two_rk_dev.pointeurback.repository.*;
 import io.github.two_rk_dev.pointeurback.service.ScheduleService;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.stereotype.Service;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
 
-  private final ScheduleItemRepository scheduleItemRepository;
-  private final GroupRepository groupRepository;
-  private final TeacherRepository teacherRepository;
-  private final TeachingUnitRepository teachingUnitRepository;
-  private final RoomRepository roomRepository;
-  private final ScheduleItemMapper scheduleItemMapper;
+    private final ScheduleItemRepository scheduleItemRepository;
+    private final GroupRepository groupRepository;
+    private final TeacherRepository teacherRepository;
+    private final TeachingUnitRepository teachingUnitRepository;
+    private final RoomRepository roomRepository;
+    private final ScheduleItemMapper scheduleItemMapper;
 
-  public ScheduleServiceImpl(ScheduleItemRepository scheduleItemRepository, GroupRepository groupRepository,
-      TeacherRepository teacherRepository, TeachingUnitRepository teachingUnitRepository, RoomRepository roomRepository,
-      ScheduleItemMapper scheduleItemMapper) {
-    this.scheduleItemRepository = scheduleItemRepository;
-    this.groupRepository = groupRepository;
-    this.teacherRepository = teacherRepository;
-    this.teachingUnitRepository = teachingUnitRepository;
-    this.roomRepository = roomRepository;
-    this.scheduleItemMapper = scheduleItemMapper;
-  }
-
-  @Override
-  public List<ScheduleItemDTO> getSchedule(@Nullable Long levelId, @Nullable Long groupId, String start,
-      String endTime) {
-    OffsetDateTime startDateTime = scheduleItemMapper.parseDateTime(start);
-    OffsetDateTime endDateTime = scheduleItemMapper.parseDateTime(endTime);
-
-    if (startDateTime == null || endDateTime == null) {
-      throw new IllegalArgumentException("Start and end times must be provided");
-    }
-    List<ScheduleItem> items;
-    if (groupId != null) {
-      if (levelId != null && !groupRepository.existsGroupByLevel_IdIs(levelId)) {
-        throw new GroupNotFoundException("Group with id " + groupId + " not found in level " + levelId);
-      }
-      items = scheduleItemRepository.findByGroupsId(groupId);
-    } else if (levelId != null) {
-      items = scheduleItemRepository.findByLevelId(levelId);
-    } else
-      items = scheduleItemRepository.findByStartTimeBetween(startDateTime, endDateTime);
-    return scheduleItemMapper.toDtoList(items);
-  }
-
-  @Override
-  public ScheduleItemDTO updateScheduleItem(Long id, UpdateScheduleItemDTO dto) {
-    ScheduleItem existingItem = scheduleItemRepository.findById(id)
-        .orElseThrow(() -> new ScheduleItemNotFoundException("Schedule item not found with id: " + id));
-
-    OffsetDateTime newStart = scheduleItemMapper.parseDateTime(dto.startTime());
-    OffsetDateTime newEnd = scheduleItemMapper.parseDateTime(dto.endTime());
-    List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
-        newStart,
-        newEnd,
-        Optional.ofNullable(existingItem.getRoom()).map(Room::getId).orElse(null),
-        existingItem.getTeacher().getId(),
-        dto.groupIds());
-    conflictingItems.removeIf(si -> si.getId().equals(existingItem.getId()));
-    if (!conflictingItems.isEmpty()) {
-      throw new IllegalStateException("Schedule conflict detected");
+    public ScheduleServiceImpl(ScheduleItemRepository scheduleItemRepository, GroupRepository groupRepository,
+                               TeacherRepository teacherRepository, TeachingUnitRepository teachingUnitRepository, RoomRepository roomRepository,
+                               ScheduleItemMapper scheduleItemMapper) {
+        this.scheduleItemRepository = scheduleItemRepository;
+        this.groupRepository = groupRepository;
+        this.teacherRepository = teacherRepository;
+        this.teachingUnitRepository = teachingUnitRepository;
+        this.roomRepository = roomRepository;
+        this.scheduleItemMapper = scheduleItemMapper;
     }
 
-    scheduleItemMapper.updateFromDto(
-        dto,
-        existingItem,
-        groupRepository::findAllById,
-        teacherId -> teacherRepository.findById(teacherId).orElse(null),
-        teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
-        roomId -> roomRepository.findById(roomId).orElse(null));
+    @Override
+    public List<ScheduleItemDTO> getSchedule(@Nullable Long levelId, @Nullable Long groupId, String start,
+                                             String endTime) {
+        OffsetDateTime startDateTime = scheduleItemMapper.parseDateTime(start);
+        OffsetDateTime endDateTime = scheduleItemMapper.parseDateTime(endTime);
 
-    ScheduleItem updatedItem = scheduleItemRepository.save(existingItem);
-    return scheduleItemMapper.toDto(updatedItem);
-  }
-
-  @Override
-  public void deleteScheduleItem(Long id) {
-    scheduleItemRepository.deleteById(id);
-  }
-
-  @Override
-  public ScheduleItemDTO addScheduleItem(CreateScheduleItemDTO dto) {
-    if (dto == null) {
-      throw new IllegalArgumentException("CreateScheduleItemDTO cannot be null");
-    }
-    ScheduleItem newItem = scheduleItemMapper.createFromDto(
-        dto,
-        groupId -> groupRepository.findById(groupId).orElse(null),
-        teacherId -> teacherRepository.findById(teacherId).orElse(null),
-        teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
-        roomId -> roomRepository.findById(roomId).orElse(null));
-
-    List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
-        newItem.getStartTime(),
-        newItem.getEndTime(),
-        Optional.ofNullable(newItem.getRoom()).map(Room::getId).orElse(null),
-        newItem.getTeacher().getId(),
-        dto.groupIds());
-    if (!conflictingItems.isEmpty()) {
-      throw new IllegalStateException("Schedule conflict detected");
+        if (startDateTime == null || endDateTime == null) {
+            throw new IllegalArgumentException("Start and end times must be provided");
+        }
+        List<ScheduleItem> items;
+        if (groupId != null) {
+            if (levelId != null && !groupRepository.existsGroupByLevel_IdIs(levelId)) {
+                throw new GroupNotFoundException("Group with id " + groupId + " not found in level " + levelId);
+            }
+            items = scheduleItemRepository.findByGroupsId(groupId);
+        } else if (levelId != null) {
+            items = scheduleItemRepository.findByLevelId(levelId);
+        } else
+            items = scheduleItemRepository.findByStartTimeBetween(startDateTime, endDateTime);
+        return scheduleItemMapper.toDtoList(items);
     }
 
-    ScheduleItem savedItem = scheduleItemRepository.save(newItem);
-    return scheduleItemMapper.toDto(savedItem);
-  }
+    @Override
+    public ScheduleItemDTO updateScheduleItem(Long id, UpdateScheduleItemDTO dto) {
+        ScheduleItem existingItem = scheduleItemRepository.findById(id)
+                .orElseThrow(() -> new ScheduleItemNotFoundException("Schedule item not found with id: " + id));
 
-  @Override
-  public ScheduleItemDTO getScheduleById(Long scheduleId) {
-    return null;
-  }
+        OffsetDateTime newStart = scheduleItemMapper.parseDateTime(dto.startTime());
+        OffsetDateTime newEnd = scheduleItemMapper.parseDateTime(dto.endTime());
+        List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
+                newStart,
+                newEnd,
+                Optional.ofNullable(existingItem.getRoom()).map(Room::getId).orElse(null),
+                existingItem.getTeacher().getId(),
+                dto.groupIds());
+        conflictingItems.removeIf(si -> si.getId().equals(existingItem.getId()));
+        if (!conflictingItems.isEmpty()) {
+            throw new IllegalStateException("Schedule conflict detected");
+        }
+
+        scheduleItemMapper.updateFromDto(
+                dto,
+                existingItem,
+                groupRepository::findAllById,
+                teacherId -> teacherRepository.findById(teacherId).orElse(null),
+                teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
+                roomId -> roomRepository.findById(roomId).orElse(null));
+
+        ScheduleItem updatedItem = scheduleItemRepository.save(existingItem);
+        return scheduleItemMapper.toDto(updatedItem);
+    }
+
+    @Override
+    public void deleteScheduleItem(Long id) {
+        scheduleItemRepository.deleteById(id);
+    }
+
+    @Override
+    public ScheduleItemDTO addScheduleItem(CreateScheduleItemDTO dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("CreateScheduleItemDTO cannot be null");
+        }
+        ScheduleItem newItem = scheduleItemMapper.createFromDto(
+                dto,
+                groupId -> groupRepository.findById(groupId).orElse(null),
+                teacherId -> teacherRepository.findById(teacherId).orElse(null),
+                teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
+                roomId -> roomRepository.findById(roomId).orElse(null));
+
+        List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
+                newItem.getStartTime(),
+                newItem.getEndTime(),
+                Optional.ofNullable(newItem.getRoom()).map(Room::getId).orElse(null),
+                newItem.getTeacher().getId(),
+                dto.groupIds());
+        if (!conflictingItems.isEmpty()) {
+            throw new IllegalStateException("Schedule conflict detected");
+        }
+
+        ScheduleItem savedItem = scheduleItemRepository.save(newItem);
+        return scheduleItemMapper.toDto(savedItem);
+    }
+
+    @Override
+    public ScheduleItemDTO getScheduleById(Long scheduleId) {
+        return null;
+    }
 }

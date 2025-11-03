@@ -41,6 +41,7 @@ public class LevelServiceImpl implements LevelService {
         this.groupMapper = groupMapper;
         this.scheduleItemMapper = scheduleItemMapper;
     }
+
     @Override
     public LevelDTO createLevel(CreateLevelDTO dto) {
         if (dto == null) {
@@ -82,6 +83,7 @@ public class LevelServiceImpl implements LevelService {
         }
         return detailsDto;
     }
+
     @Override
     public LevelDTO updateLevel(Long id, UpdateLevelDTO dto) {
         if (dto == null) {
@@ -99,18 +101,18 @@ public class LevelServiceImpl implements LevelService {
         Level existing = levelRepository.findById(id)
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + id));
         if (!existing.getGroups().isEmpty()) {
-                for (Group group : existing.getGroups()) {
-                    for (ScheduleItem scheduleItem : group.getSchedules()) {
-                        group.removeScheduleItem(scheduleItem);
-                    }
+            for (Group group : existing.getGroups()) {
+                for (ScheduleItem scheduleItem : group.getSchedules()) {
+                    group.removeScheduleItem(scheduleItem);
                 }
-                existing.getGroups().clear();
             }
+            existing.getGroups().clear();
+        }
         levelRepository.delete(existing);
     }
 
     @Override
-    public List<GroupDTO> getGroups(Long levelId){
+    public List<GroupDTO> getGroups(Long levelId) {
         if (!levelRepository.existsById(levelId)) {
             throw new LevelNotFoundException("Level not found with id: " + levelId);
         }
@@ -128,7 +130,7 @@ public class LevelServiceImpl implements LevelService {
     }
 
     @Override
-    public List<TeachingUnitDTO> getTeachingUnits(Long levelId){
+    public List<TeachingUnitDTO> getTeachingUnits(Long levelId) {
         if (!levelRepository.existsById(levelId)) {
             throw new LevelNotFoundException("Level not found with id: " + levelId);
         }
@@ -143,7 +145,7 @@ public class LevelServiceImpl implements LevelService {
     }
 
     @Override
-    public List<ScheduleItemDTO> getSchedule(Long levelId){
+    public List<ScheduleItemDTO> getSchedule(Long levelId) {
         if (!levelRepository.existsById(levelId)) {
             throw new LevelNotFoundException("Level not found with id: " + levelId);
         }
@@ -154,7 +156,7 @@ public class LevelServiceImpl implements LevelService {
     }
 
     @Override
-    public GroupDTO createGroup(Long levelId,CreateGroupDTO dto) {
+    public GroupDTO createGroup(Long levelId, CreateGroupDTO dto) {
         if (dto == null) {
             throw new IllegalArgumentException("CreateGroupDTO cannot be null");
         }

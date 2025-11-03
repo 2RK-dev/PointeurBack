@@ -16,9 +16,9 @@ public interface ScheduleItemRepository extends JpaRepository<ScheduleItem, Long
     List<ScheduleItem> findByLevelId(@Param("levelId") Long levelId);
 
     @Query("SELECT DISTINCT si FROM ScheduleItem si " +
-            "LEFT JOIN si.groups g " +
+           "LEFT JOIN si.groups g " +
            "WHERE (((:roomId <> NULL AND si.room.id = :roomId) OR si.teacher.id = :teacherId OR g.id IN :groupIds) " +
-            "AND (si.startTime < :endTime AND si.endTime > :startTime))")
+           "AND (si.startTime < :endTime AND si.endTime > :startTime))")
     List<ScheduleItem> findConflictingSchedule(
             @Param("startTime") OffsetDateTime startTime,
             @Param("endTime") OffsetDateTime endTime,

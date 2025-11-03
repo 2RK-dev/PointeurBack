@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/levels/{levelId}/groups")
-public class  GroupController {
+public class GroupController {
 
     private final GroupService groupService;
 

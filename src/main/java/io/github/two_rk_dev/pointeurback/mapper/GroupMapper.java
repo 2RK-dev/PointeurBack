@@ -5,12 +5,7 @@ import io.github.two_rk_dev.pointeurback.dto.GroupDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateGroupDTO;
 import io.github.two_rk_dev.pointeurback.model.Group;
 import io.github.two_rk_dev.pointeurback.model.Level;
-
-import org.mapstruct.IterableMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 
 import java.util.List;
 

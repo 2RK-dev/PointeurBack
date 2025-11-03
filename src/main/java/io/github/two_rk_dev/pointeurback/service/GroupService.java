@@ -9,7 +9,9 @@ import java.util.Map;
 
 public interface GroupService {
     GroupDTO getGroupByLevel(Long levelId, Long groupId);
+
     GroupDTO updateGroup(Long levelId, Long groupId, UpdateGroupDTO dto);
+
     void deleteGroup(Long levelId, Long groupId);
 
     void saveGroups(Map<Long, List<CreateGroupDTO>> groups);

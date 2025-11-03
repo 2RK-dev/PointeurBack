@@ -11,10 +11,12 @@ public class MappingQualifier {
     @Qualifier
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.CLASS)
-    public @interface LevelToDtoWithoutGroups {}
+    public @interface LevelToDtoWithoutGroups {
+    }
 
     @Qualifier
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.CLASS)
-    public @interface GroupToDtoWithoutLevel {}
+    public @interface GroupToDtoWithoutLevel {
+    }
 }

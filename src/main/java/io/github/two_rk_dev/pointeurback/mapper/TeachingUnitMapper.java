@@ -5,12 +5,7 @@ import io.github.two_rk_dev.pointeurback.dto.TeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.model.Level;
 import io.github.two_rk_dev.pointeurback.model.TeachingUnit;
-
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 
 import java.util.List;
 

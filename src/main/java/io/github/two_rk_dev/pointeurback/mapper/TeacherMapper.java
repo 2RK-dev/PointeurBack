@@ -4,12 +4,7 @@ import io.github.two_rk_dev.pointeurback.dto.CreateTeacherDTO;
 import io.github.two_rk_dev.pointeurback.dto.TeacherDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeacherDTO;
 import io.github.two_rk_dev.pointeurback.model.Teacher;
-
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 
 import java.util.List;
 

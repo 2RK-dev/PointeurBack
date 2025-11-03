@@ -22,6 +22,7 @@ public class TeachingUnitServiceImpl implements TeachingUnitService {
     private final TeachingUnitRepository teachingUnitRepository;
     private final LevelRepository levelRepository;
     private final TeachingUnitMapper teachingUnitMapper;
+
     public TeachingUnitServiceImpl(TeachingUnitRepository teachingUnitRepository, LevelRepository levelRepository, TeachingUnitMapper teachingUnitMapper) {
         this.teachingUnitRepository = teachingUnitRepository;
         this.levelRepository = levelRepository;
@@ -91,7 +92,7 @@ public class TeachingUnitServiceImpl implements TeachingUnitService {
             }
             if (dto.name() == null) continue;
             if (teachingUnitRepository.existsByName(dto.name()) ||
-                    (dto.abbreviation() != null && teachingUnitRepository.existsByAbbreviation(dto.abbreviation()))) {
+                (dto.abbreviation() != null && teachingUnitRepository.existsByAbbreviation(dto.abbreviation()))) {
                 continue;
             }
             TeachingUnit tu = teachingUnitMapper.createTeachingUnitFromDto(dto, level);

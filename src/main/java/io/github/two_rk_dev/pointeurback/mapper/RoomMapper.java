@@ -4,7 +4,6 @@ import io.github.two_rk_dev.pointeurback.dto.CreateRoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.RoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateRoomDTO;
 import io.github.two_rk_dev.pointeurback.model.Room;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
