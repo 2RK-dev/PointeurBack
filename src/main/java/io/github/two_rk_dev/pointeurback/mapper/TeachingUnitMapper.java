@@ -9,9 +9,7 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(
-        componentModel = "spring",
-        uses = {LevelMapper.class})
+@Mapper(componentModel = "spring", uses = {LevelMapper.class})
 public interface TeachingUnitMapper {
 
     @Mapping(target = "level", source = "level")

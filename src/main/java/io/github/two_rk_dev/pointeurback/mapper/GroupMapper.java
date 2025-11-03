@@ -9,9 +9,7 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(
-        componentModel = "spring",
-        uses = {LevelMapper.class})
+@Mapper(componentModel = "spring", uses = {LevelMapper.class})
 public interface GroupMapper {
 
     @Named("toDto")
@@ -44,4 +42,5 @@ public interface GroupMapper {
 
     @IterableMapping(qualifiedByName = "toDto")
     List<GroupDTO> toDtoList(List<Group> entities);
+
 }
