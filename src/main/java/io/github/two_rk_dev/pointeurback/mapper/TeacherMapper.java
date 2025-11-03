@@ -25,8 +25,7 @@ public interface TeacherMapper {
     void updateFromDto(UpdateTeacherDTO dto, @MappingTarget Teacher entity);
 
     default Teacher createTeacherFromDto(CreateTeacherDTO dto) {
-        if (dto == null)
-            return null;
+        if (dto == null) return null;
         return fromCreateDto(dto);
     }
 

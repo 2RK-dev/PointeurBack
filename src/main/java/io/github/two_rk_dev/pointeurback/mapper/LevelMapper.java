@@ -16,8 +16,7 @@ public interface LevelMapper {
 
     @MappingQualifier.LevelToDtoWithoutGroups
     default LevelDTO toDtoWithoutGroups(Level entity) {
-        if (entity == null)
-            return null;
+        if (entity == null) return null;
         return new LevelDTO(entity.getId(), entity.getName(), entity.getAbbreviation());
     }
 
@@ -42,5 +41,4 @@ public interface LevelMapper {
         }
         updateFromUpdateDto(updateDto, level);
     }
-
 }

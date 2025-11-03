@@ -9,10 +9,16 @@ import java.util.List;
 
 public interface RoomService {
     List<RoomDTO> getAll();
+
     RoomDTO createRoom(CreateRoomDTO dto);
+
     RoomDTO getRoom(Long id);
+
     RoomDTO updateRoom(Long id, UpdateRoomDTO dto);
+
     void deleteRoom(Long id);
+
     List<RoomDTO> getAvailableRooms(LocalDateTime start, LocalDateTime endTime, int size);
+
     void saveRooms(CreateRoomDTO[] rooms);
 }

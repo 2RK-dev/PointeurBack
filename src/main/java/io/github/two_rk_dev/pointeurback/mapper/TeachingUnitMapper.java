@@ -29,14 +29,14 @@ public interface TeachingUnitMapper {
     void updateFromDto(UpdateTeachingUnitDTO dto, @MappingTarget TeachingUnit entity);
 
     default TeachingUnit createTeachingUnitFromDto(CreateTeachingUnitDTO dto, Level level) {
-        if (dto == null)
-            return null;
+        if (dto == null) return null;
         TeachingUnit teachingUnit = fromCreateDto(dto);
         teachingUnit.setLevel(level);
         return teachingUnit;
     }
 
-    default void updateTeachingUnit(UpdateTeachingUnitDTO updateDto, TeachingUnit teachingUnit, Level level) {
+    default void updateTeachingUnit(
+            UpdateTeachingUnitDTO updateDto, TeachingUnit teachingUnit, Level level) {
         if (updateDto != null) {
             updateFromDto(updateDto, teachingUnit);
             teachingUnit.setLevel(level);

@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface TeacherRepository extends JpaRepository<Teacher, Long> {
 
     boolean existsByName(String name);
+
     boolean existsByAbbreviation(String abbreviation);
 }
