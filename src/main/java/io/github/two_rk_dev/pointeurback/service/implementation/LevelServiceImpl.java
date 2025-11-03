@@ -1,6 +1,7 @@
 package io.github.two_rk_dev.pointeurback.service.implementation;
 
 import io.github.two_rk_dev.pointeurback.dto.*;
+import io.github.two_rk_dev.pointeurback.dto.datasync.ImportLevelDTO;
 import io.github.two_rk_dev.pointeurback.exception.GroupNotFoundException;
 import io.github.two_rk_dev.pointeurback.exception.LevelNotFoundException;
 import io.github.two_rk_dev.pointeurback.mapper.GroupMapper;
@@ -16,10 +17,12 @@ import io.github.two_rk_dev.pointeurback.repository.ScheduleItemRepository;
 import io.github.two_rk_dev.pointeurback.repository.TeachingUnitRepository;
 import io.github.two_rk_dev.pointeurback.service.LevelService;
 import jakarta.transaction.Transactional;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class LevelServiceImpl implements LevelService {
@@ -52,6 +55,11 @@ public class LevelServiceImpl implements LevelService {
         }
         Level savedLevel = levelRepository.save(newLevel);
         return levelMapper.toDto(savedLevel);
+    }
+
+    @Override
+    public void importLevels(@NotNull Stream<ImportLevelDTO> dtoStream) {
+        levelRepository.saveAll(dtoStream.map(levelMapper::fromImportDto).toList());
     }
 
     @Transactional

@@ -3,15 +3,17 @@ package io.github.two_rk_dev.pointeurback.service.implementation;
 import io.github.two_rk_dev.pointeurback.dto.CreateTeacherDTO;
 import io.github.two_rk_dev.pointeurback.dto.TeacherDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeacherDTO;
+import io.github.two_rk_dev.pointeurback.dto.datasync.ImportTeacherDTO;
 import io.github.two_rk_dev.pointeurback.exception.TeacherNotFoundException;
 import io.github.two_rk_dev.pointeurback.mapper.TeacherMapper;
 import io.github.two_rk_dev.pointeurback.model.Teacher;
 import io.github.two_rk_dev.pointeurback.repository.TeacherRepository;
 import io.github.two_rk_dev.pointeurback.service.TeacherService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
@@ -67,21 +69,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public void saveTeachers(CreateTeacherDTO[] teachers) {
-        Objects.requireNonNull(teachers, "teachers array cannot be null");
-        List<Teacher> toSave = new java.util.ArrayList<>();
-        for (CreateTeacherDTO dto : teachers) {
-            if (dto == null) continue;
-            Teacher teacher = teacherMapper.createTeacherFromDto(dto);
-            if (teacher == null || teacher.getName() == null
-                || teacherRepository.existsByName(teacher.getName())
-                || (teacher.getAbbreviation() != null && teacherRepository.existsByAbbreviation(teacher.getAbbreviation())))
-                continue;
-            toSave.add(teacher);
-        }
-
-        if (!toSave.isEmpty()) {
-            teacherRepository.saveAll(toSave);
-        }
+    public void importTeachers(@NotNull Stream<ImportTeacherDTO> teacherDTOStream) {
+        teacherRepository.saveAll(teacherDTOStream.map(teacherMapper::fromImportDTO).toList());
     }
 }

@@ -4,6 +4,7 @@ import io.github.two_rk_dev.pointeurback.dto.CreateLevelDTO;
 import io.github.two_rk_dev.pointeurback.dto.LevelDTO;
 import io.github.two_rk_dev.pointeurback.dto.LevelDetailsDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateLevelDTO;
+import io.github.two_rk_dev.pointeurback.dto.datasync.ImportLevelDTO;
 import io.github.two_rk_dev.pointeurback.model.Level;
 import org.mapstruct.*;
 
@@ -27,6 +28,9 @@ public interface LevelMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "groups", ignore = true)
     Level fromCreateDto(CreateLevelDTO dto);
+
+    @Mapping(target = "groups", ignore = true)
+    Level fromImportDto(ImportLevelDTO dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "groups", ignore = true)

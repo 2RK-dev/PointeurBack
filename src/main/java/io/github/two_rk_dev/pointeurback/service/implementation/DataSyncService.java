@@ -33,7 +33,7 @@ public class DataSyncService implements ImportService, ExportService {
                 .filter(td -> td.tableName().equals(entityName))
                 .findFirst()
                 .orElseGet(decoded::getFirst);
-        entityMappers.get(entityType.beanName()).persist(tableData);
+        entityMappers.get(entityType.beanName()).process(null, tableData);
     }
 
     @Override
