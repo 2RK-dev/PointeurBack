@@ -28,7 +28,7 @@ public class GroupTableAdapter extends AbstractEntityTableAdapter<ImportGroupDTO
     @Override
     public @NotNull TableData fetch() {
         List<String> headers = Utils.getHeaders(this.getMapping());
-        List<@NotNull List<String>> rows = Utils.toRows(groupService.getAll());
+        List<@NotNull List<String>> rows = Utils.toRows(groupService.exportAll());
         return new TableData(Type.GROUP.entityName(), headers, rows);
     }
 
@@ -39,13 +39,15 @@ public class GroupTableAdapter extends AbstractEntityTableAdapter<ImportGroupDTO
      */
     @Override
     public List<SyncError> finalize(UUID stageID) {
+        String stageIDString = stageID.toString();
         String insertValid = """
                     INSERT INTO groups (group_id, level_id, name, size)
                     SELECT s.group_id, s.level_id, s.name, s.size
                     FROM staging_groups s
                     WHERE s.stage_id = ? AND EXISTS (SELECT 1 FROM level l WHERE l.level_id = s.level_id)
+                    ON CONFLICT DO NOTHING
                 """;
-        jdbcTemplate.update(insertValid, stageID);
+        jdbcTemplate.update(insertValid, stageIDString);
         String selectInvalid = """
                     SELECT s.filename, s.row_index, s.row_context
                     FROM staging_groups s
@@ -59,22 +61,25 @@ public class GroupTableAdapter extends AbstractEntityTableAdapter<ImportGroupDTO
                         "Invalid level_id (no matching level found)",
                         rs.getString("row_context")
                 ),
-                stageID
+                stageIDString
         );
-        jdbcTemplate.update("DELETE FROM staging_groups WHERE stage_id = ?", stageID);
+        jdbcTemplate.update("DELETE FROM staging_groups WHERE stage_id = ?", stageIDString);
         return errors;
     }
 
     @Override
     protected void stage(UUID stageID, @NotNull List<ImportRow<ImportGroupDTO>> toStage) {
         jdbcTemplate.batchUpdate(
-                "INSERT INTO staging_groups (group_id, level_id, name, size, stage_id, filename, row_index, row_context) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                """
+                        INSERT INTO staging_groups (group_id, level_id, name, size, stage_id, filename, row_index, row_context)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
                 toStage,
                 100,
                 (ps, argument) -> {
                     ImportGroupDTO group = argument.data();
                     ps.setLong(1, group.id());
-                    ps.setLong(2, group.levelId());
+                    ps.setObject(2, group.levelId());
                     ps.setString(3, group.name());
                     ps.setInt(4, group.size());
                     ps.setString(5, stageID.toString());

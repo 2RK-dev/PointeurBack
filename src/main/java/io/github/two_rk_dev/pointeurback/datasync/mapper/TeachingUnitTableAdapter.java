@@ -28,14 +28,17 @@ public class TeachingUnitTableAdapter extends AbstractEntityTableAdapter<ImportT
     @Override
     public @NotNull TableData fetch() {
         List<String> headers = Utils.getHeaders(this.getMapping());
-        List<@NotNull List<String>> rows = Utils.toRows(teachingUnitService.getAll());
+        List<@NotNull List<String>> rows = Utils.toRows(teachingUnitService.exportAll());
         return new TableData(Type.TEACHING_UNIT.entityName(), headers, rows);
     }
 
     @Override
     protected void stage(UUID stageID, @NotNull List<ImportRow<ImportTeachingUnitDTO>> toStage) {
         jdbcTemplate.batchUpdate(
-                "INSERT INTO staging_teaching_unit(teaching_unit_id, abbreviation, name, level_id, stage_id, filename, row_index, row_context) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                """
+                        INSERT INTO staging_teaching_unit(teaching_unit_id, abbreviation, name, level_id, stage_id, filename, row_index, row_context)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
                 toStage,
                 100,
                 (ps, argument) -> {
@@ -43,7 +46,7 @@ public class TeachingUnitTableAdapter extends AbstractEntityTableAdapter<ImportT
                     ps.setLong(1, teachingUnit.id());
                     ps.setString(2, teachingUnit.abbreviation());
                     ps.setString(3, teachingUnit.name());
-                    ps.setLong(4, teachingUnit.levelId());
+                    ps.setObject(4, teachingUnit.levelId());
                     ps.setString(5, stageID.toString());
                     ps.setString(6, argument.filename());
                     ps.setInt(7, argument.rowIndex());
@@ -58,14 +61,16 @@ public class TeachingUnitTableAdapter extends AbstractEntityTableAdapter<ImportT
      * @return a list of the invalid data's information
      */
     @Override
-    public List<SyncError> finalize(UUID stageID) {
+    public List<SyncError> finalize(@NotNull UUID stageID) {
+        String stageIDString = stageID.toString();
         String insertValid = """
                 INSERT INTO teaching_unit(teaching_unit_id, level_id, name, abbreviation)
                 SELECT s.teaching_unit_id, s.level_id, s.name, s.abbreviation
                 FROM staging_teaching_unit s
-                WHERE s.stage_id = ? AND EXISTS (SELECT 1 FROM level l WHERE l.level_id = s.level_id)
+                WHERE s.stage_id = ? AND s.level_id IS NULL OR EXISTS (SELECT 1 FROM level l WHERE l.level_id = s.level_id)
+                ON CONFLICT DO NOTHING
                 """;
-        jdbcTemplate.update(insertValid, stageID);
+        jdbcTemplate.update(insertValid, stageIDString);
         String selectInvalid = """
                 SELECT s.filename, s.row_index, s.row_context
                 FROM staging_teaching_unit s
@@ -79,9 +84,9 @@ public class TeachingUnitTableAdapter extends AbstractEntityTableAdapter<ImportT
                         "Invalid level_id (no matching level found)",
                         rs.getString("row_context")
                 ),
-                stageID
+                stageIDString
         );
-        jdbcTemplate.update("DELETE FROM staging_teaching_unit WHERE stage_id = ?", stageID);
+        jdbcTemplate.update("DELETE FROM staging_teaching_unit WHERE stage_id = ?", stageIDString);
         return errors;
     }
 }

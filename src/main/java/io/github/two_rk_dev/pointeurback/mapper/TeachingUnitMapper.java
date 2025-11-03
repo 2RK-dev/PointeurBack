@@ -3,6 +3,7 @@ package io.github.two_rk_dev.pointeurback.mapper;
 import io.github.two_rk_dev.pointeurback.dto.CreateTeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.dto.TeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeachingUnitDTO;
+import io.github.two_rk_dev.pointeurback.dto.datasync.ImportTeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.model.Level;
 import io.github.two_rk_dev.pointeurback.model.TeachingUnit;
 import org.mapstruct.*;
@@ -41,4 +42,7 @@ public interface TeachingUnitMapper {
             teachingUnit.setLevel(level);
         }
     }
+
+    @Mapping(target = "levelId", source = "level.id")
+    ImportTeachingUnitDTO toExportDTO(TeachingUnit entity);
 }

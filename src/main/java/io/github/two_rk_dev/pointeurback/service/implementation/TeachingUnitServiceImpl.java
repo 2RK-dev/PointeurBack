@@ -3,6 +3,7 @@ package io.github.two_rk_dev.pointeurback.service.implementation;
 import io.github.two_rk_dev.pointeurback.dto.CreateTeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.dto.TeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeachingUnitDTO;
+import io.github.two_rk_dev.pointeurback.dto.datasync.ImportTeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.exception.LevelNotFoundException;
 import io.github.two_rk_dev.pointeurback.exception.TeachingUnitNotFoundException;
 import io.github.two_rk_dev.pointeurback.mapper.TeachingUnitMapper;
@@ -74,6 +75,11 @@ public class TeachingUnitServiceImpl implements TeachingUnitService {
     @Override
     public void deleteTeachingUnit(Long id) {
         teachingUnitRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ImportTeachingUnitDTO> exportAll() {
+        return teachingUnitRepository.findAll().stream().map(teachingUnitMapper::toExportDTO).toList();
     }
 
 }

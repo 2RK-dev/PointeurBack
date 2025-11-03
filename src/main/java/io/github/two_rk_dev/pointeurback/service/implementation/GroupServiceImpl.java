@@ -2,6 +2,7 @@ package io.github.two_rk_dev.pointeurback.service.implementation;
 
 import io.github.two_rk_dev.pointeurback.dto.GroupDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateGroupDTO;
+import io.github.two_rk_dev.pointeurback.dto.datasync.ImportGroupDTO;
 import io.github.two_rk_dev.pointeurback.exception.GroupNotFoundException;
 import io.github.two_rk_dev.pointeurback.mapper.GroupMapper;
 import io.github.two_rk_dev.pointeurback.model.Group;
@@ -67,7 +68,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<GroupDTO> getAll() {
-        return groupMapper.toDtoList(groupRepository.findAll());
+    public List<ImportGroupDTO> exportAll() {
+        return groupRepository.findAll().stream().map(groupMapper::toExportDTO).toList();
     }
 }

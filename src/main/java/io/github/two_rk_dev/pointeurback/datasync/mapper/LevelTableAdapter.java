@@ -6,6 +6,7 @@ import io.github.two_rk_dev.pointeurback.dto.datasync.TableData;
 import io.github.two_rk_dev.pointeurback.service.LevelService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Validator;
 
@@ -15,10 +16,12 @@ import java.util.UUID;
 @Component("level_table_adapter")
 public class LevelTableAdapter extends AbstractEntityTableAdapter<ImportLevelDTO> {
     private final LevelService levelService;
+    private final JdbcTemplate jdbcTemplate;
 
-    public LevelTableAdapter(LevelService levelService, ObjectMapper objectMapper, @Qualifier("mvcValidator") Validator validator) {
+    public LevelTableAdapter(LevelService levelService, ObjectMapper objectMapper, @Qualifier("mvcValidator") Validator validator, JdbcTemplate jdbcTemplate) {
         super(objectMapper, validator, ImportLevelDTO.class);
         this.levelService = levelService;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -30,6 +33,15 @@ public class LevelTableAdapter extends AbstractEntityTableAdapter<ImportLevelDTO
 
     @Override
     protected void stage(UUID stageID, @NotNull List<ImportRow<ImportLevelDTO>> toStage) {
-        levelService.importLevels(toStage.stream().map(ImportRow::data));
+        jdbcTemplate.batchUpdate(
+                "INSERT INTO level(level_id, name, abbreviation) VALUES (?, ?, ?) ON CONFLICT DO NOTHING",
+                toStage,
+                100,
+                (ps, argument) -> {
+                    ps.setLong(1, argument.data().id());
+                    ps.setString(2, argument.data().name());
+                    ps.setString(3, argument.data().abbreviation());
+                }
+        );
     }
 }
