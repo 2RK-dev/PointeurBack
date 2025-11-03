@@ -9,7 +9,9 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {LevelMapper.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {LevelMapper.class})
 public interface TeachingUnitMapper {
 
     @Mapping(target = "level", source = "level")
@@ -35,7 +37,8 @@ public interface TeachingUnitMapper {
         return teachingUnit;
     }
 
-    default void updateTeachingUnit(UpdateTeachingUnitDTO updateDto, TeachingUnit teachingUnit, Level level) {
+    default void updateTeachingUnit(
+            UpdateTeachingUnitDTO updateDto, TeachingUnit teachingUnit, Level level) {
         if (updateDto != null) {
             updateFromDto(updateDto, teachingUnit);
             teachingUnit.setLevel(level);

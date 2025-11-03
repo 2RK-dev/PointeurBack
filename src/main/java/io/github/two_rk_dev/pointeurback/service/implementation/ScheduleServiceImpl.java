@@ -26,7 +26,10 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final TeachingUnitRepository teachingUnitRepository;
     private final RoomRepository roomRepository;
     private final ScheduleItemMapper scheduleItemMapper;
-    public ScheduleServiceImpl(ScheduleItemRepository scheduleItemRepository, GroupRepository groupRepository, TeacherRepository teacherRepository, TeachingUnitRepository teachingUnitRepository, RoomRepository roomRepository, ScheduleItemMapper scheduleItemMapper) {
+
+    public ScheduleServiceImpl(ScheduleItemRepository scheduleItemRepository, GroupRepository groupRepository,
+                               TeacherRepository teacherRepository, TeachingUnitRepository teachingUnitRepository, RoomRepository roomRepository,
+                               ScheduleItemMapper scheduleItemMapper) {
         this.scheduleItemRepository = scheduleItemRepository;
         this.groupRepository = groupRepository;
         this.teacherRepository = teacherRepository;
@@ -36,7 +39,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<ScheduleItemDTO> getSchedule(@Nullable Long levelId, @Nullable Long groupId, String start, String endTime) {
+    public List<ScheduleItemDTO> getSchedule(@Nullable Long levelId, @Nullable Long groupId, String start,
+                                             String endTime) {
         OffsetDateTime startDateTime = scheduleItemMapper.parseDateTime(start);
         OffsetDateTime endDateTime = scheduleItemMapper.parseDateTime(endTime);
 
@@ -51,7 +55,8 @@ public class ScheduleServiceImpl implements ScheduleService {
             items = scheduleItemRepository.findByGroupsId(groupId);
         } else if (levelId != null) {
             items = scheduleItemRepository.findByLevelId(levelId);
-        } else items = scheduleItemRepository.findByStartTimeBetween(startDateTime, endDateTime);
+        } else
+            items = scheduleItemRepository.findByStartTimeBetween(startDateTime, endDateTime);
         return scheduleItemMapper.toDtoList(items);
     }
 
@@ -67,8 +72,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 newEnd,
                 Optional.ofNullable(existingItem.getRoom()).map(Room::getId).orElse(null),
                 existingItem.getTeacher().getId(),
-                dto.groupIds()
-        );
+                dto.groupIds());
         conflictingItems.removeIf(si -> si.getId().equals(existingItem.getId()));
         if (!conflictingItems.isEmpty()) {
             throw new IllegalStateException("Schedule conflict detected");
@@ -80,8 +84,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 groupRepository::findAllById,
                 teacherId -> teacherRepository.findById(teacherId).orElse(null),
                 teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
-                roomId -> roomRepository.findById(roomId).orElse(null)
-        );
+                roomId -> roomRepository.findById(roomId).orElse(null));
 
         ScheduleItem updatedItem = scheduleItemRepository.save(existingItem);
         return scheduleItemMapper.toDto(updatedItem);
@@ -102,16 +105,14 @@ public class ScheduleServiceImpl implements ScheduleService {
                 groupId -> groupRepository.findById(groupId).orElse(null),
                 teacherId -> teacherRepository.findById(teacherId).orElse(null),
                 teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
-                roomId -> roomRepository.findById(roomId).orElse(null)
-        );
+                roomId -> roomRepository.findById(roomId).orElse(null));
 
         List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
                 newItem.getStartTime(),
                 newItem.getEndTime(),
                 Optional.ofNullable(newItem.getRoom()).map(Room::getId).orElse(null),
                 newItem.getTeacher().getId(),
-                dto.groupIds()
-        );
+                dto.groupIds());
         if (!conflictingItems.isEmpty()) {
             throw new IllegalStateException("Schedule conflict detected");
         }

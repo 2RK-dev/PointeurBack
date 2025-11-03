@@ -9,7 +9,9 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {LevelMapper.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {LevelMapper.class})
 public interface GroupMapper {
 
     @Named("toDto")
@@ -21,8 +23,6 @@ public interface GroupMapper {
     @Mapping(target = "level", ignore = true)
     GroupDTO toDtoWithoutLevel(Group entity);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "level", ignore = true)
     @Mapping(target = "schedules", ignore = true)
     Group fromCreateDto(CreateGroupDTO dto);
 
@@ -32,12 +32,16 @@ public interface GroupMapper {
         return group;
     }
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "level", ignore = true)
+    default void updateGroup(UpdateGroupDTO updateDto, Group group) {
+        if (updateDto == null) {
+            return;
+        }
+        updateFromUpdateDto(updateDto, group);
+    }
+
     @Mapping(target = "schedules", ignore = true)
     void updateFromUpdateDto(UpdateGroupDTO dto, @MappingTarget Group entity);
 
     @IterableMapping(qualifiedByName = "toDto")
     List<GroupDTO> toDtoList(List<Group> entities);
-
 }

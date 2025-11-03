@@ -41,5 +41,4 @@ public interface LevelMapper {
         }
         updateFromUpdateDto(updateDto, level);
     }
-
 }

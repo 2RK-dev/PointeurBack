@@ -59,7 +59,7 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public void deleteGroup(Long levelId, Long groupId) {
         Group existing = groupRepository.findByLevelIdAndId(levelId, groupId);
-        if(!existing.getSchedules().isEmpty()) {
+        if (!existing.getSchedules().isEmpty()) {
             List<ScheduleItem> schedulesCopy = new ArrayList<>(existing.getSchedules());
             schedulesCopy.forEach(schedule -> {
                 schedule.getGroups().remove(existing);

@@ -8,9 +8,14 @@ import java.util.List;
 
 public interface TeachingUnitService {
     List<TeachingUnitDTO> getAll();
+
     TeachingUnitDTO getTeachingUnit(Long id);
+
     TeachingUnitDTO createTeachingUnit(CreateTeachingUnitDTO dto);
+
     TeachingUnitDTO updateTeachingUnit(Long id, UpdateTeachingUnitDTO dto);
+
     void deleteTeachingUnit(Long id);
+
     void saveTeachingUnits(CreateTeachingUnitDTO[] teachingUnits);
 }
