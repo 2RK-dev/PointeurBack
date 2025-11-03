@@ -12,5 +12,4 @@ public interface TeachingUnitService {
     TeachingUnitDTO createTeachingUnit(CreateTeachingUnitDTO dto);
     TeachingUnitDTO updateTeachingUnit(Long id, UpdateTeachingUnitDTO dto);
     void deleteTeachingUnit(Long id);
-    void saveTeachingUnits(CreateTeachingUnitDTO[] teachingUnits);
 }

@@ -87,7 +87,7 @@ public interface FileCodec {
                     .filter(type -> type.inputMediaType.equals(mediaType))
                     .findFirst()
                     .orElseThrow(() -> new UnsupportedMediaTypeStatusException(
-                            "Unsupported export output : " + mediaType,
+                            "Unsupported import input : " + mediaType,
                             availableInputMediaTypes()
                     ));
         }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -193,6 +194,17 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 ex.getMessage(),
                 "UNSUPPORTED_CODEC"
+        );
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
+
+    @ExceptionHandler(UnsupportedMediaTypeStatusException.class)
+    public ResponseEntity<ErrorDetails> handleUnsupportedMediaTypeStatusException(@NotNull UnsupportedMediaTypeStatusException ex) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                OffsetDateTime.now(ZoneOffset.UTC),
+                ex.getMessage(),
+                "Supported media types: %s".formatted(ex.getSupportedMediaTypes()),
+                "UNSUPPORTED_MEDIA_TYPE"
         );
         return ResponseEntity.badRequest().body(errorDetails);
     }
