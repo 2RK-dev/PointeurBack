@@ -13,12 +13,19 @@ public interface LevelService {
     List<LevelDetailsDTO> getAllDetailed();
 
     List<LevelDTO> getAll();
+
     LevelDetailsDTO getDetails(Long Id);
+
     LevelDTO updateLevel(Long id, UpdateLevelDTO dto);
-    void deleteLevel (Long id);
+
+    void deleteLevel(Long id);
+
     List<GroupDTO> getGroups(Long id);
+
     List<TeachingUnitDTO> getTeachingUnits(Long id);
+
     List<ScheduleItemDTO> getSchedule(Long id);
-    GroupDTO createGroup(Long id,CreateGroupDTO dto);
+
+    GroupDTO createGroup(Long id, CreateGroupDTO dto);
 
 }

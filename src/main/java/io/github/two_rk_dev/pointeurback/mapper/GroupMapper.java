@@ -22,8 +22,6 @@ public interface GroupMapper {
     @Mapping(target = "level", ignore = true)
     GroupDTO toDtoWithoutLevel(Group entity);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "level", ignore = true)
     @Mapping(target = "schedules", ignore = true)
     Group fromCreateDto(CreateGroupDTO dto);
 
@@ -33,8 +31,13 @@ public interface GroupMapper {
         return group;
     }
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "level", ignore = true)
+    default void updateGroup(UpdateGroupDTO updateDto, Group group) {
+        if (updateDto == null) {
+            return;
+        }
+        updateFromUpdateDto(updateDto, group);
+    }
+
     @Mapping(target = "schedules", ignore = true)
     void updateFromUpdateDto(UpdateGroupDTO dto, @MappingTarget Group entity);
 

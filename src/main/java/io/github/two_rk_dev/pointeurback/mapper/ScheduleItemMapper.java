@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-@Mapper(componentModel = "spring",
-        uses = {TeacherMapper.class, TeachingUnitMapper.class, RoomMapper.class, GroupMapper.class})
+@Mapper(componentModel = "spring", uses = {TeacherMapper.class, TeachingUnitMapper.class, RoomMapper.class,
+        GroupMapper.class})
 public interface ScheduleItemMapper {
 
     DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
@@ -48,15 +48,14 @@ public interface ScheduleItemMapper {
     @Mapping(target = "teacher", ignore = true)
     @Mapping(target = "teachingUnit", ignore = true)
     @Mapping(target = "room", ignore = true)
-    @Mapping(target = "startTime",
-            expression = "java(dto.startTime() != null ? parseDateTime(dto.startTime()) : entity.getStartTime())")
-    @Mapping(target = "endTime",
-            expression = "java(dto.endTime() != null ? parseDateTime(dto.endTime()) : entity.getEndTime())")
+    @Mapping(target = "startTime", expression = "java(dto.startTime() != null ? parseDateTime(dto.startTime()) : entity.getStartTime())")
+    @Mapping(target = "endTime", expression = "java(dto.endTime() != null ? parseDateTime(dto.endTime()) : entity.getEndTime())")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromDto(UpdateScheduleItemDTO dto, @MappingTarget ScheduleItem entity);
 
     default OffsetDateTime parseDateTime(String dateTimeStr) {
-        if (dateTimeStr == null) return null;
+        if (dateTimeStr == null)
+            return null;
         return OffsetDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER);
     }
 
@@ -119,7 +118,6 @@ public interface ScheduleItemMapper {
 
         Objects.requireNonNull(entity, "Entity cannot be null");
 
-
         if (dto.startTime() != null) {
             entity.setStartTime(parseDateTime(dto.startTime()));
         }
@@ -157,7 +155,8 @@ public interface ScheduleItemMapper {
                 throw new RoomNotFoundException("Room not found with id: " + dto.roomId());
             }
             entity.setRoom(room);
-        } else entity.setRoom(null);
+        } else
+            entity.setRoom(null);
 
         if (entity.getEndTime().isBefore(entity.getStartTime())) {
             throw new IllegalStateException("End time cannot be before startTime time");

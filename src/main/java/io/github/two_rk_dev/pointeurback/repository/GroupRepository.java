@@ -9,7 +9,9 @@ import java.util.List;
 @Repository
 public interface GroupRepository extends JpaRepository<Group, Long> {
     List<Group> findByLevelId(Long levelId);
+
     Group findByName(String name);
+
     Group findByLevelIdAndId(Long levelId, Long groupId);
 
     boolean existsGroupByLevel_IdIs(Long levelId);

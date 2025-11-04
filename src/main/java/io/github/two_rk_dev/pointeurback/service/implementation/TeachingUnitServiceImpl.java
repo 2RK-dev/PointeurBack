@@ -23,6 +23,7 @@ public class TeachingUnitServiceImpl implements TeachingUnitService {
     private final TeachingUnitRepository teachingUnitRepository;
     private final LevelRepository levelRepository;
     private final TeachingUnitMapper teachingUnitMapper;
+
     public TeachingUnitServiceImpl(TeachingUnitRepository teachingUnitRepository, LevelRepository levelRepository, TeachingUnitMapper teachingUnitMapper) {
         this.teachingUnitRepository = teachingUnitRepository;
         this.levelRepository = levelRepository;

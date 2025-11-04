@@ -12,10 +12,10 @@ import java.util.List;
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
     @Query("SELECT r FROM Room r WHERE " +
-            "r.size >= :size AND " +
-            "NOT EXISTS (SELECT s FROM ScheduleItem s WHERE " +
-            "s.room.id = r.id AND " +
-            "(s.startTime < :endTime AND s.endTime > :startTime))")
+           "r.size >= :size AND " +
+           "NOT EXISTS (SELECT s FROM ScheduleItem s WHERE " +
+           "s.room.id = r.id AND " +
+           "(s.startTime < :endTime AND s.endTime > :startTime))")
     List<Room> findAvailableRooms(@Param("startTime") LocalDateTime start,
                                   @Param("endTime") LocalDateTime endTime,
                                   @Param("size") int size);
