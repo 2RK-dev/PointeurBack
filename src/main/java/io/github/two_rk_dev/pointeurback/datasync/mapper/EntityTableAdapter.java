@@ -19,8 +19,8 @@ import java.util.UUID;
  * <p>
  * This adapter supports a two-phase import workflow to handle cross-file foreign key dependencies:
  * <ol>
- *   <li>{@link #process(UUID, TableData)} - validates and persists data</li>
- *   <li>{@link #finalize(UUID)} - resolves foreign keys and finalizes import</li>
+ *   <li>{@link #process(UUID, TableData, boolean)} - validates and persists data</li>
+ *   <li>{@link #finalize(UUID, boolean)} - resolves foreign keys and finalizes import</li>
  * </ol>
  * <p>
  * For entities without foreign key dependencies (e.g., Level, Teacher, Room), {@code process()} persists directly to
@@ -37,14 +37,15 @@ public interface EntityTableAdapter {
      * <ul>
      *   <li><strong>Entities without FK dependencies:</strong> Persists directly to final tables</li>
      *   <li><strong>Entities with FK dependencies:</strong> Stages to temporary tables with row metadata
-     *       (row index and stringified context) for error reporting during {@link #finalize(UUID)}</li>
+     *       (row index and stringified context) for error reporting during {@link #finalize(UUID, boolean)}</li>
      * </ul>
      *
      * @param stageID   unique identifier for this import session, used to group related data
      * @param tableData the tabular data to process, containing headers and rows
+     * @param ignoreConflicts if true, skips rows that would cause conflicts (e.g., duplicates); if false, merge with existing
      * @return list of validation errors encountered during parsing and validation (empty if all rows were valid)
      */
-    List<SyncError> process(UUID stageID, @NotNull TableData tableData);
+    List<SyncError> process(UUID stageID, @NotNull TableData tableData, boolean ignoreConflicts);
 
     /**
      * Finalizes the import session by promoting staged data to final tables.
@@ -52,15 +53,16 @@ public interface EntityTableAdapter {
      * This method validates foreign key constraints and promotes staged entities in dependency order (parents before
      * children).
      * <p>
-     * For entities that were persisted directly during {@link #process(UUID, TableData)}
+     * For entities that were persisted directly during {@link #process(UUID, TableData, boolean)}
      * (i.e., entities without FK dependencies), this method is a no-op and returns an empty list.
      * <p>
      * This should be called after all related data has been processed via {@code process()}.
      *
-     * @param stageID unique identifier for the import session to finalize
+     * @param stageID         unique identifier for the import session to finalize
+     * @param ignoreConflicts if true, skips rows that would cause conflicts (e.g., duplicates); if false, merge with existing.
      * @return list of foreign key validation errors discovered during promotion (empty if all references were valid)
      */
-    List<SyncError> finalize(UUID stageID);
+    List<SyncError> finalize(UUID stageID, boolean ignoreConflicts);
 
     /**
      * Retrieves stored entity data in tabular format for export.

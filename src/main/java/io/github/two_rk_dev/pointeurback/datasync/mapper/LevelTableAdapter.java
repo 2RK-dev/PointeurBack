@@ -37,9 +37,12 @@ public class LevelTableAdapter extends AbstractEntityTableAdapter<ImportLevelDTO
     }
 
     @Override
-    protected void stage(UUID stageID, @NotNull List<ImportRow<ImportLevelDTO>> toStage) {
+    protected void stage(UUID stageID, @NotNull List<ImportRow<ImportLevelDTO>> toStage, boolean ignoreConflicts) {
+        String sql = ignoreConflicts ?
+                "INSERT INTO level(level_id, name, abbreviation) VALUES (?, ?, ?) ON CONFLICT DO NOTHING" :
+                "INSERT INTO level(level_id, name, abbreviation) VALUES (?, ?, ?) ON CONFLICT(level_id) DO UPDATE SET name = excluded.name, abbreviation = excluded.abbreviation";
         jdbcTemplate.batchUpdate(
-                "INSERT INTO level(level_id, name, abbreviation) VALUES (?, ?, ?) ON CONFLICT DO NOTHING",
+                sql,
                 toStage,
                 100,
                 (ps, argument) -> {

@@ -28,7 +28,7 @@ public abstract class AbstractEntityTableAdapter<T extends Record> implements En
     }
 
     @Override
-    public final @NotNull List<SyncError> process(UUID stageID, @NotNull TableData tableData) {
+    public final @NotNull List<SyncError> process(UUID stageID, @NotNull TableData tableData, boolean ignoreConflicts) {
         List<SyncError> errors = new ArrayList<>();
         List<String> headers = tableData.headers();
         List<ImportRow<T>> toInsert = new ArrayList<>();
@@ -49,16 +49,17 @@ public abstract class AbstractEntityTableAdapter<T extends Record> implements En
             }
             toInsert.add(new ImportRow<>(dto, tableData.tableName(), r, context));
         }
-        stage(stageID, toInsert);
+        stage(stageID, toInsert, ignoreConflicts);
         return errors;
     }
 
     /**
-     * No-op, data insertion is already performed in {@link #process(UUID, TableData)} unless children override this method.
+     * No-op, data insertion is already performed in {@link #process(UUID, TableData, boolean)} unless children override
+     * this method.
      * @return an empty list
      */
     @Override
-    public List<SyncError> finalize(UUID stageID) {
+    public List<SyncError> finalize(UUID stageID, boolean ignoreConflicts) {
         return List.of();
     }
 
@@ -66,11 +67,12 @@ public abstract class AbstractEntityTableAdapter<T extends Record> implements En
      * Stage the validated and parsed rows for the given staging session.
      * <p>
      * Implementations should persist or otherwise prepare the provided rows (each represented by an {@link ImportRow})
-     * for the provided `stageID`. This method is invoked after {@link #process(UUID, TableData)} has parsed
+     * for the provided `stageID`. This method is invoked after {@link #process(UUID, TableData, boolean)} has parsed
      * and validated input rows.
      *
-     * @param stageID identifier of the current staging session
-     * @param toStage list of rows to stage; each entry contains the DTO, source table name, row index and context
+     * @param stageID         identifier of the current staging session
+     * @param toStage         list of rows to stage; each entry contains the DTO, source table name, row index and context
+     * @param ignoreConflicts if true, rows that would cause conflicts (e.g., duplicates) should be skipped, otherwise merge to existing
      */
-    protected abstract void stage(UUID stageID, @NotNull List<ImportRow<T>> toStage);
+    protected abstract void stage(UUID stageID, @NotNull List<ImportRow<T>> toStage, boolean ignoreConflicts);
 }

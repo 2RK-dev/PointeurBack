@@ -36,7 +36,7 @@ public class DataSyncService implements ImportService, ExportService {
     }
 
     @Override
-    public ImportResponse batchImport(MultipartFile @NotNull [] files, ImportMapping mapping) {
+    public ImportResponse batchImport(MultipartFile @NotNull [] files, ImportMapping mapping, boolean ignoreConflicts) {
         UUID stageID = UUID.randomUUID();
         Map<String, Integer> entitySummary = new HashMap<>();
         List<SyncError> errors = new ArrayList<>();
@@ -56,7 +56,7 @@ public class DataSyncService implements ImportService, ExportService {
                     EntityTableAdapter adapter = entityAdapters.get(entityType.beanName());
                     usedAdapters.add(adapter);
                     String subfileFullName = "%s/%s".formatted(filename, tableData.tableName());
-                    List<SyncError> syncErrors = adapter.process(stageID, tableData.withTableName(subfileFullName));
+                    List<SyncError> syncErrors = adapter.process(stageID, tableData.withTableName(subfileFullName), ignoreConflicts);
                     errors.addAll(syncErrors);
                     totalRows += tableData.rows().size();
                     int successful = tableData.rows().size() - syncErrors.size();
@@ -70,7 +70,7 @@ public class DataSyncService implements ImportService, ExportService {
             }
         }
         for (EntityTableAdapter adapter : usedAdapters) {
-            List<SyncError> syncErrors = adapter.finalize(stageID);
+            List<SyncError> syncErrors = adapter.finalize(stageID, ignoreConflicts);
             errors.addAll(syncErrors);
             successfulRows -= syncErrors.size();
             entitySummary.merge(adapter.getEntityType().entityName(), syncErrors.size(), (val, newVal) -> val - newVal);

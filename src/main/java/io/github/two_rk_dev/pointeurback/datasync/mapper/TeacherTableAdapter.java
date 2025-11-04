@@ -37,9 +37,12 @@ public class TeacherTableAdapter extends AbstractEntityTableAdapter<ImportTeache
     }
 
     @Override
-    protected void stage(UUID stageID, @NotNull List<ImportRow<ImportTeacherDTO>> toStage) {
+    protected void stage(UUID stageID, @NotNull List<ImportRow<ImportTeacherDTO>> toStage, boolean ignoreConflicts) {
+        String sql = ignoreConflicts ?
+                "INSERT INTO teacher(teacher_id, name, abbreviation) VALUES (?, ?, ?) ON CONFLICT DO NOTHING" :
+                "INSERT INTO teacher(teacher_id, name, abbreviation) VALUES (?, ?, ?) ON CONFLICT(teacher_id) DO UPDATE SET name = excluded.name, abbreviation = excluded.abbreviation";
         jdbcTemplate.batchUpdate(
-                "INSERT INTO teacher(teacher_id, name, abbreviation) VALUES (?, ?, ?) ON CONFLICT DO NOTHING",
+                sql,
                 toStage,
                 100,
                 (ps, argument) -> {

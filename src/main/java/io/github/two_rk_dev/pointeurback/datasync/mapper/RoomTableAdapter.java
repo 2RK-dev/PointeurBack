@@ -37,9 +37,12 @@ public class RoomTableAdapter extends AbstractEntityTableAdapter<ImportRoomDTO> 
     }
 
     @Override
-    protected void stage(UUID stageID, @NotNull List<ImportRow<ImportRoomDTO>> toStage) {
+    protected void stage(UUID stageID, @NotNull List<ImportRow<ImportRoomDTO>> toStage, boolean ignoreConflicts) {
+        String sql = ignoreConflicts ?
+                "INSERT INTO room(room_id, name, size, abbreviation) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING" :
+                "INSERT INTO room(room_id, name, size, abbreviation) VALUES (?, ?, ?, ?) ON CONFLICT(room_id) DO UPDATE SET name = excluded.name, abbreviation = excluded.abbreviation, size = excluded.size";
         jdbcTemplate.batchUpdate(
-                "INSERT INTO room(room_id, name, size, abbreviation) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING",
+                sql,
                 toStage,
                 100,
                 (ps, argument) -> {

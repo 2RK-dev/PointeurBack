@@ -194,6 +194,48 @@ class ImportControllerTest {
                 .containsExactlyInAnyOrder("PROG", "BDD", "MATH", "TRES", "LANG", "MATH", "PROG", "BDD", "TRES", "LANG");
     }
 
+    @Test
+    void ignoreConflictTrueShouldSkipInsert() throws Exception {
+        int roomCount = 3;
+        MockMultipartFile roomCsvFile = getCsvMultipartFile("room.csv");
+        MockMultipartFile anotherRoomCsvFile = getCsvMultipartFile("room_2.csv");
+        mockMvc.perform(multipart("/import/upload")
+                        .file(getRoomCsvMetadataFile())
+                        .file(roomCsvFile))
+                .andExpect(status().isOk());
+        mockMvc.perform(multipart("/import/upload")
+                        .file(getRoom2CsvMetadataFile())
+                        .file(anotherRoomCsvFile))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.entitySummary.room").value(roomCount));
+
+        assertThat(roomRepository.findAll())
+                .hasSize(roomCount)
+                .extracting("name")
+                .containsExactlyInAnyOrder("S001", "S002", "S009");
+    }
+
+    @Test
+    void shouldMergeIfIgnoreConflictsIsFalse() throws Exception {
+        int roomCount = 3;
+        MockMultipartFile roomCsvFile = getCsvMultipartFile("room.csv");
+        MockMultipartFile anotherRoomCsvFile = getCsvMultipartFile("room_2.csv");
+        mockMvc.perform(multipart("/import/upload")
+                        .file(getRoomCsvMetadataFile())
+                        .file(roomCsvFile))
+                .andExpect(status().isOk());
+        mockMvc.perform(multipart("/import/upload?ignoreConflicts=false")
+                        .file(getRoom2CsvMetadataFile())
+                        .file(anotherRoomCsvFile))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.entitySummary.room").value(roomCount));
+
+        assertThat(roomRepository.findAll())
+                .hasSize(roomCount)
+                .extracting("name")
+                .containsExactlyInAnyOrder("S010", "S014", "S009");
+    }
+
     private @NotNull MockMultipartFile getCsvMultipartFile(String filename) {
         try {
             return new MockMultipartFile(
@@ -205,6 +247,58 @@ class ImportControllerTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static @NotNull MockMultipartFile getRoom2CsvMetadataFile() {
+        @Language("JSON") String metadata = """
+                {
+                  "metadata": {
+                    "room_2.csv": {
+                      "": {
+                        "entityType": "room",
+                        "headersMapping": {
+                          "id": "id",
+                          "name": "name",
+                          "abbreviation": "abbreviation",
+                          "size": "size"
+                        }
+                      }
+                    }
+                  }
+                }
+                """;
+        return new MockMultipartFile(
+                "metadata",
+                "",
+                "application/json",
+                metadata.getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
+    private static @NotNull MockMultipartFile getRoomCsvMetadataFile() {
+        @Language("JSON") String metadata = """
+                {
+                  "metadata": {
+                    "room.csv": {
+                      "": {
+                        "entityType": "room",
+                        "headersMapping": {
+                          "id": "id",
+                          "name": "name",
+                          "abbreviation": "abbreviation",
+                          "size": "size"
+                        }
+                      }
+                    }
+                  }
+                }
+                """;
+        return new MockMultipartFile(
+                "metadata",
+                "",
+                "application/json",
+                metadata.getBytes(StandardCharsets.UTF_8)
+        );
     }
 
     private static @NotNull MockMultipartFile getCsvMetadataFile() {
@@ -407,4 +501,3 @@ class ImportControllerTest {
         assertThat(postgres.getDatabaseName()).isEqualTo("test");
     }
 }
-

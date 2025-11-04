@@ -39,20 +39,30 @@ public class GroupTableAdapter extends AbstractEntityTableAdapter<ImportGroupDTO
 
     /**
      * Promote the valid staged data, return the invalid ones, and clean up the staging table.
-     * @param stageID unique identifier for the import session to finalize
+     *
+     * @param stageID         unique identifier for the import session to finalize
+     * @param ignoreConflicts whether to skip rows that would cause conflicts (e.g., duplicates) or to merge with existing.
      * @return a list of the invalid data's information
      */
     @Override
-    public List<SyncError> finalize(UUID stageID) {
+    public List<SyncError> finalize(UUID stageID, boolean ignoreConflicts) {
         String stageIDString = stageID.toString();
-        String insertValid = """
+        String insertValidIgnoreConflict = """
                     INSERT INTO groups (group_id, level_id, name, size)
                     SELECT s.group_id, s.level_id, s.name, s.size
                     FROM staging_groups s
                     WHERE s.stage_id = ? AND EXISTS (SELECT 1 FROM level l WHERE l.level_id = s.level_id)
                     ON CONFLICT DO NOTHING
                 """;
-        jdbcTemplate.update(insertValid, stageIDString);
+        String insertValidMergeConflict = """
+                    INSERT INTO groups (group_id, level_id, name, size)
+                    SELECT s.group_id, s.level_id, s.name, s.size
+                    FROM staging_groups s
+                    WHERE s.stage_id = ? AND EXISTS (SELECT 1 FROM level l WHERE l.level_id = s.level_id)
+                    ON CONFLICT(group_id) DO UPDATE SET level_id = excluded.level_id, name = excluded.level_id, size = excluded.size
+                """;
+        if (ignoreConflicts) jdbcTemplate.update(insertValidIgnoreConflict, stageIDString);
+        else jdbcTemplate.update(insertValidMergeConflict, stageIDString);
         String selectInvalid = """
                     SELECT s.filename, s.row_index, s.row_context
                     FROM staging_groups s
@@ -73,7 +83,7 @@ public class GroupTableAdapter extends AbstractEntityTableAdapter<ImportGroupDTO
     }
 
     @Override
-    protected void stage(UUID stageID, @NotNull List<ImportRow<ImportGroupDTO>> toStage) {
+    protected void stage(UUID stageID, @NotNull List<ImportRow<ImportGroupDTO>> toStage, boolean ignoreConflicts) {
         jdbcTemplate.batchUpdate(
                 """
                         INSERT INTO staging_groups (group_id, level_id, name, size, stage_id, filename, row_index, row_context)

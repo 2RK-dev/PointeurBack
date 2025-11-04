@@ -38,7 +38,7 @@ public class TeachingUnitTableAdapter extends AbstractEntityTableAdapter<ImportT
     }
 
     @Override
-    protected void stage(UUID stageID, @NotNull List<ImportRow<ImportTeachingUnitDTO>> toStage) {
+    protected void stage(UUID stageID, @NotNull List<ImportRow<ImportTeachingUnitDTO>> toStage, boolean ignoreConflicts) {
         jdbcTemplate.batchUpdate(
                 """
                         INSERT INTO staging_teaching_unit(teaching_unit_id, abbreviation, name, level_id, stage_id, filename, row_index, row_context)
@@ -62,20 +62,30 @@ public class TeachingUnitTableAdapter extends AbstractEntityTableAdapter<ImportT
 
     /**
      * Promote the valid staged data, return the invalid ones, and clean up the staging table.
-     * @param stageID unique identifier for the import session to finalize
+     *
+     * @param stageID         unique identifier for the import session to finalize
+     * @param ignoreConflicts whether to skip rows that would cause conflicts (e.g., duplicates) or to merge with existing.
      * @return a list of the invalid data's information
      */
     @Override
-    public List<SyncError> finalize(@NotNull UUID stageID) {
+    public List<SyncError> finalize(@NotNull UUID stageID, boolean ignoreConflicts) {
         String stageIDString = stageID.toString();
-        String insertValid = """
+        String insertValidIgnoreConflict = """
                 INSERT INTO teaching_unit(teaching_unit_id, level_id, name, abbreviation)
                 SELECT s.teaching_unit_id, s.level_id, s.name, s.abbreviation
                 FROM staging_teaching_unit s
                 WHERE s.stage_id = ? AND s.level_id IS NULL OR EXISTS (SELECT 1 FROM level l WHERE l.level_id = s.level_id)
                 ON CONFLICT DO NOTHING
                 """;
-        jdbcTemplate.update(insertValid, stageIDString);
+        String insertValidMergeConflict = """
+                INSERT INTO teaching_unit(teaching_unit_id, level_id, name, abbreviation)
+                SELECT s.teaching_unit_id, s.level_id, s.name, s.abbreviation
+                FROM staging_teaching_unit s
+                WHERE s.stage_id = ? AND s.level_id IS NULL OR EXISTS (SELECT 1 FROM level l WHERE l.level_id = s.level_id)
+                ON CONFLICT(teaching_unit_id) DO UPDATE SET level_id = excluded.level_id, name = excluded.level_id, abbreviation = excluded.abbreviation
+                """;
+        if (ignoreConflicts) jdbcTemplate.update(insertValidIgnoreConflict, stageIDString);
+        else jdbcTemplate.update(insertValidMergeConflict, stageIDString);
         String selectInvalid = """
                 SELECT s.filename, s.row_index, s.row_context
                 FROM staging_teaching_unit s
