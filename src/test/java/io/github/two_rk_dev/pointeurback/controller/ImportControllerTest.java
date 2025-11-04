@@ -236,6 +236,48 @@ class ImportControllerTest {
                 .containsExactlyInAnyOrder("S010", "S014", "S009");
     }
 
+    @Test
+    void shouldSkipNonMappedFiles() throws Exception {
+        MockMultipartFile roomCsvFile = getCsvMultipartFile("room.csv");
+        mockMvc.perform(multipart("/import/upload")
+                        .file(getRoom2CsvMetadataFile()) // room_2.csv metadata
+                        .file(roomCsvFile))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalRows").value(0));
+    }
+
+    @Test
+    void shouldSkipNonMappedSubfiles() throws Exception {
+        int roomCount = 6;
+        MockMultipartFile jsonFile = new MockMultipartFile(
+                "files",
+                "level_room_teacher_teaching_unit_group.json",
+                "application/json",
+                new ClassPathResource("level_room_teacher_teaching_unit_group.json").getInputStream()
+        );
+        mockMvc.perform(multipart("/import/upload")
+                        .file(getRoomOnlyJSONMetadataFile())
+                        .file(jsonFile))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalRows").value(roomCount));
+    }
+
+    @Test
+    void shouldParseCorrectlyWithDifferentHeaders() throws Exception {
+        int roomCount = 2;
+        MockMultipartFile room3CsvFile = getCsvMultipartFile("room_3.csv");
+        mockMvc.perform(multipart("/import/upload")
+                        .file(getRoom3CsvMetadataFile())
+                        .file(room3CsvFile))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.entitySummary.room").value(roomCount));
+
+        assertThat(roomRepository.findAll())
+                .hasSize(roomCount)
+                .extracting("name")
+                .containsExactlyInAnyOrder("S001", "S002");
+    }
+
     private @NotNull MockMultipartFile getCsvMultipartFile(String filename) {
         try {
             return new MockMultipartFile(
@@ -261,6 +303,32 @@ class ImportControllerTest {
                           "name": "name",
                           "abbreviation": "abbreviation",
                           "size": "size"
+                        }
+                      }
+                    }
+                  }
+                }
+                """;
+        return new MockMultipartFile(
+                "metadata",
+                "",
+                "application/json",
+                metadata.getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
+    private static @NotNull MockMultipartFile getRoom3CsvMetadataFile() {
+        @Language("JSON") String metadata = """
+                {
+                  "metadata": {
+                    "room_3.csv": {
+                      "": {
+                        "entityType": "room",
+                        "headersMapping": {
+                          "identifiant": "id",
+                          "nom": "name",
+                          "abréviation": "abbreviation",
+                          "taille": "size"
                         }
                       }
                     }
@@ -480,6 +548,33 @@ class ImportControllerTest {
                           "name": "name",
                           "abbreviation": "abbreviation",
                           "levelId": "levelId"
+                        }
+                      }
+                    }
+                  }
+                }
+                """;
+
+        return new MockMultipartFile(
+                "metadata",
+                "",
+                "application/json",
+                metadata.getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
+    private static @NotNull MockMultipartFile getRoomOnlyJSONMetadataFile() {
+        @Language("JSON") String metadata = """
+                {
+                  "metadata": {
+                    "level_room_teacher_teaching_unit_group.json": {
+                      "room": {
+                        "entityType": "room",
+                        "headersMapping": {
+                          "id": "id",
+                          "name": "name",
+                          "abbreviation": "abbreviation",
+                          "size": "size"
                         }
                       }
                     }

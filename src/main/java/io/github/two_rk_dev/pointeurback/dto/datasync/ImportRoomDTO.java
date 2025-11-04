@@ -7,6 +7,6 @@ public record ImportRoomDTO(
         @NotNull Long id,
         @NotNull String name,
         @NotNull String abbreviation,
-        @Positive int size
+        @Positive Integer size
 ) {
 }

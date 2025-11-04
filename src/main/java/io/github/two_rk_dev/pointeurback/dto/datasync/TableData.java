@@ -19,7 +19,7 @@ public record TableData(
 ) {
     public static final TableData EMPTY = new TableData("", List.of(), List.of());
 
-    public @NotNull TableData withTableName(String subfileFullName) {
-        return new TableData(subfileFullName, headers, rows);
+    public @NotNull TableData withTableInfo(String tableName, List<String> newHeaders) {
+        return new TableData(tableName, newHeaders, rows);
     }
 }

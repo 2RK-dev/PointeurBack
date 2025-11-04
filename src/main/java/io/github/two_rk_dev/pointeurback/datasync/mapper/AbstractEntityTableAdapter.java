@@ -44,7 +44,7 @@ public abstract class AbstractEntityTableAdapter<T extends Record> implements En
             }
             Errors validationErrors = validator.validateObject(dto);
             if (validationErrors.hasErrors()) {
-                errors.add(new SyncError(tableData.tableName(), r, validationErrors.toString(), context));
+                errors.add(new SyncError(tableData.tableName(), r, formatValidationErrors(validationErrors), context));
                 continue;
             }
             toInsert.add(new ImportRow<>(dto, tableData.tableName(), r, context));
@@ -75,4 +75,15 @@ public abstract class AbstractEntityTableAdapter<T extends Record> implements En
      * @param ignoreConflicts if true, rows that would cause conflicts (e.g., duplicates) should be skipped, otherwise merge to existing
      */
     protected abstract void stage(UUID stageID, @NotNull List<ImportRow<T>> toStage, boolean ignoreConflicts);
+
+    private @NotNull String formatValidationErrors(@NotNull Errors errors) {
+        List<String> errorMessages = new ArrayList<>();
+        errors.getFieldErrors().forEach(
+                fieldError -> errorMessages.add(fieldError.getField() + ": " + fieldError.getDefaultMessage())
+        );
+        errors.getGlobalErrors().forEach(
+                globalError -> errorMessages.add(globalError.getDefaultMessage())
+        );
+        return String.join("; ", errorMessages);
+    }
 }

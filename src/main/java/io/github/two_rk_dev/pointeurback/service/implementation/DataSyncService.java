@@ -36,45 +36,97 @@ public class DataSyncService implements ImportService, ExportService {
     }
 
     @Override
-    public ImportResponse batchImport(MultipartFile @NotNull [] files, ImportMapping mapping, boolean ignoreConflicts) {
-        UUID stageID = UUID.randomUUID();
-        Map<String, Integer> entitySummary = new HashMap<>();
-        List<SyncError> errors = new ArrayList<>();
-        int totalRows = 0;
-        int successfulRows = 0;
-        Set<EntityTableAdapter> usedAdapters = new HashSet<>();
+    public ImportSummary batchImport(MultipartFile @NotNull [] files, ImportMapping mapping, boolean ignoreConflicts) {
+        ImportContext context = new ImportContext(ignoreConflicts);
         for (MultipartFile file : files) {
-            String codecType = FileCodec.Type.forInputMediaType(file.getContentType()).beanName();
-            String filename = file.getOriginalFilename();
-            FileCodec fileCodec = codecs.get(codecType);
-            try {
-                List<@NotNull TableData> decoded = fileCodec.decode(file.getInputStream());
-                Map<String, TableMapping> fileMapping = mapping.metadata().get(filename);
-                for (TableData tableData : decoded) {
-                    TableMapping tableMapping = fileMapping.get(tableData.tableName());
-                    EntityTableAdapter.Type entityType = EntityTableAdapter.Type.forEntity(tableMapping.entityType());
-                    EntityTableAdapter adapter = entityAdapters.get(entityType.beanName());
-                    usedAdapters.add(adapter);
-                    String subfileFullName = "%s/%s".formatted(filename, tableData.tableName());
-                    List<SyncError> syncErrors = adapter.process(stageID, tableData.withTableName(subfileFullName), ignoreConflicts);
-                    errors.addAll(syncErrors);
-                    totalRows += tableData.rows().size();
-                    int successful = tableData.rows().size() - syncErrors.size();
-                    successfulRows += successful;
-                    entitySummary.merge(entityType.entityName(), successful, Integer::sum);
-                }
-            } catch (IOException e) {
-                log.error("Failed to process file: {}", file.getOriginalFilename(), e);
-                errors.add(SyncError.forEntity("SYSTEM", -1,
-                        "File processing failed: " + e.getMessage(), filename));
+            processFile(file, mapping, context);
+        }
+        finalizeImport(context);
+        return context.summary;
+    }
+
+    private void processFile(@NotNull MultipartFile file, @NotNull ImportMapping mapping, ImportContext context) {
+        String filename = file.getOriginalFilename();
+        Map<String, TableMapping> fileMapping = mapping.metadata().get(filename);
+
+        if (fileMapping == null) {
+            context.summary.skippedFiles().add(filename);
+            return;
+        }
+
+        try {
+            FileCodec fileCodec = getFileCodec(file);
+            List<@NotNull TableData> decoded = fileCodec.decode(file.getInputStream());
+            for (TableData tableData : decoded) {
+                processTable(tableData, fileMapping, filename, context);
             }
+        } catch (IOException e) {
+            context.summary.errors().add(SyncError.forEntity("SYSTEM", -1,
+                    "File processing failed: " + e.getMessage(), filename));
         }
-        for (EntityTableAdapter adapter : usedAdapters) {
-            List<SyncError> syncErrors = adapter.finalize(stageID, ignoreConflicts);
-            errors.addAll(syncErrors);
-            successfulRows -= syncErrors.size();
-            entitySummary.merge(adapter.getEntityType().entityName(), syncErrors.size(), (val, newVal) -> val - newVal);
+    }
+
+    private FileCodec getFileCodec(@NotNull MultipartFile file) {
+        String codecType = FileCodec.Type.forInputMediaType(file.getContentType()).beanName();
+        return codecs.get(codecType);
+    }
+
+    private void processTable(@NotNull TableData tableData, @NotNull Map<String, TableMapping> fileMapping,
+                              String filename, ImportContext context) {
+        TableMapping tableMapping = fileMapping.get(tableData.tableName());
+        String subfileFullName = "%s/%s".formatted(filename, tableData.tableName());
+        if (tableMapping == null) {
+            context.summary.skippedFiles().add(subfileFullName);
+            return;
         }
-        return ImportResponse.withErrors(totalRows, successfulRows, errors, entitySummary);
+        List<String> newHeaders = tableData.headers().stream()
+                .map(h -> tableMapping.headersMapping().get(h))
+                .toList();
+
+        EntityTableAdapter adapter = getEntityAdapter(tableMapping);
+        context.usedAdapters.add(adapter);
+
+        List<SyncError> syncErrors = adapter.process(
+                context.stageID,
+                tableData.withTableInfo(subfileFullName, newHeaders),
+                context.ignoreConflicts
+        );
+
+        EntityTableAdapter.@NotNull Type entityType = adapter.getEntityType();
+        context.summary.errors().addAll(syncErrors);
+        context.summary.updateTotalRows(old -> old + tableData.rows().size());
+
+        int successful = tableData.rows().size() - syncErrors.size();
+        context.summary.updateSuccessfulRows(old -> old + successful);
+        context.summary.entitySummary().merge(entityType.entityName(), successful, Integer::sum);
+    }
+
+    private EntityTableAdapter getEntityAdapter(@NotNull TableMapping tableMapping) {
+        EntityTableAdapter.Type entityType = EntityTableAdapter.Type.forEntity(tableMapping.entityType());
+        return entityAdapters.get(entityType.beanName());
+    }
+
+    private void finalizeImport(@NotNull ImportContext context) {
+        for (EntityTableAdapter adapter : context.usedAdapters) {
+            List<SyncError> syncErrors = adapter.finalize(context.stageID, context.ignoreConflicts);
+            context.summary.errors().addAll(syncErrors);
+            context.summary.updateSuccessfulRows(old -> old - syncErrors.size());
+            context.summary.entitySummary().merge(
+                    adapter.getEntityType().entityName(),
+                    syncErrors.size(),
+                    (val, newVal) -> val - newVal
+            );
+        }
+    }
+
+    private static class ImportContext {
+        private final Set<EntityTableAdapter> usedAdapters = new HashSet<>();
+        private final ImportSummary summary = new ImportSummary();
+        private final boolean ignoreConflicts;
+        private final UUID stageID = UUID.randomUUID();
+
+        public ImportContext(boolean ignoreConflicts) {
+            this.ignoreConflicts = ignoreConflicts;
+        }
     }
 }
