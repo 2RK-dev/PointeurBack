@@ -15,7 +15,6 @@ import io.github.two_rk_dev.pointeurback.service.TeachingUnitService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class TeachingUnitServiceImpl implements TeachingUnitService {
@@ -45,7 +44,6 @@ public class TeachingUnitServiceImpl implements TeachingUnitService {
 
     @Override
     public TeachingUnitDTO createTeachingUnit(CreateTeachingUnitDTO dto) {
-        Objects.requireNonNull(dto, "CreateTeachingUnitDTO cannot be null");
         Level level = null;
         if (dto.levelId() != null) {
             level = levelRepository.findById(dto.levelId())
@@ -58,7 +56,6 @@ public class TeachingUnitServiceImpl implements TeachingUnitService {
 
     @Override
     public TeachingUnitDTO updateTeachingUnit(Long id, UpdateTeachingUnitDTO dto) {
-        Objects.requireNonNull(dto, "UpdateTeachingUnitDTO cannot be null");
         TeachingUnit existingTeachingUnit = teachingUnitRepository.findById(id)
                 .orElseThrow(() -> new TeachingUnitNotFoundException("Teaching unit not found with id: " + id));
 

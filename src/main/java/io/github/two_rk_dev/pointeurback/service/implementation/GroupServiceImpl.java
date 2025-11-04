@@ -45,7 +45,6 @@ public class GroupServiceImpl implements GroupService {
             throw new GroupNotFoundException("Groupe non trouvé pour levelId: " + levelId + " et groupId: " + groupId);
         }
         groupMapper.updateFromUpdateDto(dto, existing);
-
         Group updated = groupRepository.save(existing);
         return groupMapper.toDto(updated);
     }
