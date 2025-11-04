@@ -4,18 +4,16 @@ import io.github.two_rk_dev.pointeurback.dto.GroupDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateGroupDTO;
 import io.github.two_rk_dev.pointeurback.service.GroupService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/levels/{levelId}/groups")
+@RequiredArgsConstructor
 public class GroupController {
 
     private final GroupService groupService;
-
-    public GroupController(GroupService groupService) {
-        this.groupService = groupService;
-    }
 
     @DeleteMapping("/{groupId}")
     public ResponseEntity<Void> deleteGroup(

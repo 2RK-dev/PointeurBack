@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.two_rk_dev.pointeurback.dto.datasync.TableData;
 import io.github.two_rk_dev.pointeurback.exception.InvalidFileFormatException;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -19,12 +20,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Component("json_codec")
+@RequiredArgsConstructor
 public class JsonCodec implements FileCodec {
     private final ObjectMapper objectMapper;
-
-    public JsonCodec(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
 
     @Override
     public byte[] encode(List<TableData> dataSet) throws IOException {

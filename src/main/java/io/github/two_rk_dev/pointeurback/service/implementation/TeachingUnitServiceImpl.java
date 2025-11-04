@@ -12,23 +12,19 @@ import io.github.two_rk_dev.pointeurback.model.TeachingUnit;
 import io.github.two_rk_dev.pointeurback.repository.LevelRepository;
 import io.github.two_rk_dev.pointeurback.repository.TeachingUnitRepository;
 import io.github.two_rk_dev.pointeurback.service.TeachingUnitService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class TeachingUnitServiceImpl implements TeachingUnitService {
 
     private final TeachingUnitRepository teachingUnitRepository;
     private final LevelRepository levelRepository;
     private final TeachingUnitMapper teachingUnitMapper;
-
-    public TeachingUnitServiceImpl(TeachingUnitRepository teachingUnitRepository, LevelRepository levelRepository, TeachingUnitMapper teachingUnitMapper) {
-        this.teachingUnitRepository = teachingUnitRepository;
-        this.levelRepository = levelRepository;
-        this.teachingUnitMapper = teachingUnitMapper;
-    }
 
     @Override
     public List<TeachingUnitDTO> getAll() {

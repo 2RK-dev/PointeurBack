@@ -10,6 +10,7 @@ import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
 import io.github.two_rk_dev.pointeurback.repository.GroupRepository;
 import io.github.two_rk_dev.pointeurback.repository.ScheduleItemRepository;
 import io.github.two_rk_dev.pointeurback.service.GroupService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,17 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
     private final GroupMapper groupMapper;
     private final ScheduleItemRepository scheduleRepository;
-
-    public GroupServiceImpl(GroupRepository groupRepository, GroupMapper groupMapper, ScheduleItemRepository scheduleRepository) {
-        this.groupRepository = groupRepository;
-        this.groupMapper = groupMapper;
-        this.scheduleRepository = scheduleRepository;
-    }
 
     @Override
     public GroupDTO getGroupByLevel(Long levelId, Long groupId) {

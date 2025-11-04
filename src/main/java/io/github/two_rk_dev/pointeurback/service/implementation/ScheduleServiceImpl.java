@@ -10,6 +10,7 @@ import io.github.two_rk_dev.pointeurback.model.Room;
 import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
 import io.github.two_rk_dev.pointeurback.repository.*;
 import io.github.two_rk_dev.pointeurback.service.ScheduleService;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
 
     private final ScheduleItemRepository scheduleItemRepository;
@@ -26,17 +28,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final TeachingUnitRepository teachingUnitRepository;
     private final RoomRepository roomRepository;
     private final ScheduleItemMapper scheduleItemMapper;
-
-    public ScheduleServiceImpl(ScheduleItemRepository scheduleItemRepository, GroupRepository groupRepository,
-                               TeacherRepository teacherRepository, TeachingUnitRepository teachingUnitRepository, RoomRepository roomRepository,
-                               ScheduleItemMapper scheduleItemMapper) {
-        this.scheduleItemRepository = scheduleItemRepository;
-        this.groupRepository = groupRepository;
-        this.teacherRepository = teacherRepository;
-        this.teachingUnitRepository = teachingUnitRepository;
-        this.roomRepository = roomRepository;
-        this.scheduleItemMapper = scheduleItemMapper;
-    }
 
     @Override
     public List<ScheduleItemDTO> getSchedule(@Nullable Long levelId, @Nullable Long groupId, String start,
