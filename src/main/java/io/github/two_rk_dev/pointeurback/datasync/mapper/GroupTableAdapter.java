@@ -48,18 +48,19 @@ public class GroupTableAdapter extends AbstractEntityTableAdapter<ImportGroupDTO
     public List<SyncError> finalize(UUID stageID, boolean ignoreConflicts) {
         String stageIDString = stageID.toString();
         String insertValidIgnoreConflict = """
-                    INSERT INTO groups (group_id, level_id, name, size)
-                    SELECT s.group_id, s.level_id, s.name, s.size
+                    INSERT INTO groups (group_id, level_id, name, size, type, classe)
+                    SELECT s.group_id, s.level_id, s.name, s.size, s.type, s.classe
                     FROM staging_groups s
                     WHERE s.stage_id = ? AND EXISTS (SELECT 1 FROM level l WHERE l.level_id = s.level_id)
                     ON CONFLICT DO NOTHING
                 """;
         String insertValidMergeConflict = """
-                    INSERT INTO groups (group_id, level_id, name, size)
-                    SELECT s.group_id, s.level_id, s.name, s.size
+                    INSERT INTO groups (group_id, level_id, name, size, type, classe)
+                    SELECT s.group_id, s.level_id, s.name, s.size, s.type, s.classe
                     FROM staging_groups s
                     WHERE s.stage_id = ? AND EXISTS (SELECT 1 FROM level l WHERE l.level_id = s.level_id)
-                    ON CONFLICT(group_id) DO UPDATE SET level_id = excluded.level_id, name = excluded.level_id, size = excluded.size
+                    ON CONFLICT(group_id)
+                    DO UPDATE SET level_id = excluded.level_id, name = excluded.level_id, size = excluded.size, type = excluded.type, classe = excluded.classe
                 """;
         if (ignoreConflicts) jdbcTemplate.update(insertValidIgnoreConflict, stageIDString);
         else jdbcTemplate.update(insertValidMergeConflict, stageIDString);
@@ -86,8 +87,8 @@ public class GroupTableAdapter extends AbstractEntityTableAdapter<ImportGroupDTO
     protected void stage(UUID stageID, @NotNull List<ImportRow<ImportGroupDTO>> toStage, boolean ignoreConflicts) {
         jdbcTemplate.batchUpdate(
                 """
-                        INSERT INTO staging_groups (group_id, level_id, name, size, stage_id, filename, row_index, row_context)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        INSERT INTO staging_groups (group_id, level_id, name, size, stage_id, filename, row_index, row_context, type, classe)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """,
                 toStage,
                 100,
@@ -101,6 +102,8 @@ public class GroupTableAdapter extends AbstractEntityTableAdapter<ImportGroupDTO
                     ps.setString(6, argument.filename());
                     ps.setInt(7, argument.rowIndex());
                     ps.setString(8, argument.rowContext());
+                    ps.setString(9, group.type());
+                    ps.setString(10, group.classe());
                 }
         );
     }

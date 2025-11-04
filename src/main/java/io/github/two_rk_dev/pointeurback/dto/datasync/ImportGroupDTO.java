@@ -7,6 +7,8 @@ public record ImportGroupDTO(
         @NotNull Long id,
         @NotNull String name,
         @Positive Integer size,
-        Long levelId
+        Long levelId,
+        String type,
+        String classe
 ) {
 }

@@ -2,6 +2,7 @@ package io.github.two_rk_dev.pointeurback.controller;
 
 import io.github.two_rk_dev.pointeurback.datasync.filecodec.FileCodec;
 import io.github.two_rk_dev.pointeurback.repository.*;
+import org.assertj.core.groups.Tuple;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -278,6 +279,28 @@ class ImportControllerTest {
                 .containsExactlyInAnyOrder("S001", "S002");
     }
 
+    @Test
+    void shouldSaveGroupTypeAndClasse() throws Exception {
+        int groupCount = 4;
+        MockMultipartFile groupCsvFile = getCsvMultipartFile("group_with_type_and_classe.csv");
+        mockMvc.perform(multipart("/import/upload")
+                        .file(getGroupWithTypeAndClasseCsvMetadataFile())
+                        .file(getCsvMultipartFile("level.csv"))
+                        .file(groupCsvFile))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.entitySummary.group").value(groupCount));
+
+        assertThat(groupRepository.findAll())
+                .hasSize(groupCount)
+                .extracting("type", "classe")
+                .containsExactlyInAnyOrder(
+                        Tuple.tuple("projet", "GB"),
+                        Tuple.tuple("", "GB"),
+                        Tuple.tuple("projet", "GB"),
+                        Tuple.tuple("", "SR")
+                );
+    }
+
     private @NotNull MockMultipartFile getCsvMultipartFile(String filename) {
         try {
             return new MockMultipartFile(
@@ -289,6 +312,45 @@ class ImportControllerTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static @NotNull MockMultipartFile getGroupWithTypeAndClasseCsvMetadataFile() {
+        @Language("JSON") String metadata = """
+                {
+                  "metadata": {
+                    "group_with_type_and_classe.csv": {
+                      "": {
+                        "entityType": "group",
+                        "headersMapping": {
+                          "id": "id",
+                          "name": "name",
+                          "size": "size",
+                          "levelId": "levelId",
+                          "type": "type",
+                          "classe": "classe"
+                        }
+                      }
+                    },
+                    "level.csv": {
+                      "": {
+                        "entityType": "level",
+                        "headersMapping": {
+                          "id": "id",
+                          "name": "name",
+                          "abbreviation": "abbreviation"
+                        }
+                      }
+                    }
+                  }
+                }
+                """;
+        return new MockMultipartFile(
+                "metadata",
+                "",
+                "application/json",
+                metadata.getBytes(StandardCharsets.UTF_8)
+        );
+
     }
 
     private static @NotNull MockMultipartFile getRoom2CsvMetadataFile() {
