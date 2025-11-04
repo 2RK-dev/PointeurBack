@@ -32,6 +32,11 @@ public class GroupTableAdapter extends AbstractEntityTableAdapter<ImportGroupDTO
         return new TableData(Type.GROUP.entityName(), headers, rows);
     }
 
+    @Override
+    public @NotNull Type getEntityType() {
+        return Type.GROUP;
+    }
+
     /**
      * Promote the valid staged data, return the invalid ones, and clean up the staging table.
      * @param stageID unique identifier for the import session to finalize

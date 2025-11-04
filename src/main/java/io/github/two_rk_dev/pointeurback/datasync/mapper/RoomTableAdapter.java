@@ -32,6 +32,11 @@ public class RoomTableAdapter extends AbstractEntityTableAdapter<ImportRoomDTO> 
     }
 
     @Override
+    public @NotNull Type getEntityType() {
+        return Type.ROOM;
+    }
+
+    @Override
     protected void stage(UUID stageID, @NotNull List<ImportRow<ImportRoomDTO>> toStage) {
         jdbcTemplate.batchUpdate(
                 "INSERT INTO room(room_id, name, size, abbreviation) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING",

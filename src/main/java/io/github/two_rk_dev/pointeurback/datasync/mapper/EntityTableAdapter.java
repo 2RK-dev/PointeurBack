@@ -69,6 +69,8 @@ public interface EntityTableAdapter {
      */
     @NotNull TableData fetch();
 
+    @NotNull Type getEntityType();
+
     @Getter
     @AllArgsConstructor
     @Accessors(fluent = true)

@@ -1,15 +1,12 @@
 package io.github.two_rk_dev.pointeurback.service;
 
 import io.github.two_rk_dev.pointeurback.dto.*;
-import io.github.two_rk_dev.pointeurback.dto.datasync.ImportLevelDTO;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public interface LevelService {
     LevelDTO createLevel(CreateLevelDTO dto);
 
-    void importLevels(Stream<ImportLevelDTO> dtoStream);
     List<LevelDetailsDTO> getAllDetailed();
 
     List<LevelDTO> getAll();

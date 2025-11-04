@@ -2,12 +2,7 @@ package io.github.two_rk_dev.pointeurback.service.implementation;
 
 import io.github.two_rk_dev.pointeurback.datasync.filecodec.FileCodec;
 import io.github.two_rk_dev.pointeurback.datasync.mapper.EntityTableAdapter;
-import io.github.two_rk_dev.pointeurback.dto.datasync.ImportMapping;
-import io.github.two_rk_dev.pointeurback.dto.datasync.SyncError;
-import io.github.two_rk_dev.pointeurback.datasync.mapper.EntityTableMapper;
-import io.github.two_rk_dev.pointeurback.dto.datasync.ImportResponse;
-import io.github.two_rk_dev.pointeurback.dto.datasync.TableData;
-import io.github.two_rk_dev.pointeurback.dto.datasync.TableMapping;
+import io.github.two_rk_dev.pointeurback.dto.datasync.*;
 import io.github.two_rk_dev.pointeurback.service.ExportService;
 import io.github.two_rk_dev.pointeurback.service.ImportService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,75 +25,6 @@ public class DataSyncService implements ImportService, ExportService {
     }
 
     @Override
-    public ImportResponse importMultipleFiles(@NotNull MultipartFile[] files) throws IOException {
-        Map<String, Integer> entitySummary = new HashMap<>();
-        List<SyncError> allErrors = new ArrayList<>();
-        int totalRows = 0;
-        int successfulRows = 0;
-
-        for (MultipartFile file : files) {
-            try {
-                FileImportResult result = processSingleFile(file);
-                allErrors.addAll(result.errors());
-                totalRows += result.totalRows();
-                successfulRows += result.successfulRows();
-
-                // Update entity summary
-                result.entitySummary().forEach((entity, count) ->
-                        entitySummary.merge(entity, count, Integer::sum));
-
-            } catch (IOException e) {
-                log.error("Failed to process file: {}", file.getOriginalFilename(), e);
-                allErrors.add(SyncError.forEntity("SYSTEM", -1,
-                        "File processing failed: " + e.getMessage(), file.getOriginalFilename()));
-            }
-        }
-
-        return ImportResponse.withErrors(totalRows, successfulRows, allErrors, entitySummary);
-    }
-
-    private FileImportResult processSingleFile(@NotNull MultipartFile file) throws IOException {
-        String fileContentType = file.getContentType();
-        if (fileContentType == null) {
-            throw new IOException("No content type specified for file: " + file.getOriginalFilename());
-        }
-
-        FileCodec fileCodec = codecs.get(FileCodec.Type.forInputMediaType(fileContentType).beanName());
-        List<@NotNull TableData> decoded = fileCodec.decode(file.getInputStream());
-
-        List<SyncError> fileErrors = new ArrayList<>();
-        int fileTotalRows = 0;
-        int fileSuccessfulRows = 0;
-        Map<String, Integer> fileEntitySummary = new HashMap<>();
-
-        for (TableData tableData : decoded) {
-            EntityTableMapper.Type entityType = EntityTableMapper.Type.forEntity(tableData.tableName());
-            EntityTableMapper mapper = entityMappers.get(entityType.beanName());
-
-            try {
-                mapper.persist(tableData);
-                fileSuccessfulRows += tableData.rows().size();
-                fileEntitySummary.merge(tableData.tableName(), tableData.rows().size(), Integer::sum);
-            } catch (Exception e) {
-                log.error("Failed to persist entity {} from file {}", tableData.tableName(), file.getOriginalFilename(), e);
-                // Add error for each row in the table
-                for (int i = 0; i < tableData.rows().size(); i++) {
-                    fileErrors.add(SyncError.forEntity(
-                            tableData.tableName(),
-                            i,
-                            "Persistence failed: " + e.getMessage(),
-                            tableData.rows().get(i).toString()
-                    ));
-                }
-            }
-
-            fileTotalRows += tableData.rows().size();
-        }
-
-        return new FileImportResult(fileTotalRows, fileSuccessfulRows, fileErrors, fileEntitySummary);
-    }
-
-    @Override
     public Exported export(@NotNull List<String> entitiesNames, String format) throws IOException {
         FileCodec fileCodec = codecs.get(FileCodec.Type.forCodecName(format).beanName());
         List<TableData> tableDataList = new ArrayList<>();
@@ -110,9 +36,12 @@ public class DataSyncService implements ImportService, ExportService {
     }
 
     @Override
-    public List<SyncError> batchImport(MultipartFile @NotNull [] files, ImportMapping mapping) {
+    public ImportResponse batchImport(MultipartFile @NotNull [] files, ImportMapping mapping) {
         UUID stageID = UUID.randomUUID();
+        Map<String, Integer> entitySummary = new HashMap<>();
         List<SyncError> errors = new ArrayList<>();
+        int totalRows = 0;
+        int successfulRows = 0;
         Set<EntityTableAdapter> usedAdapters = new HashSet<>();
         for (MultipartFile file : files) {
             String codecType = FileCodec.Type.forInputMediaType(file.getContentType()).beanName();
@@ -129,23 +58,23 @@ public class DataSyncService implements ImportService, ExportService {
                     String subfileFullName = "%s/%s".formatted(filename, tableData.tableName());
                     List<SyncError> syncErrors = adapter.process(stageID, tableData.withTableName(subfileFullName));
                     errors.addAll(syncErrors);
+                    totalRows += tableData.rows().size();
+                    int successful = tableData.rows().size() - syncErrors.size();
+                    successfulRows += successful;
+                    entitySummary.merge(entityType.entityName(), successful, Integer::sum);
                 }
             } catch (IOException e) {
-                log.error("Failed to parse file {}", filename, e);
+                log.error("Failed to process file: {}", file.getOriginalFilename(), e);
+                errors.add(SyncError.forEntity("SYSTEM", -1,
+                        "File processing failed: " + e.getMessage(), filename));
             }
         }
-        for (EntityTableAdapter entityTableAdapter : usedAdapters) {
-            List<SyncError> syncErrors = entityTableAdapter.finalize(stageID);
+        for (EntityTableAdapter adapter : usedAdapters) {
+            List<SyncError> syncErrors = adapter.finalize(stageID);
             errors.addAll(syncErrors);
+            successfulRows -= syncErrors.size();
+            entitySummary.merge(adapter.getEntityType().entityName(), syncErrors.size(), (val, newVal) -> val - newVal);
         }
-        return errors;
-    }
-
-    private record FileImportResult(
-            int totalRows,
-            int successfulRows,
-            List<SyncError> errors,
-            Map<String, Integer> entitySummary
-    ) {
+        return ImportResponse.withErrors(totalRows, successfulRows, errors, entitySummary);
     }
 }

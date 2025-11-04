@@ -32,6 +32,11 @@ public class TeacherTableAdapter extends AbstractEntityTableAdapter<ImportTeache
     }
 
     @Override
+    public @NotNull Type getEntityType() {
+        return Type.TEACHER;
+    }
+
+    @Override
     protected void stage(UUID stageID, @NotNull List<ImportRow<ImportTeacherDTO>> toStage) {
         jdbcTemplate.batchUpdate(
                 "INSERT INTO teacher(teacher_id, name, abbreviation) VALUES (?, ?, ?) ON CONFLICT DO NOTHING",

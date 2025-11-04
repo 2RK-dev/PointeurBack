@@ -33,6 +33,11 @@ public class TeachingUnitTableAdapter extends AbstractEntityTableAdapter<ImportT
     }
 
     @Override
+    public @NotNull Type getEntityType() {
+        return Type.TEACHING_UNIT;
+    }
+
+    @Override
     protected void stage(UUID stageID, @NotNull List<ImportRow<ImportTeachingUnitDTO>> toStage) {
         jdbcTemplate.batchUpdate(
                 """
@@ -74,7 +79,7 @@ public class TeachingUnitTableAdapter extends AbstractEntityTableAdapter<ImportT
         String selectInvalid = """
                 SELECT s.filename, s.row_index, s.row_context
                 FROM staging_teaching_unit s
-                WHERE s.stage_id = ? AND NOT EXISTS (SELECT 1 FROM level l WHERE l.level_id = s.level_id)
+                WHERE s.stage_id = ? AND s.level_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM level l WHERE l.level_id = s.level_id)
                 """;
         List<SyncError> errors = jdbcTemplate.query(
                 selectInvalid,

@@ -86,5 +86,5 @@ public class RoomServiceImpl implements RoomService {
 
     public void importRooms(@NotNull Stream<ImportRoomDTO> roomDTOStream) {
         roomRepository.saveAll(roomDTOStream.map(roomMapper::fromImportDTO).toList());
-  }
+    }
 }

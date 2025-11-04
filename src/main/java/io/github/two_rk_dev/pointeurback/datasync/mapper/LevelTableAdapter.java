@@ -32,6 +32,11 @@ public class LevelTableAdapter extends AbstractEntityTableAdapter<ImportLevelDTO
     }
 
     @Override
+    public @NotNull Type getEntityType() {
+        return Type.LEVEL;
+    }
+
+    @Override
     protected void stage(UUID stageID, @NotNull List<ImportRow<ImportLevelDTO>> toStage) {
         jdbcTemplate.batchUpdate(
                 "INSERT INTO level(level_id, name, abbreviation) VALUES (?, ?, ?) ON CONFLICT DO NOTHING",

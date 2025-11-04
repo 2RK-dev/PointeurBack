@@ -22,10 +22,11 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(printOnlyOnFailure = false)
 @Testcontainers
 class ImportControllerTest {
 
@@ -62,6 +63,11 @@ class ImportControllerTest {
 
     @Test
     void shouldImportCsvFilesSuccessfully() throws Exception {
+        int roomCount = 2;
+        int levelCount = 3;
+        int teacherCount = 6;
+        int groupCount = 4;
+        int teachingUnitCount = 10;
         mockMvc.perform(multipart("/import/upload")
                         .file(getCsvMetadataFile())
                         .file(getCsvMultipartFile("room.csv"))
@@ -69,26 +75,31 @@ class ImportControllerTest {
                         .file(getCsvMultipartFile("group.csv"))
                         .file(getCsvMultipartFile("teaching_unit.csv"))
                         .file(getCsvMultipartFile("teacher.csv")))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.entitySummary.room").value(roomCount))
+                .andExpect(jsonPath("$.entitySummary.level").value(levelCount))
+                .andExpect(jsonPath("$.entitySummary.group").value(groupCount))
+                .andExpect(jsonPath("$.entitySummary.teaching_unit").value(teachingUnitCount))
+                .andExpect(jsonPath("$.entitySummary.teacher").value(teacherCount));
 
         assertThat(roomRepository.findAll())
-                .hasSize(2)
+                .hasSize(roomCount)
                 .extracting("name")
                 .containsExactlyInAnyOrder("S001", "S002");
         assertThat(levelRepository.findAll())
-                .hasSize(3)
+                .hasSize(levelCount)
                 .extracting("abbreviation")
                 .containsExactlyInAnyOrder("L1", "L2", "L3");
         assertThat(teacherRepository.findAll())
-                .hasSize(6)
+                .hasSize(teacherCount)
                 .extracting("name")
                 .contains("Alix", "Andry", "Angelo", "Bertin", "Cyprien", "Jean Christian RALAIVAO");
         assertThat(groupRepository.findAll())
-                .hasSize(4)
+                .hasSize(groupCount)
                 .extracting("name")
                 .containsExactlyInAnyOrder("L1Gp1", "L1Gp2", "L2Gp1", "L2Gp2");
         assertThat(teachingUnitRepository.findAll())
-                .hasSize(10)
+                .hasSize(teachingUnitCount)
                 .extracting("abbreviation")
                 .containsExactlyInAnyOrder("PROG", "BDD", "MATH", "TRES", "LANG", "MATH", "PROG", "BDD", "TRES", "LANG");
     }
@@ -101,35 +112,50 @@ class ImportControllerTest {
                 FileCodec.Type.EXCEL.inputMediaType().toString(),
                 new ClassPathResource("level_room_teacher_teaching_unit_group.xlsx").getInputStream()
         );
+        int roomCount = 6;
+        int levelCount = 3;
+        int groupCount = 4;
+        int teachingUnitCount = 10;
+        int teacherCount = 6;
         mockMvc.perform(multipart("/import/upload")
                         .file(getExcelMetadataFile())
                         .file(excelFile))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.entitySummary.room").value(roomCount))
+                .andExpect(jsonPath("$.entitySummary.level").value(levelCount))
+                .andExpect(jsonPath("$.entitySummary.group").value(groupCount))
+                .andExpect(jsonPath("$.entitySummary.teaching_unit").value(teachingUnitCount))
+                .andExpect(jsonPath("$.entitySummary.teacher").value(teacherCount));
 
         assertThat(roomRepository.findAll())
-                .hasSize(6)
+                .hasSize(roomCount)
                 .extracting("name")
                 .containsExactlyInAnyOrder("S001", "S002", "S003", "S101", "S001", "S002");
         assertThat(levelRepository.findAll())
-                .hasSize(3)
+                .hasSize(levelCount)
                 .extracting("abbreviation")
                 .containsExactlyInAnyOrder("L1", "L2", "L3");
         assertThat(teacherRepository.findAll())
-                .hasSize(6)
+                .hasSize(teacherCount)
                 .extracting("name")
                 .contains("Alix", "Andry", "Angelo", "Bertin", "Cyprien", "Jean Christian RALAIVAO");
         assertThat(groupRepository.findAll())
-                .hasSize(4)
+                .hasSize(groupCount)
                 .extracting("name")
                 .containsExactlyInAnyOrder("L1Gp1", "L1Gp2", "L2Gp1", "L2Gp2");
         assertThat(teachingUnitRepository.findAll())
-                .hasSize(10)
+                .hasSize(teachingUnitCount)
                 .extracting("abbreviation")
                 .containsExactlyInAnyOrder("PROG", "BDD", "MATH", "TRES", "LANG", "MATH", "PROG", "BDD", "TRES", "LANG");
     }
 
     @Test
     void shouldImportJSONFileSuccessfully() throws Exception {
+        int roomCount = 6;
+        int levelCount = 3;
+        int teacherCount = 6;
+        int groupCount = 4;
+        int teachingUnitCount = 10;
         MockMultipartFile jsonFile = new MockMultipartFile(
                 "files",
                 "level_room_teacher_teaching_unit_group.json",
@@ -139,26 +165,31 @@ class ImportControllerTest {
         mockMvc.perform(multipart("/import/upload")
                         .file(getJSONMetadataFile())
                         .file(jsonFile))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.entitySummary.room").value(roomCount))
+                .andExpect(jsonPath("$.entitySummary.level").value(levelCount))
+                .andExpect(jsonPath("$.entitySummary.group").value(groupCount))
+                .andExpect(jsonPath("$.entitySummary.teaching_unit").value(teachingUnitCount))
+                .andExpect(jsonPath("$.entitySummary.teacher").value(teacherCount));
 
         assertThat(roomRepository.findAll())
-                .hasSize(6)
+                .hasSize(roomCount)
                 .extracting("name")
                 .containsExactlyInAnyOrder("S001", "S002", "S003", "S101", "S001", "S002");
         assertThat(levelRepository.findAll())
-                .hasSize(3)
+                .hasSize(levelCount)
                 .extracting("abbreviation")
                 .containsExactlyInAnyOrder("L1", "L2", "L3");
         assertThat(teacherRepository.findAll())
-                .hasSize(6)
+                .hasSize(teacherCount)
                 .extracting("name")
                 .contains("Alix", "Andry", "Angelo", "Bertin", "Cyprien", "Jean Christian RALAIVAO");
         assertThat(groupRepository.findAll())
-                .hasSize(4)
+                .hasSize(groupCount)
                 .extracting("name")
                 .containsExactlyInAnyOrder("L1Gp1", "L1Gp2", "L2Gp1", "L2Gp2");
         assertThat(teachingUnitRepository.findAll())
-                .hasSize(10)
+                .hasSize(teachingUnitCount)
                 .extracting("abbreviation")
                 .containsExactlyInAnyOrder("PROG", "BDD", "MATH", "TRES", "LANG", "MATH", "PROG", "BDD", "TRES", "LANG");
     }
