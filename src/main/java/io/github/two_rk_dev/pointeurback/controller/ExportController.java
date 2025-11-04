@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/export")
+@RequestMapping("/export")
 public class ExportController {
 
     private final ExportService exportService;

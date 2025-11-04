@@ -3,9 +3,11 @@ package io.github.two_rk_dev.pointeurback.service;
 import io.github.two_rk_dev.pointeurback.dto.CreateRoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.RoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateRoomDTO;
+import io.github.two_rk_dev.pointeurback.dto.datasync.ImportRoomDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 public interface RoomService {
     List<RoomDTO> getAll();
@@ -20,5 +22,5 @@ public interface RoomService {
 
     List<RoomDTO> getAvailableRooms(LocalDateTime start, LocalDateTime endTime, int size);
 
-    void saveRooms(CreateRoomDTO[] rooms);
+    void importRooms(Stream<ImportRoomDTO> roomDTOStream);
 }

@@ -1,11 +1,10 @@
 package io.github.two_rk_dev.pointeurback.service;
 
-import io.github.two_rk_dev.pointeurback.dto.CreateGroupDTO;
 import io.github.two_rk_dev.pointeurback.dto.GroupDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateGroupDTO;
+import io.github.two_rk_dev.pointeurback.dto.datasync.ImportGroupDTO;
 
 import java.util.List;
-import java.util.Map;
 
 public interface GroupService {
     GroupDTO getGroupByLevel(Long levelId, Long groupId);
@@ -14,7 +13,5 @@ public interface GroupService {
 
     void deleteGroup(Long levelId, Long groupId);
 
-    void saveGroups(Map<Long, List<CreateGroupDTO>> groups);
-
-    List<GroupDTO> getAll();
+    List<ImportGroupDTO> exportAll();
 }

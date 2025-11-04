@@ -9,8 +9,4 @@ import java.util.List;
 @Repository
 public interface TeachingUnitRepository extends JpaRepository<TeachingUnit, Long> {
     List<TeachingUnit> findByLevelId(Long LevelId);
-
-    boolean existsByName(String name);
-
-    boolean existsByAbbreviation(String abbreviation);
 }

@@ -1,0 +1,11 @@
+id,abbreviation,name,levelId
+2,PROG,Programmation Web,null
+3,BDD,Base de Données,null
+1,MATH,Mathématiques Appliquées,null
+4,TRES,Théorie des Réseaux,null
+5,LANG,Langage C,null
+6,MATH,Mathématiques Appliquées,1
+7,PROG,Programmation Web,2
+8,BDD,Base de Données,2
+9,TRES,Théorie des Réseaux,1
+10,LANG,Langage C,1

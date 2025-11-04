@@ -3,15 +3,18 @@ package io.github.two_rk_dev.pointeurback.service.implementation;
 import io.github.two_rk_dev.pointeurback.dto.CreateRoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.RoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateRoomDTO;
+import io.github.two_rk_dev.pointeurback.dto.datasync.ImportRoomDTO;
 import io.github.two_rk_dev.pointeurback.exception.RoomNotFoundException;
 import io.github.two_rk_dev.pointeurback.mapper.RoomMapper;
 import io.github.two_rk_dev.pointeurback.model.Room;
 import io.github.two_rk_dev.pointeurback.repository.RoomRepository;
 import io.github.two_rk_dev.pointeurback.service.RoomService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -81,28 +84,7 @@ public class RoomServiceImpl implements RoomService {
         return roomMapper.toDtoList(availableRooms);
     }
 
-    public void saveRooms(CreateRoomDTO[] rooms) {
-        if (rooms == null) {
-            throw new IllegalArgumentException("rooms array cannot be null");
-        }
-
-        List<Room> toSave = new java.util.ArrayList<>();
-        for (CreateRoomDTO roomDTO : rooms) {
-            if (roomDTO == null) {
-                continue;
-            }
-            Room room = roomMapper.createRoomFromDto(roomDTO);
-            if (room == null || room.getName() == null) {
-                continue; // skip malformed entries
-            }
-            if (roomRepository.existsByName(room.getName())) {
-                continue; // Skip saving if a room with the same name already exists
-            }
-            toSave.add(room);
-        }
-
-        if (!toSave.isEmpty()) {
-            roomRepository.saveAll(toSave);
-        }
+    public void importRooms(@NotNull Stream<ImportRoomDTO> roomDTOStream) {
+        roomRepository.saveAll(roomDTOStream.map(roomMapper::fromImportDTO).toList());
     }
 }

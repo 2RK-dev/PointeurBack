@@ -3,6 +3,7 @@ package io.github.two_rk_dev.pointeurback.service;
 import io.github.two_rk_dev.pointeurback.dto.CreateTeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.dto.TeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeachingUnitDTO;
+import io.github.two_rk_dev.pointeurback.dto.datasync.ImportTeachingUnitDTO;
 
 import java.util.List;
 
@@ -17,5 +18,5 @@ public interface TeachingUnitService {
 
     void deleteTeachingUnit(Long id);
 
-    void saveTeachingUnits(CreateTeachingUnitDTO[] teachingUnits);
+    List<ImportTeachingUnitDTO> exportAll();
 }

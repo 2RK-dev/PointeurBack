@@ -56,7 +56,11 @@ public class ExcelCodec implements FileCodec {
     @Override
     public List<@NotNull TableData> decode(InputStream inputStream) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-        return List.of(parseSheet(workbook.getSheetAt(0)));
+        List<TableData> tableDataList = new ArrayList<>();
+        for (Sheet sheet : workbook) {
+            tableDataList.add(parseSheet(sheet));
+        }
+        return tableDataList;
     }
 
     @Override

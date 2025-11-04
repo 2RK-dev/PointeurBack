@@ -1,53 +1,43 @@
 package io.github.two_rk_dev.pointeurback.datasync.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.two_rk_dev.pointeurback.dto.datasync.TableData;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.RecordComponent;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @UtilityClass
 class Utils {
-    @SuppressWarnings("unchecked")
-    public static <T extends Record> T @NotNull [] parseDTOs(@NotNull TableData data,
-                                                             @NotNull Class<T> clazz,
-                                                             Map<String, @NotNull ColumnFieldBinding<T>> bindings,
-                                                             ObjectMapper objectMapper) {
-        return data.rows().stream()
-                .map(r -> parseDTO(r, data.headers(), clazz, bindings, objectMapper))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toArray(i -> (T[]) Array.newInstance(clazz, i));
-    }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Record> Optional<T> parseDTO(@NotNull List<String> row,
-                                                          @NotNull List<String> headers,
-                                                          @NotNull Class<T> clazz,
-                                                          @NotNull Map<String, ColumnFieldBinding<T>> bindings,
-                                                          ObjectMapper objectMapper) {
-        assert bindings.size() == row.size();
+    public static <T extends Record> @NotNull T parseDTO(@NotNull List<String> row,
+                                                         @NotNull List<String> headers,
+                                                         @NotNull Class<T> clazz,
+                                                         @NotNull Map<String, ColumnFieldBinding<T>> bindings,
+                                                         ObjectMapper objectMapper) {
         Object[] args = new Object[bindings.size()];
         for (Iterator<String> rowIt = row.iterator(), headersIt = headers.iterator();
              headersIt.hasNext() && rowIt.hasNext();
         ) {
-            ColumnFieldBinding<T> binding = bindings.get(headersIt.next());
-            args[binding.order()] = objectMapper.convertValue(rowIt.next(), binding.fieldType());
+            String header = headersIt.next();
+            String value = rowIt.next();
+            ColumnFieldBinding<T> binding = bindings.get(header);
+            if (binding != null) args[binding.order()] = objectMapper.convertValue(value, binding.fieldType());
         }
         try {
-            return Optional.of((T) clazz.getDeclaredConstructors()[0].newInstance(args));
+            return (T) clazz.getDeclaredConstructors()[0].newInstance(args);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             log.error("Failed to parse {} from {}", clazz.getName(), Arrays.toString(args), e);
-            return Optional.empty();
+            throw new IllegalArgumentException("Failed to parse row", e);
         }
     }
 
@@ -97,5 +87,11 @@ class Utils {
                 .stream().sorted(Comparator.comparing(entry -> entry.getValue().order()))
                 .map(Map.Entry::getKey)
                 .toList();
+    }
+
+    public static String rowToString(@NotNull List<String> row, @NotNull List<String> headers) {
+        return IntStream.range(0, headers.size())
+                .mapToObj(i -> "%s=%s".formatted(headers.get(i), i < row.size() ? row.get(i) : ""))
+                .collect(Collectors.joining(", ", "[", "]"));
     }
 }

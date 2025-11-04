@@ -1,5 +1,6 @@
 package io.github.two_rk_dev.pointeurback.dto.datasync;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
@@ -17,4 +18,8 @@ public record TableData(
         List<@Unmodifiable List<String>> rows
 ) {
     public static final TableData EMPTY = new TableData("", List.of(), List.of());
+
+    public @NotNull TableData withTableInfo(String tableName, List<String> newHeaders) {
+        return new TableData(tableName, newHeaders, rows);
+    }
 }

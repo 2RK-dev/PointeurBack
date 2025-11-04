@@ -1,0 +1,177 @@
+{
+  "level": [
+    {
+      "id": "4",
+      "name": "L1",
+      "abbreviation": "L1"
+    },
+    {
+      "id": "5",
+      "name": "L2",
+      "abbreviation": "L2"
+    },
+    {
+      "id": "6",
+      "name": "L3",
+      "abbreviation": "L3"
+    }
+  ],
+  "room": [
+    {
+      "id": "5",
+      "name": "S001",
+      "abbreviation": "S001",
+      "size": "100"
+    },
+    {
+      "id": "6",
+      "name": "S002",
+      "abbreviation": "S002",
+      "size": "200"
+    },
+    {
+      "id": "7",
+      "name": "S003",
+      "abbreviation": "S003",
+      "size": "150"
+    },
+    {
+      "id": "8",
+      "name": "S101",
+      "abbreviation": "S101",
+      "size": "250"
+    },
+    {
+      "id": "1",
+      "name": "S001",
+      "abbreviation": "S001",
+      "size": "100"
+    },
+    {
+      "id": "2",
+      "name": "S002",
+      "abbreviation": "S002",
+      "size": "200"
+    }
+  ],
+  "teacher": [
+    {
+      "id": "7",
+      "name": "Alix",
+      "abbreviation": "ALX"
+    },
+    {
+      "id": "8",
+      "name": "Andry",
+      "abbreviation": "ANDR"
+    },
+    {
+      "id": "9",
+      "name": "Angelo",
+      "abbreviation": "ANG"
+    },
+    {
+      "id": "10",
+      "name": "Bertin",
+      "abbreviation": "BERT"
+    },
+    {
+      "id": "11",
+      "name": "Cyprien",
+      "abbreviation": "CYPR"
+    },
+    {
+      "id": "12",
+      "name": "Jean Christian RALAIVAO",
+      "abbreviation": "JCR"
+    }
+  ],
+  "teaching_unit": [
+    {
+      "id": "2",
+      "abbreviation": "PROG",
+      "name": "Programmation Web",
+      "levelId": "null"
+    },
+    {
+      "id": "3",
+      "abbreviation": "BDD",
+      "name": "Base de Données",
+      "levelId": "null"
+    },
+    {
+      "id": "1",
+      "abbreviation": "MATH",
+      "name": "Mathématiques Appliquées",
+      "levelId": "null"
+    },
+    {
+      "id": "4",
+      "abbreviation": "TRES",
+      "name": "Théorie des Réseaux",
+      "levelId": "null"
+    },
+    {
+      "id": "5",
+      "abbreviation": "LANG",
+      "name": "Langage C",
+      "levelId": "null"
+    },
+    {
+      "id": "6",
+      "abbreviation": "MATH",
+      "name": "Mathématiques Appliquées",
+      "levelId": "4"
+    },
+    {
+      "id": "7",
+      "abbreviation": "PROG",
+      "name": "Programmation Web",
+      "levelId": "5"
+    },
+    {
+      "id": "8",
+      "abbreviation": "BDD",
+      "name": "Base de Données",
+      "levelId": "5"
+    },
+    {
+      "id": "9",
+      "abbreviation": "TRES",
+      "name": "Théorie des Réseaux",
+      "levelId": "4"
+    },
+    {
+      "id": "10",
+      "abbreviation": "LANG",
+      "name": "Langage C",
+      "levelId": "4"
+    }
+  ],
+  "group": [
+    {
+      "id": "20",
+      "name": "L1Gp1",
+      "size": "100",
+      "levelId": "4"
+    },
+    {
+      "id": "21",
+      "name": "L1Gp2",
+      "size": "50",
+      "levelId": "4"
+    },
+    {
+      "id": "22",
+      "name": "L2Gp1",
+      "size": "150",
+      "levelId": "5"
+    },
+    {
+      "id": "23",
+      "name": "L2Gp2",
+      "size": "200",
+      "levelId": "5"
+    }
+  ]
+}

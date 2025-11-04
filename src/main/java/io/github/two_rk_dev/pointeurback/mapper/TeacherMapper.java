@@ -3,6 +3,7 @@ package io.github.two_rk_dev.pointeurback.mapper;
 import io.github.two_rk_dev.pointeurback.dto.CreateTeacherDTO;
 import io.github.two_rk_dev.pointeurback.dto.TeacherDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeacherDTO;
+import io.github.two_rk_dev.pointeurback.dto.datasync.ImportTeacherDTO;
 import io.github.two_rk_dev.pointeurback.model.Teacher;
 import org.mapstruct.*;
 
@@ -34,4 +35,7 @@ public interface TeacherMapper {
             updateFromDto(updateDto, teacher);
         }
     }
+
+    @Mapping(target = "schedules", ignore = true)
+    Teacher fromImportDTO(ImportTeacherDTO dto);
 }

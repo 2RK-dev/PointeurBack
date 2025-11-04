@@ -1,7 +1,7 @@
 package io.github.two_rk_dev.pointeurback;
 
 import io.github.two_rk_dev.pointeurback.datasync.filecodec.FileCodec;
-import io.github.two_rk_dev.pointeurback.datasync.mapper.EntityTableMapper;
+import io.github.two_rk_dev.pointeurback.datasync.mapper.EntityTableAdapter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,9 +29,9 @@ class PointeurBackApplicationTests {
 
     @Test
     void allRegisteredEntityTableMapperEnumsAreImplemented() {
-        assertThat(EntityTableMapper.Type.values())
+        assertThat(EntityTableAdapter.Type.values())
                 .as("Some entity mappers registered in the EntityTableMapper.Type enum are not implemented in the" +
                     "appropriately named spring beans.")
-                .allSatisfy(fc -> applicationContext.getBean(fc.beanName(), EntityTableMapper.class));
+                .allSatisfy(fc -> applicationContext.getBean(fc.beanName(), EntityTableAdapter.class));
     }
 }
