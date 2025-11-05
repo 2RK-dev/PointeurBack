@@ -6,6 +6,7 @@ import io.github.two_rk_dev.pointeurback.dto.UpdateRoomDTO;
 import io.github.two_rk_dev.pointeurback.service.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.constraints.Min;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -60,7 +61,7 @@ public class RoomController {
     public ResponseEntity<List<RoomDTO>> getAvailableRooms(
             @RequestParam LocalDateTime startTime,
             @RequestParam LocalDateTime endTime,
-            @RequestParam(required = false, defaultValue = "1") int size) {
+            @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Size must be greater than 1") int size) {
 
         List<RoomDTO> availableRooms = roomService.getAvailableRooms(startTime, endTime, size);
         return ResponseEntity.ok(availableRooms);

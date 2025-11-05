@@ -1,7 +1,6 @@
 package io.github.two_rk_dev.pointeurback.service.implementation;
 
 import io.github.two_rk_dev.pointeurback.dto.*;
-import io.github.two_rk_dev.pointeurback.exception.GroupNotFoundException;
 import io.github.two_rk_dev.pointeurback.exception.LevelNotFoundException;
 import io.github.two_rk_dev.pointeurback.mapper.GroupMapper;
 import io.github.two_rk_dev.pointeurback.mapper.LevelMapper;
@@ -36,13 +35,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     public LevelDTO createLevel(CreateLevelDTO dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("CreateLevelDTO cannot be null");
-        }
         Level newLevel = levelMapper.fromCreateDto(dto);
-        if (newLevel.getName() == null || newLevel.getName().isBlank()) {
-            throw new IllegalStateException("Level name cannot be empty");
-        }
         Level savedLevel = levelRepository.save(newLevel);
         return levelMapper.toDto(savedLevel);
     }
@@ -78,12 +71,9 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     public LevelDTO updateLevel(Long id, UpdateLevelDTO dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("UpdateLevelDTO cannot be null");
-        }
         Level existing = levelRepository.findById(id)
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + id));
-        levelMapper.updateLevel(dto, existing);
+        levelMapper.updateFromUpdateDto(dto, existing);
         Level updated = levelRepository.save(existing);
         return levelMapper.toDto(updated);
     }
@@ -149,17 +139,10 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     public GroupDTO createGroup(Long levelId, CreateGroupDTO dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("CreateGroupDTO cannot be null");
-        }
         Level level = levelRepository.findById(levelId)
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + levelId));
         Group newGroup = groupMapper.fromCreateDto(dto, level);
-        if (groupRepository.findByName(dto.name()) != null) {
-            Group savedGroup = groupRepository.save(newGroup);
-            return groupMapper.toDto(savedGroup);
-        } else {
-            throw new GroupNotFoundException("Group name already exists for this level");
-        }
+        Group savedGroup = groupRepository.save(newGroup);
+        return groupMapper.toDto(savedGroup);
     }
 }

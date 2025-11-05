@@ -1,5 +1,5 @@
-id,name,size,levelId
-20,L1Gp1,100,1
-21,L1Gp2,50,1
-22,L2Gp1,150,2
-23,L2Gp2,200,2
+id,name,size,levelId,type,classe
+20,L1Gp1,100,1,CM,GB
+21,L1Gp2,50,1,CM,GB
+22,L2Gp1,150,2,CM,GB
+23,L2Gp2,200,2,CM,GB

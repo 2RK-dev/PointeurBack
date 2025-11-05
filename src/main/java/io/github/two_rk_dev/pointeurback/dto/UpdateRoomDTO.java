@@ -1,8 +1,11 @@
 package io.github.two_rk_dev.pointeurback.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 public record UpdateRoomDTO(
-        String name,
-        String abbreviation,
-        int size
+        @NotNull String name,
+        @NotNull String abbreviation,
+        @Positive int size
 ) {
 }

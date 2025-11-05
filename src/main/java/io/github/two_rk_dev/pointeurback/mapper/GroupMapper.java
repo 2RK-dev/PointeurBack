@@ -33,13 +33,6 @@ public interface GroupMapper {
         return group;
     }
 
-    default void updateGroup(UpdateGroupDTO updateDto, Group group) {
-        if (updateDto == null) {
-            return;
-        }
-        updateFromUpdateDto(updateDto, group);
-    }
-
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "level", ignore = true)
     @Mapping(target = "schedules", ignore = true)

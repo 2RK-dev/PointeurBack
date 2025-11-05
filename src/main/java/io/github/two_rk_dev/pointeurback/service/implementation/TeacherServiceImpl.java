@@ -38,24 +38,17 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public TeacherDTO createTeacher(CreateTeacherDTO dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("CreateTeacherDTO cannot be null");
-        }
-
-        Teacher newTeacher = teacherMapper.createTeacherFromDto(dto);
+        Teacher newTeacher = teacherMapper.fromCreateDto(dto);
         Teacher savedTeacher = teacherRepository.save(newTeacher);
         return teacherMapper.toDto(savedTeacher);
     }
 
     @Override
     public TeacherDTO updateTeacher(Long id, UpdateTeacherDTO dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("UpdateTeacherDTO cannot be null");
-        }
         Teacher existingTeacher = teacherRepository.findById(id)
                 .orElseThrow(() -> new TeacherNotFoundException("Teacher not found with id: " + id));
 
-        teacherMapper.updateTeacher(dto, existingTeacher);
+        teacherMapper.updateFromDto(dto, existingTeacher);
         Teacher updatedTeacher = teacherRepository.save(existingTeacher);
         return teacherMapper.toDto(updatedTeacher);
     }

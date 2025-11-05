@@ -4,6 +4,7 @@ import io.github.two_rk_dev.pointeurback.dto.CreateRoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.RoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateRoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.datasync.ImportRoomDTO;
+import io.github.two_rk_dev.pointeurback.exception.InvalidDateRangeException;
 import io.github.two_rk_dev.pointeurback.exception.RoomNotFoundException;
 import io.github.two_rk_dev.pointeurback.mapper.RoomMapper;
 import io.github.two_rk_dev.pointeurback.model.Room;
@@ -32,10 +33,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public RoomDTO createRoom(CreateRoomDTO dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("CreateRoomDTO cannot be null");
-        }
-        Room newRoom = roomMapper.createRoomFromDto(dto);
+        Room newRoom = roomMapper.fromCreateDto(dto);
         Room savedRoom = roomRepository.save(newRoom);
         return roomMapper.toDto(savedRoom);
     }
@@ -49,13 +47,10 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public RoomDTO updateRoom(Long id, UpdateRoomDTO dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("UpdateRoomDTO cannot be null");
-        }
         Room existingRoom = roomRepository.findById(id)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found with id: " + id));
 
-        roomMapper.updateRoom(dto, existingRoom);
+        roomMapper.updateFromDto(dto, existingRoom);
         Room updatedRoom = roomRepository.save(existingRoom);
         return roomMapper.toDto(updatedRoom);
     }
@@ -66,17 +61,10 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<RoomDTO> getAvailableRooms(LocalDateTime start, LocalDateTime endTime, int size) {
-        if (start == null || endTime == null) {
-            throw new IllegalArgumentException("Start and end time must be specified");
-        }
+    public List<RoomDTO> getAvailableRooms(LocalDateTime start, @NotNull LocalDateTime endTime, int size) {
         if (endTime.isBefore(start)) {
-            throw new IllegalArgumentException("End time cannot be before startTime time");
+            throw new InvalidDateRangeException("End time cannot be before startTime time");
         }
-        if (size <= 0) {
-            throw new IllegalArgumentException("Room size must be positive");
-        }
-
         List<Room> availableRooms = roomRepository.findAvailableRooms(start, endTime, size);
         return roomMapper.toDtoList(availableRooms);
     }

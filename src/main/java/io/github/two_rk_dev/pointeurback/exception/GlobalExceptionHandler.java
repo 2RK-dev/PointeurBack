@@ -4,28 +4,35 @@ import io.github.two_rk_dev.pointeurback.dto.ErrorDetails;
 import io.github.two_rk_dev.pointeurback.dto.ValidationError;
 import io.github.two_rk_dev.pointeurback.dto.ValidationErrorDetails;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.MessageSourceResolvable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.server.UnsupportedMediaTypeStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ScheduleConflictException.class)
-    public ResponseEntity<ErrorDetails> handleScheduleConflictException(@NotNull ScheduleConflictException ex,
-                                                                        @NotNull WebRequest request) {
+    public ResponseEntity<ErrorDetails> handleScheduleConflictException(@NotNull ScheduleConflictException ex) {
+        String conflicts = String.join(", ", ex.getConflicts());
         ErrorDetails errorDetails = new ErrorDetails(
                 OffsetDateTime.now(ZoneOffset.UTC),
-                ex.getMessage(),
-                request.getDescription(false),
+                ex.getMessage() + conflicts,
+                conflicts,
                 "SCHEDULE_CONFLICT");
         return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
@@ -150,8 +157,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleValidationExceptions(@NotNull MethodArgumentNotValidException ex) {
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(@NotNull MethodArgumentNotValidException ex,
+                                                                  @NotNull HttpHeaders headers,
+                                                                  @NotNull HttpStatusCode status,
+                                                                  @NotNull WebRequest request) {
         List<ValidationError> errors = ex.getBindingResult().getAllErrors().stream()
                 .map(ValidationError::fromFieldError)
                 .toList();
@@ -200,6 +210,45 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 "Supported media types: %s".formatted(ex.getSupportedMediaTypes()),
                 "UNSUPPORTED_MEDIA_TYPE"
+        );
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHandlerMethodValidationException(@NotNull HandlerMethodValidationException ex,
+                                                                            @NotNull HttpHeaders headers,
+                                                                            @NotNull HttpStatusCode status,
+                                                                            @NotNull WebRequest request) {
+        String errors = ex.getAllErrors().stream()
+                .map(MessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.joining("; "));
+        ErrorDetails errorDetails = new ErrorDetails(
+                OffsetDateTime.now(ZoneOffset.UTC),
+                ex.getMessage(),
+                errors,
+                "HANDLER_METHOD_VALIDATION_FAILED"
+        );
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
+
+    @ExceptionHandler(InvalidDateRangeException.class)
+    public ResponseEntity<ErrorDetails> handleInvalidDateRangeException(@NotNull InvalidDateRangeException ex) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                OffsetDateTime.now(ZoneOffset.UTC),
+                ex.getMessage(),
+                ex.getMessage(),
+                "INVALID_DATE_RANGE"
+        );
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<ErrorDetails> handleDateTimeParseException(@NotNull DateTimeParseException ex) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                OffsetDateTime.now(ZoneOffset.UTC),
+                ex.getMessage(),
+                ex.getMessage(),
+                "INVALID_DATE_TIME_FORMAT"
         );
         return ResponseEntity.badRequest().body(errorDetails);
     }
