@@ -88,17 +88,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     public void deleteLevel(Long id) {
-        Level existing = levelRepository.findById(id)
-                .orElseThrow(() -> new LevelNotFoundException("Level not found with id: " + id));
-        if (!existing.getGroups().isEmpty()) {
-            for (Group group : existing.getGroups()) {
-                for (ScheduleItem scheduleItem : group.getSchedules()) {
-                    group.removeScheduleItem(scheduleItem);
-                }
-            }
-            existing.getGroups().clear();
-        }
-        levelRepository.delete(existing);
+        levelRepository.deleteById(id);
     }
 
     @Override
