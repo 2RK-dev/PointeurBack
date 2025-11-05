@@ -1,5 +1,6 @@
 package io.github.two_rk_dev.pointeurback.controller;
 
+import io.github.two_rk_dev.pointeurback.dto.BatchCreateResponse;
 import io.github.two_rk_dev.pointeurback.dto.CreateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.ScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateScheduleItemDTO;
@@ -43,6 +44,13 @@ public class ScheduleController {
                 .buildAndExpand(createdSchedule.id())
                 .toUri();
         return ResponseEntity.created(location).body(createdSchedule);
+    }
+
+    @PostMapping("/batch")
+    public ResponseEntity<BatchCreateResponse<ScheduleItemDTO, CreateScheduleItemDTO>> addScheduleItems(
+            @Valid @RequestBody List<CreateScheduleItemDTO> dtos) {
+
+        return ResponseEntity.ok(scheduleService.addScheduleItems(dtos));
     }
 
     @PutMapping("/{schedule_item_id}")
