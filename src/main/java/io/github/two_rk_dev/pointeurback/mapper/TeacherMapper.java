@@ -25,17 +25,6 @@ public interface TeacherMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromDto(UpdateTeacherDTO dto, @MappingTarget Teacher entity);
 
-    default Teacher createTeacherFromDto(CreateTeacherDTO dto) {
-        if (dto == null) return null;
-        return fromCreateDto(dto);
-    }
-
-    default void updateTeacher(UpdateTeacherDTO updateDto, Teacher teacher) {
-        if (updateDto != null) {
-            updateFromDto(updateDto, teacher);
-        }
-    }
-
     @Mapping(target = "schedules", ignore = true)
     Teacher fromImportDTO(ImportTeacherDTO dto);
 }

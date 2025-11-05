@@ -48,9 +48,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         OffsetDateTime startDateTime = scheduleItemMapper.parseDateTime(start);
         OffsetDateTime endDateTime = scheduleItemMapper.parseDateTime(endTime);
 
-        if (startDateTime == null || endDateTime == null) {
-            throw new IllegalArgumentException("Start and end times must be provided");
-        }
         List<ScheduleItem> items;
         if (groupId != null) {
             if (levelId != null && !groupRepository.existsGroupByLevel_IdIs(levelId)) {
@@ -86,9 +83,9 @@ public class ScheduleServiceImpl implements ScheduleService {
                 dto,
                 existingItem,
                 groupRepository::findAllById,
-                teacherId -> teacherRepository.findById(teacherId).orElse(null),
-                teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
-                roomId -> roomRepository.findById(roomId).orElse(null));
+                teacherRepository::findById,
+                teachingUnitRepository::findById,
+                roomRepository::findById);
 
         ScheduleItem updatedItem = scheduleItemRepository.save(existingItem);
         return scheduleItemMapper.toDto(updatedItem);
@@ -101,15 +98,12 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public ScheduleItemDTO addScheduleItem(CreateScheduleItemDTO dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("CreateScheduleItemDTO cannot be null");
-        }
         ScheduleItem newItem = scheduleItemMapper.createFromDto(
                 dto,
-                groupId -> groupRepository.findById(groupId).orElse(null),
-                teacherId -> teacherRepository.findById(teacherId).orElse(null),
-                teachingUnitId -> teachingUnitRepository.findById(teachingUnitId).orElse(null),
-                roomId -> roomRepository.findById(roomId).orElse(null));
+                groupRepository::findById,
+                teacherRepository::findById,
+                teachingUnitRepository::findById,
+                roomRepository::findById);
 
         List<ScheduleItem> conflictingItems = scheduleItemRepository.findConflictingSchedule(
                 newItem.getStartTime(),

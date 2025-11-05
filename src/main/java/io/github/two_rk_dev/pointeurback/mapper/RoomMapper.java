@@ -26,19 +26,6 @@ public interface RoomMapper {
     @Mapping(target = "schedules", ignore = true)
     void updateFromDto(UpdateRoomDTO dto, @MappingTarget Room entity);
 
-    default Room createRoomFromDto(CreateRoomDTO dto) {
-        if (dto == null) {
-            return null;
-        }
-        return fromCreateDto(dto);
-    }
-
-    default void updateRoom(UpdateRoomDTO updateDto, Room room) {
-        if (updateDto != null) {
-            updateFromDto(updateDto, room);
-        }
-    }
-
     @Mapping(target = "schedules", ignore = true)
     Room fromImportDTO(ImportRoomDTO dto);
 }

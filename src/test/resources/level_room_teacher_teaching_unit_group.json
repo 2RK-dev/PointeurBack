@@ -153,25 +153,33 @@
       "id": "20",
       "name": "L1Gp1",
       "size": "100",
-      "levelId": "4"
+      "levelId": "4",
+      "type": "CM",
+      "classe": "GB"
     },
     {
       "id": "21",
       "name": "L1Gp2",
       "size": "50",
-      "levelId": "4"
+      "levelId": "4",
+      "type": "CM",
+      "classe": "GB"
     },
     {
       "id": "22",
       "name": "L2Gp1",
       "size": "150",
-      "levelId": "5"
+      "levelId": "5",
+      "type": "CM",
+      "classe": "GB"
     },
     {
       "id": "23",
       "name": "L2Gp2",
       "size": "200",
-      "levelId": "5"
+      "levelId": "5",
+      "type": "CM",
+      "classe": "GB"
     }
   ]
 }

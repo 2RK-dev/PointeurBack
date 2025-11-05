@@ -16,6 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -131,4 +132,37 @@ class ScheduleControllerTest {
                 .andExpect(jsonPath("$.successItems", hasSize(0)))
                 .andExpect(jsonPath("$.failedItems", hasSize(2)));
     }
+
+    @Test
+    void addScheduleItem_withNullBody_shouldReturn400() throws Exception {
+        mockMvc.perform(post("/schedule")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("null"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addScheduleItem_withEmptyBody_shouldReturn400() throws Exception {
+        mockMvc.perform(post("/schedule")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(""))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateSchedule_withNullBody_shouldReturn400() throws Exception {
+        mockMvc.perform(put("/schedule/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("null"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateSchedule_withEmptyBody_shouldReturn400() throws Exception {
+        mockMvc.perform(put("/schedule/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(""))
+                .andExpect(status().isBadRequest());
+    }
 }
+

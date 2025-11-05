@@ -1,0 +1,3 @@
+ALTER TABLE groups
+    ALTER COLUMN type SET NOT NULL,
+    ALTER COLUMN classe SET NOT NULL;
