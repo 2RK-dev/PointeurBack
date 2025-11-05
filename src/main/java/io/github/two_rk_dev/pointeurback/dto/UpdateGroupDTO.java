@@ -5,8 +5,8 @@ import jakarta.validation.constraints.Positive;
 
 public record UpdateGroupDTO(
         @NotNull String name,
-        String type,
-        String classe,
+        @NotNull String type,
+        @NotNull String classe,
         @NotNull @Positive Integer size
 ) {
 }

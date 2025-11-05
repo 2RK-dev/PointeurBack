@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Component
 @Profile("seed")
@@ -54,7 +55,12 @@ public class DatabaseSeeder implements CommandLineRunner {
         l2Group2.setName("L2Gp2");
         l2Group2.setSize(200);
         l2Group2.setLevel(l2);
-        groupRepository.saveAll(List.of(l1Group1, l1Group2, l2Group1, l2Group2));
+        List<Group> groups = Stream.of(l1Group1, l1Group2, l2Group1, l2Group2)
+                .peek(g -> {
+                    g.setClasse("GB");
+                    g.setType("CM");
+                }).toList();
+        groupRepository.saveAll(groups);
 
         Room s001 = new Room();
         s001.setName("S001");

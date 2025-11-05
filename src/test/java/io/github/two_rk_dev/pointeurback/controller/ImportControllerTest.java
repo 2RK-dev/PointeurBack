@@ -475,7 +475,9 @@ class ImportControllerTest {
                           "name": "name",
                           "abbreviation": "abbreviation",
                           "size": "size",
-                          "levelId": "levelId"
+                          "levelId": "levelId",
+                          "type": "type",
+                          "classe": "classe"
                         }
                       }
                     },
@@ -539,7 +541,9 @@ class ImportControllerTest {
                           "name": "name",
                           "abbreviation": "abbreviation",
                           "size": "size",
-                          "levelId": "levelId"
+                          "levelId": "levelId",
+                          "type": "type",
+                          "classe": "classe"
                         }
                       },
                       "teaching_unit": {
@@ -601,7 +605,9 @@ class ImportControllerTest {
                           "name": "name",
                           "abbreviation": "abbreviation",
                           "size": "size",
-                          "levelId": "levelId"
+                          "levelId": "levelId",
+                          "type": "type",
+                          "classe": "classe"
                         }
                       },
                       "teaching_unit": {
