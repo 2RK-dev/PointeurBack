@@ -1,5 +1,7 @@
 package io.github.two_rk_dev.pointeurback.service.implementation;
 
+import io.github.two_rk_dev.pointeurback.dto.BatchCreateResponse;
+import io.github.two_rk_dev.pointeurback.dto.BatchCreateResponse.FailedItem;
 import io.github.two_rk_dev.pointeurback.dto.CreateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.ScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateScheduleItemDTO;
@@ -10,10 +12,12 @@ import io.github.two_rk_dev.pointeurback.model.Room;
 import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
 import io.github.two_rk_dev.pointeurback.repository.*;
 import io.github.two_rk_dev.pointeurback.service.ScheduleService;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -124,5 +128,19 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public ScheduleItemDTO getScheduleById(Long scheduleId) {
         return null;
+    }
+
+    @Override
+    public BatchCreateResponse<ScheduleItemDTO, CreateScheduleItemDTO> addScheduleItems(@NotNull List<CreateScheduleItemDTO> dtos) {
+        List<ScheduleItemDTO> successful = new ArrayList<>();
+        List<FailedItem<CreateScheduleItemDTO>> failed = new ArrayList<>();
+        for (CreateScheduleItemDTO dto : dtos) {
+            try {
+                successful.add(addScheduleItem(dto));
+            } catch (Exception e) {
+                failed.add(new FailedItem<>(dto, e.getMessage()));
+            }
+        }
+        return new BatchCreateResponse<>(successful, failed);
     }
 }
