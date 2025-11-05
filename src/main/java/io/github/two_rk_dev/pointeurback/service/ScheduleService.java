@@ -1,8 +1,10 @@
 package io.github.two_rk_dev.pointeurback.service;
 
+import io.github.two_rk_dev.pointeurback.dto.BatchCreateResponse;
 import io.github.two_rk_dev.pointeurback.dto.CreateScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.ScheduleItemDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateScheduleItemDTO;
+import jakarta.validation.Valid;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -17,4 +19,6 @@ public interface ScheduleService {
     ScheduleItemDTO addScheduleItem(CreateScheduleItemDTO dto);
 
     ScheduleItemDTO getScheduleById(Long scheduleId);
+
+    BatchCreateResponse<ScheduleItemDTO, CreateScheduleItemDTO> addScheduleItems(@Valid List<CreateScheduleItemDTO> dtos);
 }
