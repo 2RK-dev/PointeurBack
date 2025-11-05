@@ -27,12 +27,12 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ScheduleConflictException.class)
-    public ResponseEntity<ErrorDetails> handleScheduleConflictException(@NotNull ScheduleConflictException ex,
-                                                                        @NotNull WebRequest request) {
+    public ResponseEntity<ErrorDetails> handleScheduleConflictException(@NotNull ScheduleConflictException ex) {
+        String conflicts = String.join(", ", ex.getConflicts());
         ErrorDetails errorDetails = new ErrorDetails(
                 OffsetDateTime.now(ZoneOffset.UTC),
-                ex.getMessage(),
-                request.getDescription(false),
+                ex.getMessage() + conflicts,
+                conflicts,
                 "SCHEDULE_CONFLICT");
         return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
