@@ -5,6 +5,7 @@ import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -27,8 +28,10 @@ public class ScheduleConflictException extends RuntimeException {
             }
             List<Group> groups = theItem.getGroups();
             if (groups != null && item.getGroups() != null) {
-                groups.retainAll(item.getGroups());
-                if (!groups.isEmpty()) {
+
+                List<Group> groupsCopy = new ArrayList<>(groups);
+                groupsCopy.retainAll(item.getGroups());
+                if (!groupsCopy.isEmpty()) {
                     conflicts.add("groups");
                 }
             }
