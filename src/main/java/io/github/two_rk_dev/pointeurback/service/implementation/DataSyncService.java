@@ -3,6 +3,7 @@ package io.github.two_rk_dev.pointeurback.service.implementation;
 import io.github.two_rk_dev.pointeurback.datasync.filecodec.FileCodec;
 import io.github.two_rk_dev.pointeurback.datasync.mapper.EntityTableAdapter;
 import io.github.two_rk_dev.pointeurback.dto.datasync.*;
+import io.github.two_rk_dev.pointeurback.exception.UnknownEntityException;
 import io.github.two_rk_dev.pointeurback.service.ExportService;
 import io.github.two_rk_dev.pointeurback.service.ImportService;
 import lombok.RequiredArgsConstructor;
@@ -57,9 +58,10 @@ public class DataSyncService implements ImportService, ExportService {
             for (TableData tableData : decoded) {
                 processTable(tableData, fileMapping, filename, context);
             }
-        } catch (IOException e) {
+        } catch (IOException | UnknownEntityException e) {
             context.summary.errors().add(SyncError.forEntity("SYSTEM", -1,
                     "File processing failed: " + e.getMessage(), filename));
+            context.summary.skippedFiles().add(filename);
         }
     }
 
