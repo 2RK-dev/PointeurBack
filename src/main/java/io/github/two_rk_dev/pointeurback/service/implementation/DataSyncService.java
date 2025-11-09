@@ -5,6 +5,7 @@ import io.github.two_rk_dev.pointeurback.datasync.mapper.EntityTableAdapter;
 import io.github.two_rk_dev.pointeurback.dto.datasync.*;
 import io.github.two_rk_dev.pointeurback.service.ExportService;
 import io.github.two_rk_dev.pointeurback.service.ImportService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -15,14 +16,10 @@ import java.util.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DataSyncService implements ImportService, ExportService {
     private final Map<String, FileCodec> codecs;
     private final Map<String, EntityTableAdapter> entityAdapters;
-
-    public DataSyncService(Map<String, FileCodec> codecs, Map<String, EntityTableAdapter> entityAdapters) {
-        this.codecs = codecs;
-        this.entityAdapters = entityAdapters;
-    }
 
     @Override
     public Exported export(@NotNull List<String> entitiesNames, String format) throws IOException {

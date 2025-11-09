@@ -5,6 +5,7 @@ import io.github.two_rk_dev.pointeurback.dto.RoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateRoomDTO;
 import io.github.two_rk_dev.pointeurback.service.RoomService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import jakarta.validation.constraints.Min;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +17,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/rooms")
+@RequiredArgsConstructor
 public class RoomController {
 
     private final RoomService roomService;
-
-    public RoomController(RoomService roomService) {
-        this.roomService = roomService;
-    }
 
     @GetMapping
     public ResponseEntity<List<RoomDTO>> getAllRooms() {

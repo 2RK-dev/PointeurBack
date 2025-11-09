@@ -13,6 +13,7 @@ import io.github.two_rk_dev.pointeurback.model.Room;
 import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
 import io.github.two_rk_dev.pointeurback.repository.*;
 import io.github.two_rk_dev.pointeurback.service.ScheduleService;
+import lombok.RequiredArgsConstructor;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final TeachingUnitRepository teachingUnitRepository;
     private final RoomRepository roomRepository;
     private final ScheduleItemMapper scheduleItemMapper;
+
     private final EntityManager entityManager;
 
     @Override

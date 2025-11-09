@@ -1,6 +1,7 @@
 package io.github.two_rk_dev.pointeurback.controller;
 
 import io.github.two_rk_dev.pointeurback.service.ExportService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,13 +14,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/export")
+@RequiredArgsConstructor
 public class ExportController {
 
     private final ExportService exportService;
-
-    public ExportController(ExportService exportService) {
-        this.exportService = exportService;
-    }
 
     @GetMapping
     public ResponseEntity<byte[]> export(@RequestParam("entitiesList") List<String> entitiesList,

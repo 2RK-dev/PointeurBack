@@ -15,12 +15,14 @@ import io.github.two_rk_dev.pointeurback.repository.ScheduleItemRepository;
 import io.github.two_rk_dev.pointeurback.repository.TeachingUnitRepository;
 import io.github.two_rk_dev.pointeurback.service.LevelService;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class LevelServiceImpl implements LevelService {
 
     private final LevelRepository levelRepository;
@@ -30,16 +32,6 @@ public class LevelServiceImpl implements LevelService {
     private final LevelMapper levelMapper;
     private final GroupMapper groupMapper;
     private final ScheduleItemMapper scheduleItemMapper;
-
-    public LevelServiceImpl(LevelRepository levelRepository, GroupRepository groupRepository, TeachingUnitRepository teachingUnitRepository, ScheduleItemRepository scheduleItemRepository, LevelMapper levelMapper, GroupMapper groupMapper, ScheduleItemMapper scheduleItemMapper) {
-        this.levelRepository = levelRepository;
-        this.groupRepository = groupRepository;
-        this.teachingUnitRepository = teachingUnitRepository;
-        this.scheduleItemRepository = scheduleItemRepository;
-        this.levelMapper = levelMapper;
-        this.groupMapper = groupMapper;
-        this.scheduleItemMapper = scheduleItemMapper;
-    }
 
     @Override
     public LevelDTO createLevel(CreateLevelDTO dto) {

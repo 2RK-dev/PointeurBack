@@ -3,6 +3,7 @@ package io.github.two_rk_dev.pointeurback.controller;
 import io.github.two_rk_dev.pointeurback.dto.*;
 import io.github.two_rk_dev.pointeurback.service.LevelService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -12,13 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/levels")
+@RequiredArgsConstructor
 public class LevelController {
 
     private final LevelService levelService;
-
-    public LevelController(LevelService levelService) {
-        this.levelService = levelService;
-    }
 
     @PostMapping
     public ResponseEntity<LevelDTO> createLevel(@Valid @RequestBody CreateLevelDTO dto) {

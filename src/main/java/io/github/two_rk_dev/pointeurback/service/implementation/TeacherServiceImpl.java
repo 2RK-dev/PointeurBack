@@ -9,6 +9,7 @@ import io.github.two_rk_dev.pointeurback.mapper.TeacherMapper;
 import io.github.two_rk_dev.pointeurback.model.Teacher;
 import io.github.two_rk_dev.pointeurback.repository.TeacherRepository;
 import io.github.two_rk_dev.pointeurback.service.TeacherService;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -16,15 +17,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class TeacherServiceImpl implements TeacherService {
 
     private final TeacherRepository teacherRepository;
     private final TeacherMapper teacherMapper;
-
-    public TeacherServiceImpl(TeacherRepository teacherRepository, TeacherMapper teacherMapper) {
-        this.teacherRepository = teacherRepository;
-        this.teacherMapper = teacherMapper;
-    }
 
     @Override
     public List<TeacherDTO> getAll() {

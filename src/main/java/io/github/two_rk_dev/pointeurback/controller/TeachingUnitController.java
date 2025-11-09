@@ -5,6 +5,7 @@ import io.github.two_rk_dev.pointeurback.dto.TeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateTeachingUnitDTO;
 import io.github.two_rk_dev.pointeurback.service.TeachingUnitService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -14,13 +15,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/teachingUnits")
+@RequiredArgsConstructor
 public class TeachingUnitController {
 
     private final TeachingUnitService teachingUnitService;
-
-    public TeachingUnitController(TeachingUnitService teachingUnitService) {
-        this.teachingUnitService = teachingUnitService;
-    }
 
     @GetMapping
     public ResponseEntity<List<TeachingUnitDTO>> getAllTeachingUnits() {

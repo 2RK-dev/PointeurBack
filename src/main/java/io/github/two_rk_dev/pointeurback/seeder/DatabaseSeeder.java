@@ -2,6 +2,7 @@ package io.github.two_rk_dev.pointeurback.seeder;
 
 import io.github.two_rk_dev.pointeurback.model.*;
 import io.github.two_rk_dev.pointeurback.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -11,20 +12,13 @@ import java.util.stream.Stream;
 
 @Component
 @Profile("seed")
+@RequiredArgsConstructor
 public class DatabaseSeeder implements CommandLineRunner {
     private final GroupRepository groupRepository;
     private final LevelRepository levelRepository;
     private final RoomRepository roomRepository;
     private final TeacherRepository teacherRepository;
     private final TeachingUnitRepository teachingUnitRepository;
-
-    public DatabaseSeeder(GroupRepository groupRepository, LevelRepository levelRepository, RoomRepository roomRepository, TeacherRepository teacherRepository, TeachingUnitRepository teachingUnitRepository) {
-        this.groupRepository = groupRepository;
-        this.levelRepository = levelRepository;
-        this.roomRepository = roomRepository;
-        this.teacherRepository = teacherRepository;
-        this.teachingUnitRepository = teachingUnitRepository;
-    }
 
     @Override
     public void run(String... args) {

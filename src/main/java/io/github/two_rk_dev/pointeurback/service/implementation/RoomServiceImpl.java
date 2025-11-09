@@ -10,6 +10,7 @@ import io.github.two_rk_dev.pointeurback.mapper.RoomMapper;
 import io.github.two_rk_dev.pointeurback.model.Room;
 import io.github.two_rk_dev.pointeurback.repository.RoomRepository;
 import io.github.two_rk_dev.pointeurback.service.RoomService;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +19,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomMapper roomMapper;
-
-    public RoomServiceImpl(RoomRepository roomRepository, RoomMapper roomMapper) {
-        this.roomRepository = roomRepository;
-        this.roomMapper = roomMapper;
-    }
 
     @Override
     public List<RoomDTO> getAll() {
