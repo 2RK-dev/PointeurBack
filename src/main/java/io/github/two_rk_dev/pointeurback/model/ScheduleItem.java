@@ -54,18 +54,5 @@ public class ScheduleItem {
         this.groups = groups != null ? groups : new ArrayList<>();
     }
 
-    public void addGroup(Group group) {
-        if (!this.groups.contains(group)) {
-            this.groups.add(group);
-            group.getSchedules().add(this);
-        }
-    }
-
-    public void removeGroup(Group group) {
-        if (this.groups.remove(group)) {
-            group.getSchedules().remove(this);
-        }
-    }
-
 }
 

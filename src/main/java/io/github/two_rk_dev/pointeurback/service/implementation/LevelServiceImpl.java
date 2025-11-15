@@ -4,14 +4,11 @@ import io.github.two_rk_dev.pointeurback.dto.*;
 import io.github.two_rk_dev.pointeurback.exception.LevelNotFoundException;
 import io.github.two_rk_dev.pointeurback.mapper.GroupMapper;
 import io.github.two_rk_dev.pointeurback.mapper.LevelMapper;
-import io.github.two_rk_dev.pointeurback.mapper.ScheduleItemMapper;
 import io.github.two_rk_dev.pointeurback.model.Group;
 import io.github.two_rk_dev.pointeurback.model.Level;
-import io.github.two_rk_dev.pointeurback.model.ScheduleItem;
 import io.github.two_rk_dev.pointeurback.model.TeachingUnit;
 import io.github.two_rk_dev.pointeurback.repository.GroupRepository;
 import io.github.two_rk_dev.pointeurback.repository.LevelRepository;
-import io.github.two_rk_dev.pointeurback.repository.ScheduleItemRepository;
 import io.github.two_rk_dev.pointeurback.repository.TeachingUnitRepository;
 import io.github.two_rk_dev.pointeurback.service.LevelService;
 import jakarta.transaction.Transactional;
@@ -19,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +24,8 @@ public class LevelServiceImpl implements LevelService {
     private final LevelRepository levelRepository;
     private final GroupRepository groupRepository;
     private final TeachingUnitRepository teachingUnitRepository;
-    private final ScheduleItemRepository scheduleItemRepository;
     private final LevelMapper levelMapper;
     private final GroupMapper groupMapper;
-    private final ScheduleItemMapper scheduleItemMapper;
 
     @Override
     public LevelDTO createLevel(CreateLevelDTO dto) {
@@ -114,17 +108,6 @@ public class LevelServiceImpl implements LevelService {
                         teachingUnit.getName(),
                         null))
                 .toList();
-    }
-
-    @Override
-    public List<ScheduleItemDTO> getSchedule(Long levelId) {
-        if (!levelRepository.existsById(levelId)) {
-            throw new LevelNotFoundException("Level not found with id: " + levelId);
-        }
-        List<ScheduleItem> schedules = scheduleItemRepository.findByLevelId(levelId);
-        return schedules.stream()
-                .map(scheduleItemMapper::toDto)
-                .collect(Collectors.toList());
     }
 
     @Override

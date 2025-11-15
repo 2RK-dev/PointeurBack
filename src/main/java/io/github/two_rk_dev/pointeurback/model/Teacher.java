@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -30,7 +29,4 @@ public class Teacher {
     @OneToMany(mappedBy = "teacher")
     private List<ScheduleItem> schedules;
 
-    public void setSchedules(List<ScheduleItem> schedules) {
-        this.schedules = schedules != null ? schedules : new ArrayList<>();
-    }
 }

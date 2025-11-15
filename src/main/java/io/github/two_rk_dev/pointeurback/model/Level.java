@@ -29,13 +29,4 @@ public class Level {
     @OneToMany(mappedBy = "level", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Group> groups = new ArrayList<>();
 
-    public void addGroup(Group group) {
-        groups.add(group);
-        group.setLevel(this);
-    }
-
-    public void removeGroup(Group group) {
-        groups.remove(group);
-        group.setLevel(null);
-    }
 }

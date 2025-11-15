@@ -70,16 +70,4 @@ public class Group {
                 : getClass().hashCode();
     }
 
-    public void addScheduleItem(ScheduleItem scheduleItem) {
-        if (!schedules.contains(scheduleItem)) {
-            schedules.add(scheduleItem);
-            scheduleItem.getGroups().add(this);
-        }
-    }
-
-    public void removeScheduleItem(ScheduleItem scheduleItem) {
-        if (schedules.remove(scheduleItem)) {
-            scheduleItem.getGroups().remove(this);
-        }
-    }
 }
