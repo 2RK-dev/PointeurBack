@@ -3,7 +3,6 @@ package io.github.two_rk_dev.pointeurback.service.implementation;
 import io.github.two_rk_dev.pointeurback.dto.CreateRoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.RoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateRoomDTO;
-import io.github.two_rk_dev.pointeurback.dto.datasync.ImportRoomDTO;
 import io.github.two_rk_dev.pointeurback.exception.InvalidDateRangeException;
 import io.github.two_rk_dev.pointeurback.exception.RoomNotFoundException;
 import io.github.two_rk_dev.pointeurback.mapper.RoomMapper;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -69,7 +67,4 @@ public class RoomServiceImpl implements RoomService {
         return roomMapper.toDtoList(availableRooms);
     }
 
-    public void importRooms(@NotNull Stream<ImportRoomDTO> roomDTOStream) {
-        roomRepository.saveAll(roomDTOStream.map(roomMapper::fromImportDTO).toList());
-    }
 }

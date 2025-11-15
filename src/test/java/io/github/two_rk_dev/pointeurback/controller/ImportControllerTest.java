@@ -34,7 +34,7 @@ class ImportControllerTest {
     @SuppressWarnings("resource")
     @Container
     @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine").withReuse(true);
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine").withReuse(true);
 
     @Autowired
     private MockMvc mockMvc;

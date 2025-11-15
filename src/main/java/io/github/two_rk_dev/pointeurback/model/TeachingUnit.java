@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -34,20 +33,4 @@ public class TeachingUnit {
     @OneToMany(mappedBy = "teachingUnit")
     private List<ScheduleItem> schedules;
 
-    public void setSchedules(List<ScheduleItem> schedules) {
-        this.schedules = schedules != null ? schedules : new ArrayList<>();
-    }
-
-    public void addScheduleItem(ScheduleItem scheduleItem) {
-        if (!schedules.contains(scheduleItem)) {
-            schedules.add(scheduleItem);
-            scheduleItem.setTeachingUnit(this);
-        }
-    }
-
-    public void removeScheduleItem(ScheduleItem scheduleItem) {
-        if (schedules.remove(scheduleItem)) {
-            scheduleItem.setTeachingUnit(null);
-        }
-    }
 }

@@ -14,9 +14,4 @@ public class MappingQualifier {
     public @interface LevelToDtoWithoutGroups {
     }
 
-    @Qualifier
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.CLASS)
-    public @interface GroupToDtoWithoutLevel {
-    }
 }

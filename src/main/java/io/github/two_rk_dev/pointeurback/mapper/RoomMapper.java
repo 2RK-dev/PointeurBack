@@ -3,7 +3,6 @@ package io.github.two_rk_dev.pointeurback.mapper;
 import io.github.two_rk_dev.pointeurback.dto.CreateRoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.RoomDTO;
 import io.github.two_rk_dev.pointeurback.dto.UpdateRoomDTO;
-import io.github.two_rk_dev.pointeurback.dto.datasync.ImportRoomDTO;
 import io.github.two_rk_dev.pointeurback.model.Room;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,6 +25,4 @@ public interface RoomMapper {
     @Mapping(target = "schedules", ignore = true)
     void updateFromDto(UpdateRoomDTO dto, @MappingTarget Room entity);
 
-    @Mapping(target = "schedules", ignore = true)
-    Room fromImportDTO(ImportRoomDTO dto);
 }

@@ -17,11 +17,6 @@ public interface GroupMapper {
     @Mapping(target = "level", qualifiedBy = MappingQualifier.LevelToDtoWithoutGroups.class)
     GroupDTO toDto(Group entity);
 
-    @Named("toDtoWithoutLevel")
-    @MappingQualifier.GroupToDtoWithoutLevel
-    @Mapping(target = "level", ignore = true)
-    GroupDTO toDtoWithoutLevel(Group entity);
-
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "level", ignore = true)
     @Mapping(target = "schedules", ignore = true)

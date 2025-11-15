@@ -21,8 +21,6 @@ public interface LevelService {
 
     List<TeachingUnitDTO> getTeachingUnits(Long id);
 
-    List<ScheduleItemDTO> getSchedule(Long id);
-
     GroupDTO createGroup(Long id, CreateGroupDTO dto);
 
 }
