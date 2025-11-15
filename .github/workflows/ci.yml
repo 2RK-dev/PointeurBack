@@ -26,6 +26,7 @@ jobs:
           [[ -z "${{ secrets.APP_PORT }}" ]] && MISSING_SECRETS+=("APP_PORT")
           [[ -z "${{ secrets.SPRING_JWT_SECRET_KEY }}" ]] && MISSING_SECRETS+=("SPRING_JWT_SECRET_KEY")
           [[ -z "${{ secrets.SPRING_JWT_EXPIRATION }}" ]] && MISSING_SECRETS+=("SPRING_JWT_EXPIRATION")
+          [[ -z "${{ secrets.SPRING_REFRESH_SESSION_EXPIRATION }}" ]] && MISSING_SECRETS+=("SPRING_REFRESH_SESSION_EXPIRATION")
           
           # If any secrets are missing, print them and fail
           if [ ${#MISSING_SECRETS[@]} -ne 0 ]; then
@@ -54,6 +55,7 @@ jobs:
           APP_PORT=${{ secrets.APP_PORT }}
           SPRING_JWT_SECRET_KEY=${{ secrets.SPRING_JWT_SECRET_KEY }}
           SPRING_JWT_EXPIRATION=${{ secrets.SPRING_JWT_EXPIRATION }}
+          SPRING_REFRESH_SESSION_EXPIRATION=${{ secrets.SPRING_REFRESH_SESSION_EXPIRATION }}
           EOF
 
       - name: Set up JDK 21

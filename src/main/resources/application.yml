@@ -26,7 +26,13 @@ server:
   error:
     include-message: always
     include-binding-errors: always
-jwt:
-  secret: ${SPRING_JWT_SECRET_KEY}
-  expiration: ${SPRING_JWT_EXPIRATION}
 
+app:
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+  auth:
+    jwt:
+      secret: ${SPRING_JWT_SECRET_KEY}
+      expiration: ${SPRING_JWT_EXPIRATION}
+    refresh-session-expiration: ${SPRING_REFRESH_SESSION_EXPIRATION}
