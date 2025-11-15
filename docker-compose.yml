@@ -1,6 +1,10 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DOCKER_BUILDKIT: 1
     container_name: spring_app
     ports:
       - "${APP_PORT}:${APP_PORT}"
