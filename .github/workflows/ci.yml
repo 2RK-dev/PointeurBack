@@ -11,6 +11,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Validate required secrets
+        run: |
+          MISSING_SECRETS=()
+          
+          # Check each required secret
+          [[ -z "${{ secrets.POSTGRES_USER }}" ]] && MISSING_SECRETS+=("POSTGRES_USER")
+          [[ -z "${{ secrets.POSTGRES_PASSWORD }}" ]] && MISSING_SECRETS+=("POSTGRES_PASSWORD")
+          [[ -z "${{ secrets.POSTGRES_DB }}" ]] && MISSING_SECRETS+=("POSTGRES_DB")
+          [[ -z "${{ secrets.POSTGRES_PORT }}" ]] && MISSING_SECRETS+=("POSTGRES_PORT")
+          [[ -z "${{ secrets.SPRING_DB_URL }}" ]] && MISSING_SECRETS+=("SPRING_DB_URL")
+          [[ -z "${{ secrets.SPRING_DB_USERNAME }}" ]] && MISSING_SECRETS+=("SPRING_DB_USERNAME")
+          [[ -z "${{ secrets.SPRING_DB_PASSWORD }}" ]] && MISSING_SECRETS+=("SPRING_DB_PASSWORD")
+          [[ -z "${{ secrets.APP_PORT }}" ]] && MISSING_SECRETS+=("APP_PORT")
+          [[ -z "${{ secrets.SPRING_JWT_SECRET_KEY }}" ]] && MISSING_SECRETS+=("SPRING_JWT_SECRET_KEY")
+          [[ -z "${{ secrets.SPRING_JWT_EXPIRATION }}" ]] && MISSING_SECRETS+=("SPRING_JWT_EXPIRATION")
+          
+          # If any secrets are missing, print them and fail
+          if [ ${#MISSING_SECRETS[@]} -ne 0 ]; then
+            echo "❌ Error: The following required secrets are missing:"
+            for secret in "${MISSING_SECRETS[@]}"; do
+              echo "  - $secret"
+            done
+            exit 1
+          fi
+          
+          echo "✅ All required secrets are present"
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
