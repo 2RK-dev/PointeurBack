@@ -1,4 +1,4 @@
-package io.github.two_rk_dev.pointeurback.controller;
+package io.github.two_rk_dev.pointeurback.service;
 
 import io.github.two_rk_dev.pointeurback.config.AuthProperties;
 import io.github.two_rk_dev.pointeurback.dto.LoggedInDTO;
@@ -11,7 +11,6 @@ import io.github.two_rk_dev.pointeurback.model.RefreshToken;
 import io.github.two_rk_dev.pointeurback.model.User;
 import io.github.two_rk_dev.pointeurback.repository.RefreshTokenRepository;
 import io.github.two_rk_dev.pointeurback.repository.UserRepository;
-import io.github.two_rk_dev.pointeurback.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +27,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-class AuthService {
+public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -44,7 +43,7 @@ class AuthService {
                 dto.password()
         ));
         User user = userRepository.findByUsername(authenticated.getName())
-                .orElseThrow(() -> new IllegalStateException("Authenticated should exist"));
+                .orElseThrow(() -> new IllegalStateException("The user should exist if the authentication manager have authenticated it"));
         String accessToken = jwtService.encodeToToken(user);
         RefreshToken refreshToken = Optional.ofNullable(deviceId)
                 .flatMap(dId -> refreshTokenRepository.findByDeviceIdAndUser_UsernameAndRevokedFalse(dId, user.getUsername()))
@@ -74,7 +73,7 @@ class AuthService {
         Duration maxAge = Duration.ofDays(authProperties.refreshSessionExpiration());
         refreshToken.setExpiresAt(OffsetDateTime.now().plus(maxAge));
         refreshTokenRepository.save(refreshToken);
-        return refreshTokenMapper.toDto(refreshToken, maxAge);
+        return refreshTokenMapper.toDto(refreshToken, maxAge, authProperties.cookieSecure());
     }
 
     private @NotNull RefreshToken createNewRefreshToken(@NotNull User user) {

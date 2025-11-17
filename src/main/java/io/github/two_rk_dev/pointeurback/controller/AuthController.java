@@ -4,6 +4,7 @@ import io.github.two_rk_dev.pointeurback.dto.LoggedInDTO;
 import io.github.two_rk_dev.pointeurback.dto.LoginRequestDTO;
 import io.github.two_rk_dev.pointeurback.dto.LoginResponseDTO;
 import io.github.two_rk_dev.pointeurback.dto.UserDTO;
+import io.github.two_rk_dev.pointeurback.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,7 @@ class AuthController {
                 .path("/")
                 .maxAge(Integer.MAX_VALUE)
                 .httpOnly(true)
+                .secure(loggedInDTO.refreshToken().secure())
                 .build().toString();
     }
 
@@ -40,6 +42,7 @@ class AuthController {
                 .path("/")
                 .maxAge(loggedInDTO.refreshToken().maxAge())
                 .httpOnly(true)
+                .secure(loggedInDTO.refreshToken().secure())
                 .build().toString();
     }
 

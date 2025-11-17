@@ -2,7 +2,7 @@ spring:
   application:
     name: SchedulerApp
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:prod}
+    active: ${SPRING_PROFILE_ACTIVE:prod}
   datasource:
     url: ${SPRING_DB_URL}
     username: ${SPRING_DB_USERNAME}
@@ -36,3 +36,4 @@ app:
       secret: ${SPRING_JWT_SECRET_KEY}
       expiration: ${SPRING_JWT_EXPIRATION}
     refresh-session-expiration: ${SPRING_REFRESH_SESSION_EXPIRATION}
+    cookie-secure: ${SPRING_AUTH_COOKIE_SECURE:false}

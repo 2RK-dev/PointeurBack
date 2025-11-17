@@ -5,6 +5,7 @@ import java.time.Duration;
 public record RefreshTokenDTO(
         String token,
         Duration maxAge,
-        String deviceId
+        String deviceId,
+        boolean secure
 ) {
 }

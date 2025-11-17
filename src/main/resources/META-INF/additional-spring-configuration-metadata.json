@@ -18,7 +18,12 @@
     {
       "name": "app.auth.refresh-session-expiration",
       "type": "java.lang.Long",
-      "description": "Maximum inactivity period for a refresh session, in days. This value is used in a sliding-expiration model: each successful refresh extends the session's expiration by this duration."
+      "description": "Maximum inactivity period for a refresh session, in days. This value is used in a sliding-expiration model: each successful refresh extends the session's expiration by this duration. Note: under this model, sessions may never expire if they are frequently refreshed."
+    },
+    {
+      "name": "app.auth.cookie-secure",
+      "type": "java.lang.Boolean",
+      "description": "Flag indicating whether authentication cookies should be marked as secure. This flag is so it can be disabled in non-HTTPS development environments."
     }
   ]
 }

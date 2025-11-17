@@ -30,6 +30,7 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.MultiValueMap;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -47,6 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
+@ActiveProfiles("test")
 public class AuthControllerTest {
 
     @Container
@@ -215,6 +217,7 @@ public class AuthControllerTest {
             rt.setUser(userRepository.findByUsername("admin").orElse(null));
             rt.setToken(UUID.randomUUID().toString());
             rt.setExpiresAt(OffsetDateTime.now().minusHours(1));
+            rt.setCreatedAt(OffsetDateTime.now());
             refreshTokenRepository.save(rt);
             HttpHeaders headers = new HttpHeaders(MultiValueMap.fromSingleValue(Map.of(
                     HttpHeaders.COOKIE, "refresh_token=%s; Path=/".formatted(rt.getToken())

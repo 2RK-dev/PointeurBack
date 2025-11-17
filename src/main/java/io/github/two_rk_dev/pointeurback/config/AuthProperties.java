@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "app.auth")
 public record AuthProperties(
         Long refreshSessionExpiration,
+        Boolean cookieSecure,
         JwtProperties jwt
 ) {
     public record JwtProperties(

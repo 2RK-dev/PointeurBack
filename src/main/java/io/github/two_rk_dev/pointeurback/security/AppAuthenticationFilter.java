@@ -32,15 +32,13 @@ public class AppAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(7);
             try {
                 UserDetails userDetails = jwtService.getUserFromToken(token);
-                if (userDetails != null) {
-                    SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    ));
-                }
+                SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                ));
             } catch (JwtException e) {
-                logger.warn(e.getMessage(), e);
+                logger.info(e.getClass() + " : " + e.getMessage());
             }
         }
 

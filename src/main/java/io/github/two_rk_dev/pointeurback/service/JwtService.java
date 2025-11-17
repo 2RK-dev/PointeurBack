@@ -7,18 +7,17 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
-@EnableConfigurationProperties(AuthProperties.class)
 public class JwtService {
 
     private final AuthProperties authProperties;
@@ -47,6 +46,6 @@ public class JwtService {
 
     @Contract(pure = true)
     private @NotNull SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(authProperties.jwt().secret().getBytes());
+        return Keys.hmacShaKeyFor(authProperties.jwt().secret().getBytes(StandardCharsets.UTF_8));
     }
 }
