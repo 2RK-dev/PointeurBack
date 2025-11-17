@@ -17,10 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Testcontainers
 class PointeurBackApplicationTests {
 
-    @SuppressWarnings("resource")
     @Container
     @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine").withReuse(true);
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
     @Autowired
     private ApplicationContext applicationContext;
