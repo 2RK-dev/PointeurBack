@@ -14,6 +14,7 @@ jobs:
       - name: Validate required secrets
         run: |
           MISSING_SECRETS=()
+          MISSING_VARS=()
           
           # Check each required secret
           [[ -z "${{ secrets.POSTGRES_USER }}" ]] && MISSING_SECRETS+=("POSTGRES_USER")
@@ -25,8 +26,10 @@ jobs:
           [[ -z "${{ secrets.SPRING_DB_PASSWORD }}" ]] && MISSING_SECRETS+=("SPRING_DB_PASSWORD")
           [[ -z "${{ secrets.APP_PORT }}" ]] && MISSING_SECRETS+=("APP_PORT")
           [[ -z "${{ secrets.SPRING_JWT_SECRET_KEY }}" ]] && MISSING_SECRETS+=("SPRING_JWT_SECRET_KEY")
-          [[ -z "${{ secrets.SPRING_JWT_EXPIRATION }}" ]] && MISSING_SECRETS+=("SPRING_JWT_EXPIRATION")
-          [[ -z "${{ secrets.SPRING_REFRESH_SESSION_EXPIRATION }}" ]] && MISSING_SECRETS+=("SPRING_REFRESH_SESSION_EXPIRATION")
+          # Check each required variable
+          [[ -z "${{ vars.SPRING_JWT_EXPIRATION }}" ]] && MISSING_VARS+=("SPRING_JWT_EXPIRATION")
+          [[ -z "${{ vars.SPRING_REFRESH_SESSION_EXPIRATION }}" ]] && MISSING_VARS+=("SPRING_REFRESH_SESSION_EXPIRATION")
+          [[ -z "${{ vars.SPRING_AUTH_COOKIE_SECURE }}" ]] && MISSING_VARS+=("SPRING_AUTH_COOKIE_SECURE")
           
           # If any secrets are missing, print them and fail
           if [ ${#MISSING_SECRETS[@]} -ne 0 ]; then
@@ -36,8 +39,16 @@ jobs:
             done
             exit 1
           fi
+          # If any vars are missing, print them and fail
+          if [ ${#MISSING_VARS[@]} -ne 0 ]; then
+            echo "❌ Error: The following required variables are missing:"
+            for v in "${MISSING_VARS[@]}"; do
+              echo "  - $v"
+            done
+            exit 1
+          fi
           
-          echo "✅ All required secrets are present"
+          echo "✅ All required secrets and variables are present"
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -54,8 +65,9 @@ jobs:
           SPRING_DB_PASSWORD=${{ secrets.SPRING_DB_PASSWORD }}
           APP_PORT=${{ secrets.APP_PORT }}
           SPRING_JWT_SECRET_KEY=${{ secrets.SPRING_JWT_SECRET_KEY }}
-          SPRING_JWT_EXPIRATION=${{ secrets.SPRING_JWT_EXPIRATION }}
-          SPRING_REFRESH_SESSION_EXPIRATION=${{ secrets.SPRING_REFRESH_SESSION_EXPIRATION }}
+          SPRING_JWT_EXPIRATION=${{ vars.SPRING_JWT_EXPIRATION }}
+          SPRING_REFRESH_SESSION_EXPIRATION=${{ vars.SPRING_REFRESH_SESSION_EXPIRATION }}
+          SPRING_AUTH_COOKIE_SECURE=${{ vars.SPRING_AUTH_COOKIE_SECURE }}
           EOF
 
       - name: Set up JDK 21
