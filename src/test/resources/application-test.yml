@@ -1,3 +1,5 @@
 app:
   auth:
     cookie-secure: false
+    bootstrap-superadmin:
+      username: superadmin

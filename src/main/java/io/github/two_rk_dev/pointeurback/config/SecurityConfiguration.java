@@ -56,11 +56,11 @@ class SecurityConfiguration {
                                 "/levels/**",
                                 "/rooms/**",
                                 "/teachers/**",
-                                "/teachingUnits/**").hasRole("ADMIN")
+                                "/teachingUnits/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers(HttpMethod.POST, "/schedule/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/schedule/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/schedule/**").hasAnyRole("ADMIN", "SUPERADMIN")
                         .requestMatchers(HttpMethod.GET, "/schedule/**", "/auth/me").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/schedule/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/schedule/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/schedule/**").hasRole("ADMIN")
                         .anyRequest().denyAll()
                 )
                 .exceptionHandling(exceptions -> exceptions

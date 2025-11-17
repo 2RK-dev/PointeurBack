@@ -64,7 +64,7 @@ class AuthController {
         String role = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(authority -> authority.startsWith("ROLE_"))
-                .map(authority -> authority.substring(5).toLowerCase())
+                .map(authority -> authority.substring(5))
                 .findFirst().orElse(null);
         return ResponseEntity.ok(new UserDTO(userDetails.getUsername(), role));
     }

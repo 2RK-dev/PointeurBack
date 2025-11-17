@@ -21,4 +21,12 @@ public class User {
     private String password;
 
     private String role;
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof User other && id.equals(other.id)
+               && username.equals(other.username)
+               && password.equals(other.password)
+               && role.equals(other.role);
+    }
 }

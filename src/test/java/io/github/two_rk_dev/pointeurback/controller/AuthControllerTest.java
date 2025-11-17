@@ -113,7 +113,7 @@ public class AuthControllerTest {
         User user = new User();
         user.setUsername("admin");
         user.setPassword(passwordEncoder.encode("admin"));
-        user.setRole("admin");
+        user.setRole("ADMIN");
         userRepository.save(user);
         cookieStore.clear();
     }
@@ -165,7 +165,7 @@ public class AuthControllerTest {
                     .isNotBlank();
             assertThat(mapper.convertValue(JsonPath.compile("$.user").read(body), UserDTO.class))
                     .as("An user should be returned")
-                    .isEqualTo(new UserDTO("admin", "admin"));
+                    .isEqualTo(new UserDTO("admin", "ADMIN"));
             assertThat(cookieValue("refresh_token", cookies(response)))
                     .as("A refresh_token should be returned, HTTP-only")
                     .isNotNull()
