@@ -1,10 +1,7 @@
 package io.github.two_rk_dev.pointeurback.service;
 
 import io.github.two_rk_dev.pointeurback.config.AuthProperties;
-import io.github.two_rk_dev.pointeurback.dto.LoggedInDTO;
-import io.github.two_rk_dev.pointeurback.dto.LoginRequestDTO;
-import io.github.two_rk_dev.pointeurback.dto.LoginResponseDTO;
-import io.github.two_rk_dev.pointeurback.dto.RefreshTokenDTO;
+import io.github.two_rk_dev.pointeurback.dto.*;
 import io.github.two_rk_dev.pointeurback.mapper.RefreshTokenMapper;
 import io.github.two_rk_dev.pointeurback.mapper.UserMapper;
 import io.github.two_rk_dev.pointeurback.model.RefreshToken;
@@ -18,6 +15,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -36,6 +35,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final AuthProperties authProperties;
     private final RefreshTokenMapper refreshTokenMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public LoggedInDTO login(@NotNull LoginRequestDTO dto, @Nullable String deviceId) {
         Authentication authenticated = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -88,5 +88,16 @@ public class AuthService {
     public void logout(String deviceId, String refreshToken) {
         refreshTokenRepository.findByDeviceIdAndTokenAndRevokedIsFalse(deviceId, refreshToken)
                 .ifPresent(refreshTokenRepository::delete);
+    }
+
+    public void changePassword(@NotNull UserDetails userDetails, @NotNull ChangePasswordDTO dto) {
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalStateException("The user should exist if the authentication manager have authenticated it"));
+
+        if (!passwordEncoder.matches(dto.old(), user.getPassword()))
+            throw new WrongOldPasswordException("Old password is incorrect");
+
+        user.setPassword(passwordEncoder.encode(dto.new_()));
+        userRepository.save(user);
     }
 }

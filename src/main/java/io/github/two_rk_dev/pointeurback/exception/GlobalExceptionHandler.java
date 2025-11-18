@@ -3,6 +3,7 @@ package io.github.two_rk_dev.pointeurback.exception;
 import io.github.two_rk_dev.pointeurback.dto.ErrorDetails;
 import io.github.two_rk_dev.pointeurback.dto.ValidationError;
 import io.github.two_rk_dev.pointeurback.dto.ValidationErrorDetails;
+import io.github.two_rk_dev.pointeurback.dto.WrongOldPasswordException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -284,5 +285,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 request.getDescription(false),
                 "AUTHENTICATION_FAILED");
         return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(WrongOldPasswordException.class)
+    public ResponseEntity<ErrorDetails> handleWrongOldPasswordException(@NotNull WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                OffsetDateTime.now(ZoneOffset.UTC),
+                "Password change failed",
+                request.getDescription(false),
+                "WRONG_OLD_PASSWORD"
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 }

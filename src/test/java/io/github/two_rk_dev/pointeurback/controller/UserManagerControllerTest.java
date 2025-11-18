@@ -17,7 +17,9 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -51,12 +53,6 @@ class UserManagerControllerTest extends AbstractRandomPortSpringBootTest {
     private AuthProperties authProperties;
     private String superadminUsername;
     private String superadminPassword;
-
-    private static @NotNull HttpEntity<String> createHttpEntity(String requestBody, String accessToken) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        return new HttpEntity<>(requestBody, headers);
-    }
 
     @BeforeEach
     void setUp() {

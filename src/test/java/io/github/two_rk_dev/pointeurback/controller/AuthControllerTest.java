@@ -2,6 +2,8 @@ package io.github.two_rk_dev.pointeurback.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import io.github.two_rk_dev.pointeurback.config.AuthProperties;
+import io.github.two_rk_dev.pointeurback.dto.ErrorDetails;
 import io.github.two_rk_dev.pointeurback.dto.UserInfoDTO;
 import io.github.two_rk_dev.pointeurback.model.RefreshToken;
 import io.github.two_rk_dev.pointeurback.model.User;
@@ -9,10 +11,10 @@ import io.github.two_rk_dev.pointeurback.repository.RefreshTokenRepository;
 import io.github.two_rk_dev.pointeurback.repository.UserRepository;
 import org.apache.hc.client5.http.cookie.CookieStore;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -34,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,6 +62,8 @@ public class AuthControllerTest extends AbstractRandomPortSpringBootTest {
     private TestRestTemplate testRestTemplate;
     @Autowired
     private CookieStore cookieStore;
+    @Autowired
+    private AuthProperties authProperties;
 
     private static @NotNull List<HttpCookie> cookies(@NotNull ResponseEntity<?> res) {
         List<String> raw = res.getHeaders().getOrDefault(HttpHeaders.SET_COOKIE, List.of());
@@ -91,7 +96,7 @@ public class AuthControllerTest extends AbstractRandomPortSpringBootTest {
 
     @AfterEach
     void tearDown() {
-        userRepository.deleteAll();
+        userRepository.deleteAllByRoleIsNot("SUPERADMIN");
         refreshTokenRepository.deleteAll();
     }
 
@@ -404,4 +409,97 @@ public class AuthControllerTest extends AbstractRandomPortSpringBootTest {
         }
     }
 
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class PasswordChange {
+
+        private @NotNull Stream<Arguments> provideUserCredentials() {
+            return Stream.of(
+                    Arguments.argumentSet("Simple user", "admin", "admin"),
+                    Arguments.argumentSet(
+                            "Superadmin",
+                            authProperties.bootstrapSuperadmin().username(),
+                            authProperties.bootstrapSuperadmin().password()
+                    )
+            );
+        }
+
+        @Test
+        void unauthenticated_returns401() {
+            ResponseEntity<String> response = testRestTemplate.exchange(
+                    url("/auth/password"),
+                    HttpMethod.PUT,
+                    createHttpEntity("{\"old\": \"admin\", \"new\": \"new-pass\", \"confirm\": \"new-pass\"}", null),
+                    String.class
+            );
+            assertThat(response.getStatusCode())
+                    .as("Should be 401 unauthorized")
+                    .isEqualTo(HttpStatus.UNAUTHORIZED);
+        }
+
+        @Test
+        void wrongOldPassword_returns400() {
+            ResponseEntity<String> loginRes = login("admin", "admin");
+            String accessToken = JsonPath.compile("$.access_token").read(loginRes.getBody());
+            ResponseEntity<ErrorDetails> response = testRestTemplate.exchange(
+                    url("/auth/password"),
+                    HttpMethod.PUT,
+                    createHttpEntity("{\"old\": \"adman\", \"new\": \"new-pass\", \"confirm\": \"new-pass\"}", accessToken),
+                    ErrorDetails.class
+            );
+            assertThat(response.getStatusCode())
+                    .as("Should be 400 bad request")
+                    .isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(response.getBody())
+                    .as("The error code should be WRONG_OLD_PASSWORD")
+                    .isNotNull()
+                    .extracting(ErrorDetails::errorCode)
+                    .isEqualTo("WRONG_OLD_PASSWORD");
+        }
+
+        @Test
+        void passwordMismatch_returns400() {
+            ResponseEntity<String> loginRes = login("admin", "admin");
+            String accessToken = JsonPath.compile("$.access_token").read(loginRes.getBody());
+            ResponseEntity<String> response = testRestTemplate.exchange(
+                    url("/auth/password"),
+                    HttpMethod.PUT,
+                    createHttpEntity("{\"old\": \"admin\", \"new\": \"new-pass\", \"confirm\": \"new_pass\"}", accessToken),
+                    String.class
+            );
+            assertThat(response.getStatusCode())
+                    .as("Should be 400 bad request")
+                    .isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+
+        @ParameterizedTest
+        @MethodSource("provideUserCredentials")
+        void successful_passwordChange(String username, String password) {
+            ResponseEntity<String> loginRes = login(username, password);
+            String accessToken = JsonPath.compile("$.access_token").read(loginRes.getBody());
+            ResponseEntity<String> response = testRestTemplate.exchange(
+                    url("/auth/password"),
+                    HttpMethod.PUT,
+                    createHttpEntity("{\"old\": \"%s\", \"new\": \"new-pass\", \"confirm\": \"new-pass\"}".formatted(password), accessToken),
+                    String.class
+            );
+            assertThat(response.getStatusCode())
+                    .as("Should be 200 OK")
+                    .isEqualTo(HttpStatus.OK);
+            testRestTemplate.exchange(
+                    url("/auth/logout"),
+                    HttpMethod.POST,
+                    null,
+                    String.class
+            );
+            ResponseEntity<String> incorrectLogin = login(username, password);
+            assertThat(incorrectLogin.getStatusCode())
+                    .as("Login with the old password should fail")
+                    .isEqualTo(HttpStatus.UNAUTHORIZED);
+            ResponseEntity<String> loginWithNewPassword = login(username, "new-pass");
+            assertThat(loginWithNewPassword.getStatusCode())
+                    .as("Login with new password should succeed")
+                    .isEqualTo(HttpStatus.OK);
+        }
+    }
 }

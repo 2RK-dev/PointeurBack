@@ -1,9 +1,6 @@
 package io.github.two_rk_dev.pointeurback.controller;
 
-import io.github.two_rk_dev.pointeurback.dto.LoggedInDTO;
-import io.github.two_rk_dev.pointeurback.dto.LoginRequestDTO;
-import io.github.two_rk_dev.pointeurback.dto.LoginResponseDTO;
-import io.github.two_rk_dev.pointeurback.dto.UserInfoDTO;
+import io.github.two_rk_dev.pointeurback.dto.*;
 import io.github.two_rk_dev.pointeurback.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -99,5 +96,14 @@ class AuthController {
                 .noContent()
                 .headers(headers -> headers.set("Set-Cookie", cookie.toString()))
                 .build();
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<String> changePassword(
+            @Valid @RequestBody ChangePasswordDTO changePasswordDTO,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        authService.changePassword(userDetails, changePasswordDTO);
+        return ResponseEntity.ok("Password changed successfully");
     }
 }
