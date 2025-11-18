@@ -2,33 +2,27 @@ package io.github.two_rk_dev.pointeurback.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
-import io.github.two_rk_dev.pointeurback.dto.UserDTO;
+import io.github.two_rk_dev.pointeurback.config.AuthProperties;
+import io.github.two_rk_dev.pointeurback.dto.ErrorDetails;
+import io.github.two_rk_dev.pointeurback.dto.UserInfoDTO;
 import io.github.two_rk_dev.pointeurback.model.RefreshToken;
 import io.github.two_rk_dev.pointeurback.model.User;
 import io.github.two_rk_dev.pointeurback.repository.RefreshTokenRepository;
 import io.github.two_rk_dev.pointeurback.repository.UserRepository;
-import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.cookie.CookieStore;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.client.TestRestTemplate.HttpClientOption;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.MultiValueMap;
@@ -36,34 +30,28 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.io.IOException;
 import java.net.HttpCookie;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 @ActiveProfiles("test")
-public class AuthControllerTest {
+@Import(RestTemplateTestConfig.class)
+public class AuthControllerTest extends AbstractRandomPortSpringBootTest {
 
     @Container
     @ServiceConnection
     static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
-
+    final ObjectMapper mapper = new ObjectMapper();
     @LocalServerPort
     int port;
-
-    final String REFRESH_TOKEN_URL = "/api/v1/auth/refresh";
-    final String LOGIN_API_URL = "/api/v1/auth/login";
-    final String LOGOUT_API_URL = "/api/v1/auth/logout";
-    final String PROTECTED_URL = "/api/v1/auth/me";
-    final String ADMIN_URL = "/api/v1/rooms";
-    final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -74,21 +62,14 @@ public class AuthControllerTest {
     private TestRestTemplate testRestTemplate;
     @Autowired
     private CookieStore cookieStore;
+    @Autowired
+    private AuthProperties authProperties;
 
     private static @NotNull List<HttpCookie> cookies(@NotNull ResponseEntity<?> res) {
         List<String> raw = res.getHeaders().getOrDefault(HttpHeaders.SET_COOKIE, List.of());
         return raw.stream()
                 .flatMap(header -> HttpCookie.parse(header).stream())
                 .toList();
-    }
-
-    private static @NotNull ClientHttpResponse contentTypeInterceptor(
-            @NotNull HttpRequest request,
-            byte[] body,
-            @NotNull ClientHttpRequestExecution execution) throws IOException {
-
-        request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        return execution.execute(request, body);
     }
 
     private static HttpCookie cookieValue(String name, @NotNull List<HttpCookie> cookies) {
@@ -98,14 +79,9 @@ public class AuthControllerTest {
                 .orElse(null);
     }
 
-    @Contract(pure = true)
-    private @NotNull String url(String path) {
-        return "http://localhost:" + port + path;
-    }
-
     private ResponseEntity<String> login(String username, String password) {
         String requestBody = "{\"username\":\"%s\", \"password\":\"%s\"}".formatted(username, password);
-        return testRestTemplate.postForEntity(url(LOGIN_API_URL), requestBody, String.class);
+        return testRestTemplate.postForEntity(url("/auth/login"), requestBody, String.class);
     }
 
     @BeforeEach
@@ -113,34 +89,20 @@ public class AuthControllerTest {
         User user = new User();
         user.setUsername("admin");
         user.setPassword(passwordEncoder.encode("admin"));
-        user.setRole("admin");
+        user.setRole("ADMIN");
         userRepository.save(user);
         cookieStore.clear();
     }
 
     @AfterEach
     void tearDown() {
-        userRepository.deleteAll();
+        userRepository.deleteAllByRoleIsNot("SUPERADMIN");
         refreshTokenRepository.deleteAll();
     }
 
-    @TestConfiguration
-    static class AuthControllerTestConfig {
-        @Bean
-        public CookieStore cookieStore() {
-            return new BasicCookieStore();
-        }
-
-        @Bean
-        public TestRestTemplate testRestTemplate(CookieStore cookieStore) {
-            return new TestRestTemplate(new RestTemplateBuilder()
-                    .requestFactory(() -> new HttpComponentsClientHttpRequestFactory(
-                            HttpClientBuilder.create()
-                                    .setDefaultCookieStore(cookieStore)
-                                    .build())
-                    ).interceptors(AuthControllerTest::contentTypeInterceptor)
-            );
-        }
+    @Override
+    protected int getPort() {
+        return port;
     }
 
     @Nested
@@ -163,9 +125,9 @@ public class AuthControllerTest {
             assertThat(JsonPath.compile("$.access_token").<String>read(body))
                     .as("An access_token should be returned")
                     .isNotBlank();
-            assertThat(mapper.convertValue(JsonPath.compile("$.user").read(body), UserDTO.class))
+            assertThat(mapper.convertValue(JsonPath.compile("$.user").read(body), UserInfoDTO.class))
                     .as("An user should be returned")
-                    .isEqualTo(new UserDTO("admin", "admin"));
+                    .isEqualTo(new UserInfoDTO("admin", "ADMIN"));
             assertThat(cookieValue("refresh_token", cookies(response)))
                     .as("A refresh_token should be returned, HTTP-only")
                     .isNotNull()
@@ -196,7 +158,7 @@ public class AuthControllerTest {
                     .isNotNull();
 
             ResponseEntity<String> refreshResponse = testRestTemplate.postForEntity(
-                    url(REFRESH_TOKEN_URL),
+                    url("/auth/refresh"),
                     null,
                     String.class
             );
@@ -224,7 +186,7 @@ public class AuthControllerTest {
             )));
 
             ResponseEntity<String> res = testRestTemplate.exchange(
-                    url(REFRESH_TOKEN_URL),
+                    url("/auth/refresh"),
                     HttpMethod.POST,
                     new HttpEntity<Void>(headers),
                     String.class
@@ -247,7 +209,7 @@ public class AuthControllerTest {
                     "device_id cookie should not be null"
             ).getValue();
 
-            ResponseEntity<String> logoutRes = testRestTemplate.postForEntity(url(LOGOUT_API_URL), null, String.class);
+            ResponseEntity<String> logoutRes = testRestTemplate.postForEntity(url("/auth/logout"), null, String.class);
 
             assertThat(logoutRes.getStatusCode())
                     .as("Status code should be 204 no content")
@@ -268,7 +230,7 @@ public class AuthControllerTest {
 
         @Test
         void logout_whenNotLoggedIn_stillReturnsEmptyBody() {
-            ResponseEntity<String> res = testRestTemplate.postForEntity(url(LOGOUT_API_URL), null, String.class);
+            ResponseEntity<String> res = testRestTemplate.postForEntity(url("/auth/logout"), null, String.class);
             assertThat(res.getStatusCode())
                     .isEqualTo(HttpStatus.NO_CONTENT);
             assertThat(res.getBody())
@@ -281,7 +243,7 @@ public class AuthControllerTest {
 
         @Test
         void withoutToken_returns401() {
-            ResponseEntity<String> res = testRestTemplate.getForEntity(url(PROTECTED_URL), String.class);
+            ResponseEntity<String> res = testRestTemplate.getForEntity(url("/auth/me"), String.class);
 
             assertThat(res.getStatusCode())
                     .as("Request without token should return 401")
@@ -294,7 +256,7 @@ public class AuthControllerTest {
             headers.setBearerAuth("this.is.not.valid");
 
             ResponseEntity<String> res = testRestTemplate.exchange(
-                    url(PROTECTED_URL),
+                    url("/auth/me"),
                     HttpMethod.GET,
                     new HttpEntity<>(headers),
                     String.class
@@ -313,7 +275,7 @@ public class AuthControllerTest {
             headers.setBearerAuth(accessToken);
 
             ResponseEntity<String> res = testRestTemplate.exchange(
-                    url(PROTECTED_URL),
+                    url("/auth/me"),
                     HttpMethod.GET,
                     new HttpEntity<>(headers),
                     String.class
@@ -338,7 +300,7 @@ public class AuthControllerTest {
             headers.setBearerAuth(accessToken);
 
             ResponseEntity<String> res = testRestTemplate.exchange(
-                    url(ADMIN_URL),
+                    url("/rooms"),
                     HttpMethod.GET,
                     new HttpEntity<>(headers),
                     String.class
@@ -401,9 +363,9 @@ public class AuthControllerTest {
 
             // Device B — new TestRestTemplate with no cookies
             TestRestTemplate otherDevice = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
-            otherDevice.getRestTemplate().getInterceptors().add(AuthControllerTest::contentTypeInterceptor);
+            otherDevice.getRestTemplate().getInterceptors().add(RestTemplateTestConfig::jsonContentTypeInterceptor);
             String body = "{\"username\":\"admin\", \"password\":\"admin\"}";
-            ResponseEntity<String> resB = otherDevice.postForEntity(url(LOGIN_API_URL), body, String.class);
+            ResponseEntity<String> resB = otherDevice.postForEntity(url("/auth/login"), body, String.class);
 
             String rtB = Objects.requireNonNull(
                     cookieValue("refresh_token", cookies(resB)),
@@ -435,7 +397,7 @@ public class AuthControllerTest {
             wrongDeviceHeaders.add(HttpHeaders.COOKIE, "refresh_token=%s".formatted(refreshToken));
 
             ResponseEntity<String> res = testRestTemplate.exchange(
-                    url(REFRESH_TOKEN_URL),
+                    url("/auth/refresh"),
                     HttpMethod.POST,
                     new HttpEntity<>(wrongDeviceHeaders),
                     String.class
@@ -447,4 +409,97 @@ public class AuthControllerTest {
         }
     }
 
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class PasswordChange {
+
+        private @NotNull Stream<Arguments> provideUserCredentials() {
+            return Stream.of(
+                    Arguments.argumentSet("Simple user", "admin", "admin"),
+                    Arguments.argumentSet(
+                            "Superadmin",
+                            authProperties.bootstrapSuperadmin().username(),
+                            authProperties.bootstrapSuperadmin().password()
+                    )
+            );
+        }
+
+        @Test
+        void unauthenticated_returns401() {
+            ResponseEntity<String> response = testRestTemplate.exchange(
+                    url("/auth/password"),
+                    HttpMethod.PUT,
+                    createHttpEntity("{\"old\": \"admin\", \"new\": \"new-pass\", \"confirm\": \"new-pass\"}", null),
+                    String.class
+            );
+            assertThat(response.getStatusCode())
+                    .as("Should be 401 unauthorized")
+                    .isEqualTo(HttpStatus.UNAUTHORIZED);
+        }
+
+        @Test
+        void wrongOldPassword_returns400() {
+            ResponseEntity<String> loginRes = login("admin", "admin");
+            String accessToken = JsonPath.compile("$.access_token").read(loginRes.getBody());
+            ResponseEntity<ErrorDetails> response = testRestTemplate.exchange(
+                    url("/auth/password"),
+                    HttpMethod.PUT,
+                    createHttpEntity("{\"old\": \"adman\", \"new\": \"new-pass\", \"confirm\": \"new-pass\"}", accessToken),
+                    ErrorDetails.class
+            );
+            assertThat(response.getStatusCode())
+                    .as("Should be 400 bad request")
+                    .isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(response.getBody())
+                    .as("The error code should be WRONG_OLD_PASSWORD")
+                    .isNotNull()
+                    .extracting(ErrorDetails::errorCode)
+                    .isEqualTo("WRONG_OLD_PASSWORD");
+        }
+
+        @Test
+        void passwordMismatch_returns400() {
+            ResponseEntity<String> loginRes = login("admin", "admin");
+            String accessToken = JsonPath.compile("$.access_token").read(loginRes.getBody());
+            ResponseEntity<String> response = testRestTemplate.exchange(
+                    url("/auth/password"),
+                    HttpMethod.PUT,
+                    createHttpEntity("{\"old\": \"admin\", \"new\": \"new-pass\", \"confirm\": \"new_pass\"}", accessToken),
+                    String.class
+            );
+            assertThat(response.getStatusCode())
+                    .as("Should be 400 bad request")
+                    .isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+
+        @ParameterizedTest
+        @MethodSource("provideUserCredentials")
+        void successful_passwordChange(String username, String password) {
+            ResponseEntity<String> loginRes = login(username, password);
+            String accessToken = JsonPath.compile("$.access_token").read(loginRes.getBody());
+            ResponseEntity<String> response = testRestTemplate.exchange(
+                    url("/auth/password"),
+                    HttpMethod.PUT,
+                    createHttpEntity("{\"old\": \"%s\", \"new\": \"new-pass\", \"confirm\": \"new-pass\"}".formatted(password), accessToken),
+                    String.class
+            );
+            assertThat(response.getStatusCode())
+                    .as("Should be 200 OK")
+                    .isEqualTo(HttpStatus.OK);
+            testRestTemplate.exchange(
+                    url("/auth/logout"),
+                    HttpMethod.POST,
+                    null,
+                    String.class
+            );
+            ResponseEntity<String> incorrectLogin = login(username, password);
+            assertThat(incorrectLogin.getStatusCode())
+                    .as("Login with the old password should fail")
+                    .isEqualTo(HttpStatus.UNAUTHORIZED);
+            ResponseEntity<String> loginWithNewPassword = login(username, "new-pass");
+            assertThat(loginWithNewPassword.getStatusCode())
+                    .as("Login with new password should succeed")
+                    .isEqualTo(HttpStatus.OK);
+        }
+    }
 }

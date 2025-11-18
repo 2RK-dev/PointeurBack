@@ -1,7 +1,8 @@
 package io.github.two_rk_dev.pointeurback.dto;
 
-public record UserDTO(
+public record UserCreatedDTO(
         Long id,
+        String password,
         UserInfoDTO info
 ) {
 }

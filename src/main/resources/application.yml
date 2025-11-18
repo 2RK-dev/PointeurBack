@@ -37,3 +37,5 @@ app:
       expiration: ${SPRING_JWT_EXPIRATION}
     refresh-session-expiration: ${SPRING_REFRESH_SESSION_EXPIRATION}
     cookie-secure: ${SPRING_AUTH_COOKIE_SECURE:false}
+    bootstrap-superadmin:
+      username: ${SPRING_BOOTSTRAP_SUPERADMIN_USERNAME}

@@ -11,6 +11,8 @@ public record ValidationError(
 ) {
     @Contract("_ -> new")
     public static @NotNull ValidationError fromFieldError(ObjectError e) {
-        return new ValidationError(((FieldError) e).getField(), e.getDefaultMessage());
+        if (e instanceof FieldError fe) {
+            return new ValidationError(fe.getField(), fe.getDefaultMessage());
+        } else return new ValidationError("global", e.getDefaultMessage());
     }
 }

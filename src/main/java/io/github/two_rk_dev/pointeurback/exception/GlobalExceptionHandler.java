@@ -50,6 +50,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorDetails> handleUserNotFoundException(@NotNull UserNotFoundException ex, @NotNull WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                OffsetDateTime.now(ZoneOffset.UTC),
+                ex.getMessage(),
+                request.getDescription(false),
+                "USER_NOT_FOUND"
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(LevelNameNotUniqueException.class)
     public ResponseEntity<ErrorDetails> handleLevelNameNotUniqueException(@NotNull LevelNameNotUniqueException ex,
                                                                           @NotNull WebRequest request) {
@@ -273,5 +284,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 request.getDescription(false),
                 "AUTHENTICATION_FAILED");
         return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(WrongOldPasswordException.class)
+    public ResponseEntity<ErrorDetails> handleWrongOldPasswordException(@NotNull WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                OffsetDateTime.now(ZoneOffset.UTC),
+                "Password change failed",
+                request.getDescription(false),
+                "WRONG_OLD_PASSWORD"
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 }

@@ -38,7 +38,7 @@ public class JwtService {
     public String encodeToToken(io.github.two_rk_dev.pointeurback.model.@NotNull User user) {
         return Jwts.builder()
                 .subject(user.getUsername())
-                .claim("role", user.getRole().toUpperCase())
+                .claim("role", user.getRole())
                 .signWith(getSigningKey())
                 .expiration(Date.from(OffsetDateTime.now().plusSeconds(authProperties.jwt().expiration()).toInstant()))
                 .compact();

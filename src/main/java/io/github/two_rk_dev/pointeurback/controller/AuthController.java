@@ -1,9 +1,6 @@
 package io.github.two_rk_dev.pointeurback.controller;
 
-import io.github.two_rk_dev.pointeurback.dto.LoggedInDTO;
-import io.github.two_rk_dev.pointeurback.dto.LoginRequestDTO;
-import io.github.two_rk_dev.pointeurback.dto.LoginResponseDTO;
-import io.github.two_rk_dev.pointeurback.dto.UserDTO;
+import io.github.two_rk_dev.pointeurback.dto.*;
 import io.github.two_rk_dev.pointeurback.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -60,13 +57,13 @@ class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDTO> me(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<UserInfoDTO> me(@AuthenticationPrincipal UserDetails userDetails) {
         String role = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(authority -> authority.startsWith("ROLE_"))
-                .map(authority -> authority.substring(5).toLowerCase())
+                .map(authority -> authority.substring(5))
                 .findFirst().orElse(null);
-        return ResponseEntity.ok(new UserDTO(userDetails.getUsername(), role));
+        return ResponseEntity.ok(new UserInfoDTO(userDetails.getUsername(), role));
     }
 
     @PostMapping("/refresh")
@@ -99,5 +96,14 @@ class AuthController {
                 .noContent()
                 .headers(headers -> headers.set("Set-Cookie", cookie.toString()))
                 .build();
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<String> changePassword(
+            @Valid @RequestBody ChangePasswordDTO changePasswordDTO,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        authService.changePassword(userDetails, changePasswordDTO);
+        return ResponseEntity.ok("Password changed successfully");
     }
 }
