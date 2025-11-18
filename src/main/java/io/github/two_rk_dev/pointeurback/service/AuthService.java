@@ -52,7 +52,7 @@ public class AuthService {
         RefreshTokenDTO rotatedRefreshToken = rotateRefreshToken(refreshToken);
         return new LoggedInDTO(
                 rotatedRefreshToken,
-                new LoginResponseDTO(accessToken, userMapper.toDto(user))
+                new LoginResponseDTO(accessToken, userMapper.toInfoDto(user))
         );
     }
 
@@ -64,7 +64,7 @@ public class AuthService {
         RefreshTokenDTO rotatedRefreshToken = rotateRefreshToken(session);
         return new LoggedInDTO(
                 rotatedRefreshToken,
-                new LoginResponseDTO(accessToken, userMapper.toDto(session.getUser()))
+                new LoginResponseDTO(accessToken, userMapper.toInfoDto(session.getUser()))
         );
     }
 

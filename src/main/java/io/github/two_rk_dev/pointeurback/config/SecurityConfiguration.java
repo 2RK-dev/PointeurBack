@@ -61,6 +61,7 @@ class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/schedule/**").hasAnyRole("ADMIN", "SUPERADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/schedule/**").hasAnyRole("ADMIN", "SUPERADMIN")
                         .requestMatchers(HttpMethod.GET, "/schedule/**", "/auth/me").authenticated()
+                        .requestMatchers("/users/**").hasRole("SUPERADMIN")
                         .anyRequest().denyAll()
                 )
                 .exceptionHandling(exceptions -> exceptions

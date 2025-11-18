@@ -29,4 +29,8 @@ public class User {
                && password.equals(other.password)
                && role.equals(other.role);
     }
+
+    public boolean isSuperAdmin() {
+        return role.equals("SUPERADMIN");
+    }
 }

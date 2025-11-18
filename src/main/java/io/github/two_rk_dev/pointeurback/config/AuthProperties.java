@@ -31,9 +31,12 @@ public record AuthProperties(
 
     /**
      * @param username Username for the bootstrap superadmin account created on application startup if no superadmin exist.
+     * @param password Test-only fixed superadmin password. Never set this property in environments where the test profile
+     *                 is not active, or the app won't start.
      */
     public record BootstrapSuperadmin(
-            String username
+            String username,
+            String password
     ) {
     }
 }

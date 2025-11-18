@@ -18,7 +18,7 @@ public interface LevelMapper {
         return new LevelDTO(entity.getId(), entity.getName(), entity.getAbbreviation());
     }
 
-    @Mapping(target = "level", source = ".")
+    @Mapping(target = "level", source = "entity")
     @Mapping(target = "groups", source = "groups")
     LevelDetailsDTO toDetailsDto(Level entity);
 

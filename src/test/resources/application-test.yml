@@ -3,3 +3,4 @@ app:
     cookie-secure: false
     bootstrap-superadmin:
       username: superadmin
+      password: super-password

@@ -70,6 +70,18 @@ jobs:
           SPRING_AUTH_COOKIE_SECURE=${{ vars.SPRING_AUTH_COOKIE_SECURE }}
           EOF
 
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            .gradle
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -77,8 +89,8 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Build with Gradle
-        run: ./gradlew build --no-daemon
+      - name: Check with Gradle
+        run: ./gradlew check --no-daemon
 
       - name: Upload test results
         if: failure()
