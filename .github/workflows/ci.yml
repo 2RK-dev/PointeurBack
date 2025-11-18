@@ -26,6 +26,7 @@ jobs:
           [[ -z "${{ secrets.SPRING_DB_PASSWORD }}" ]] && MISSING_SECRETS+=("SPRING_DB_PASSWORD")
           [[ -z "${{ secrets.APP_PORT }}" ]] && MISSING_SECRETS+=("APP_PORT")
           [[ -z "${{ secrets.SPRING_JWT_SECRET_KEY }}" ]] && MISSING_SECRETS+=("SPRING_JWT_SECRET_KEY")
+          [[ -z "${{ secrets.SPRING_BOOTSTRAP_SUPERADMIN_USERNAME }}" ]] && MISSING_SECRETS+=("SPRING_BOOTSTRAP_SUPERADMIN_USERNAME")
           # Check each required variable
           [[ -z "${{ vars.SPRING_JWT_EXPIRATION }}" ]] && MISSING_VARS+=("SPRING_JWT_EXPIRATION")
           [[ -z "${{ vars.SPRING_REFRESH_SESSION_EXPIRATION }}" ]] && MISSING_VARS+=("SPRING_REFRESH_SESSION_EXPIRATION")
@@ -68,6 +69,7 @@ jobs:
           SPRING_JWT_EXPIRATION=${{ vars.SPRING_JWT_EXPIRATION }}
           SPRING_REFRESH_SESSION_EXPIRATION=${{ vars.SPRING_REFRESH_SESSION_EXPIRATION }}
           SPRING_AUTH_COOKIE_SECURE=${{ vars.SPRING_AUTH_COOKIE_SECURE }}
+          SPRING_BOOTSTRAP_SUPERADMIN_PASSWORD=${{ secrets.SPRING_BOOTSTRAP_SUPERADMIN_PASSWORD }}
           EOF
 
       - name: Cache Gradle
