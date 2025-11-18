@@ -2,6 +2,7 @@ package io.github.two_rk_dev.pointeurback.service;
 
 import io.github.two_rk_dev.pointeurback.config.AuthProperties;
 import io.github.two_rk_dev.pointeurback.dto.*;
+import io.github.two_rk_dev.pointeurback.exception.WrongOldPasswordException;
 import io.github.two_rk_dev.pointeurback.mapper.RefreshTokenMapper;
 import io.github.two_rk_dev.pointeurback.mapper.UserMapper;
 import io.github.two_rk_dev.pointeurback.model.RefreshToken;

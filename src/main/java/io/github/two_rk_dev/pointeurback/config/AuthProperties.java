@@ -9,8 +9,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *                                 frequently refreshed.
  * @param cookieSecure Flag indicating whether authentication cookies should be marked as secure. This flag is so it can
  *                    be disabled in non-HTTPS development environments.
- * @param jwt
- * @param bootstrapSuperadmin
+ * @param jwt JWT configuration properties, including secret key and expiration settings.
+ * @param bootstrapSuperadmin Bootstrap superadmin account properties, used to create a superadmin on startup if none exist.
  */
 @ConfigurationProperties(prefix = "app.auth")
 public record AuthProperties(

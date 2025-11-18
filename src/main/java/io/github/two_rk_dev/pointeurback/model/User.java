@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 @ToString
@@ -24,10 +26,15 @@ public class User {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof User other && id.equals(other.id)
-               && username.equals(other.username)
-               && password.equals(other.password)
-               && role.equals(other.role);
+        return obj instanceof User other && Objects.equals(id, other.id)
+               && Objects.equals(username, other.username)
+               && Objects.equals(password, other.password)
+               && Objects.equals(role, other.role);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, password, role);
     }
 
     public boolean isSuperAdmin() {

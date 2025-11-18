@@ -3,7 +3,6 @@ package io.github.two_rk_dev.pointeurback.exception;
 import io.github.two_rk_dev.pointeurback.dto.ErrorDetails;
 import io.github.two_rk_dev.pointeurback.dto.ValidationError;
 import io.github.two_rk_dev.pointeurback.dto.ValidationErrorDetails;
-import io.github.two_rk_dev.pointeurback.dto.WrongOldPasswordException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
