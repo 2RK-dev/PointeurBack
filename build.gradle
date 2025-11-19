@@ -48,7 +48,6 @@ dependencies {
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
     implementation 'org.mapstruct:mapstruct:1.6.3'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.15.2'
     implementation 'org.apache.poi:poi-ooxml:5.4.0'
     implementation 'org.apache.commons:commons-csv:1.14.1'
     implementation 'org.springframework.boot:spring-boot-starter-security'

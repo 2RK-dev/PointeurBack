@@ -267,10 +267,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorDetails> handleBadCredentialsException(@NotNull WebRequest request) {
+    public ResponseEntity<ErrorDetails> handleBadCredentialsException(BadCredentialsException ex, @NotNull WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(
                 OffsetDateTime.now(ZoneOffset.UTC),
-                "Invalid username or password",
+                ex.getMessage(),
                 request.getDescription(false),
                 "BAD_CREDENTIALS");
         return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
