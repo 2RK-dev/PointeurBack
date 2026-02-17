@@ -47,7 +47,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         List<ScheduleItem> items;
         if (groupId != null) {
-            if (levelId != null && !groupRepository.existsGroupByLevel_IdIs(levelId)) {
+            if (levelId != null && !groupRepository.existsGroupByIdAndLevel_Id(groupId, levelId)) {
                 throw new GroupNotFoundException("Group with id " + groupId + " not found in level " + levelId);
             }
             items = scheduleItemRepository.findByGroupsId(groupId);
