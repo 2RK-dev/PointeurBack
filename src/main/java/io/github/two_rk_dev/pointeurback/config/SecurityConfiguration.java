@@ -34,6 +34,7 @@ class SecurityConfiguration {
                                                    AppAuthenticationFilter appAuthenticationFilter,
                                                    CorsProperties corsProperties) throws Exception {
         http
+                .securityMatcher("/api/v1/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
@@ -47,22 +48,22 @@ class SecurityConfiguration {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/login",
-                                "/auth/refresh",
-                                "/auth/logout").permitAll()
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/refresh",
+                                "/api/v1/auth/logout").permitAll()
                         .requestMatchers(
-                                "/export/**",
-                                "/import/**",
-                                "/levels/**",
-                                "/rooms/**",
-                                "/teachers/**",
-                                "/teachingUnits/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                        .requestMatchers(HttpMethod.POST, "/schedule/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/schedule/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/schedule/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                        .requestMatchers(HttpMethod.GET, "/schedule/**", "/auth/me").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/auth/password").authenticated()
-                        .requestMatchers("/users/**").hasRole("SUPERADMIN")
+                                "/api/v1/export/**",
+                                "/api/v1/import/**",
+                                "/api/v1/levels/**",
+                                "/api/v1/rooms/**",
+                                "/api/v1/teachers/**",
+                                "/api/v1/teachingUnits/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/schedule/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/schedule/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/schedule/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/schedule/**", "/api/v1/auth/me").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/auth/password").authenticated()
+                        .requestMatchers("/api/v1/users/**").hasRole("SUPERADMIN")
                         .anyRequest().denyAll()
                 )
                 .exceptionHandling(exceptions -> exceptions

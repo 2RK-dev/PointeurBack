@@ -30,7 +30,7 @@ class TeachingUnitControllerTest {
 
     @Test
     void createTeachingUnit_withNullBody_shouldReturn400() throws Exception {
-        mockMvc.perform(post("/teachingUnits")
+        mockMvc.perform(post("/api/v1/teachingUnits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("null"))
                 .andExpect(status().isBadRequest());
@@ -38,7 +38,7 @@ class TeachingUnitControllerTest {
 
     @Test
     void createTeachingUnit_withEmptyBody_shouldReturn400() throws Exception {
-        mockMvc.perform(post("/teachingUnits")
+        mockMvc.perform(post("/api/v1/teachingUnits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(""))
                 .andExpect(status().isBadRequest());
@@ -46,7 +46,7 @@ class TeachingUnitControllerTest {
 
     @Test
     void updateTeachingUnit_withNullBody_shouldReturn400() throws Exception {
-        mockMvc.perform(put("/teachingUnits/1")
+        mockMvc.perform(put("/api/v1/teachingUnits/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("null"))
                 .andExpect(status().isBadRequest());
@@ -54,7 +54,7 @@ class TeachingUnitControllerTest {
 
     @Test
     void updateTeachingUnit_withEmptyBody_shouldReturn400() throws Exception {
-        mockMvc.perform(put("/teachingUnits/1")
+        mockMvc.perform(put("/api/v1/teachingUnits/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(""))
                 .andExpect(status().isBadRequest());
@@ -64,7 +64,7 @@ class TeachingUnitControllerTest {
     class ValidationTests {
         @Test
         void createTeachingUnit_withoutName_shouldReturn400() throws Exception {
-            mockMvc.perform(post("/teachingUnits")
+            mockMvc.perform(post("/api/v1/teachingUnits")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"abbreviation\": \"LANG\"}"))
                     .andExpect(status().isBadRequest());

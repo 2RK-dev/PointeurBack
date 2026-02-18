@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/levels/{levelId}/groups")
+@RequestMapping("/api/v1/levels/{levelId}/groups")
 @RequiredArgsConstructor
 public class GroupController {
 

@@ -34,7 +34,7 @@ class LevelControllerTest {
 
     @Test
     void createLevel_withNullBody_shouldReturn400() throws Exception {
-        mockMvc.perform(post("/levels")
+        mockMvc.perform(post("/api/v1/levels")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("null"))
                 .andExpect(status().isBadRequest());
@@ -42,7 +42,7 @@ class LevelControllerTest {
 
     @Test
     void createLevel_withEmptyBody_shouldReturn400() throws Exception {
-        mockMvc.perform(post("/levels")
+        mockMvc.perform(post("/api/v1/levels")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(""))
                 .andExpect(status().isBadRequest());
@@ -50,7 +50,7 @@ class LevelControllerTest {
 
     @Test
     void updateLevel_withNullBody_shouldReturn400() throws Exception {
-        mockMvc.perform(put("/levels/1")
+        mockMvc.perform(put("/api/v1/levels/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("null"))
                 .andExpect(status().isBadRequest());
@@ -58,7 +58,7 @@ class LevelControllerTest {
 
     @Test
     void updateLevel_withEmptyBody_shouldReturn400() throws Exception {
-        mockMvc.perform(put("/levels/1")
+        mockMvc.perform(put("/api/v1/levels/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(""))
                 .andExpect(status().isBadRequest());
@@ -66,7 +66,7 @@ class LevelControllerTest {
 
     @Test
     void createGroup_withNullBody_shouldReturn400() throws Exception {
-        mockMvc.perform(post("/levels/1/groups")
+        mockMvc.perform(post("/api/v1/levels/1/groups")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("null"))
                 .andExpect(status().isBadRequest());
@@ -74,7 +74,7 @@ class LevelControllerTest {
 
     @Test
     void createGroup_withEmptyBody_shouldReturn400() throws Exception {
-        mockMvc.perform(post("/levels/1/groups")
+        mockMvc.perform(post("/api/v1/levels/1/groups")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(""))
                 .andExpect(status().isBadRequest());
@@ -84,7 +84,7 @@ class LevelControllerTest {
     class ValidationTests {
         @Test
         void createLevel_withoutName_shouldReturn400() throws Exception {
-            mockMvc.perform(post("/levels")
+            mockMvc.perform(post("/api/v1/levels")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"abbreviation\": \"M1\"}"))
                     .andExpect(status().isBadRequest());
@@ -92,7 +92,7 @@ class LevelControllerTest {
 
         @Test
         void createLevel_withoutAbbreviation_shouldReturn400() throws Exception {
-            mockMvc.perform(post("/levels")
+            mockMvc.perform(post("/api/v1/levels")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"name\": \"M1\"}"))
                     .andExpect(status().isBadRequest());
@@ -100,7 +100,7 @@ class LevelControllerTest {
 
         @Test
         void createGroup_withoutNameNorSize_shouldReturn400() throws Exception {
-            mockMvc.perform(post("/levels/1/groups")
+            mockMvc.perform(post("/api/v1/levels/1/groups")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"type\": \"\", \"classe\": \"GB\"}"))
                     .andExpect(status().isBadRequest());

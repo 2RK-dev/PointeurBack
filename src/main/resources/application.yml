@@ -21,8 +21,6 @@ spring:
 
 server:
   port: ${APP_PORT:8080}
-  servlet:
-    context-path: /api/v1
   error:
     include-message: always
     include-binding-errors: always

@@ -30,7 +30,7 @@ class TeacherControllerTest {
 
     @Test
     void createTeacher_withNullBody_shouldReturn400() throws Exception {
-        mockMvc.perform(post("/teachers")
+        mockMvc.perform(post("/api/v1/teachers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("null"))
                 .andExpect(status().isBadRequest());
@@ -38,7 +38,7 @@ class TeacherControllerTest {
 
     @Test
     void createTeacher_withEmptyBody_shouldReturn400() throws Exception {
-        mockMvc.perform(post("/teachers")
+        mockMvc.perform(post("/api/v1/teachers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(""))
                 .andExpect(status().isBadRequest());
@@ -46,7 +46,7 @@ class TeacherControllerTest {
 
     @Test
     void updateTeacher_withNullBody_shouldReturn400() throws Exception {
-        mockMvc.perform(put("/teachers/1")
+        mockMvc.perform(put("/api/v1/teachers/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("null"))
                 .andExpect(status().isBadRequest());
@@ -54,7 +54,7 @@ class TeacherControllerTest {
 
     @Test
     void updateTeacher_withEmptyBody_shouldReturn400() throws Exception {
-        mockMvc.perform(put("/teachers/1")
+        mockMvc.perform(put("/api/v1/teachers/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(""))
                 .andExpect(status().isBadRequest());
@@ -64,7 +64,7 @@ class TeacherControllerTest {
     class ValidationTests {
         @Test
         void createTeacher_withoutName_shouldReturn400() throws Exception {
-            mockMvc.perform(post("/teachers")
+            mockMvc.perform(post("/api/v1/teachers")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"abbreviation\": \"JD\"}"))
                     .andExpect(status().isBadRequest());
