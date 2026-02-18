@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/schedule")
+@RequestMapping({"/api/v1/schedule", "/integration/schedule"})
 @RequiredArgsConstructor
 public class ScheduleController {
 
