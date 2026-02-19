@@ -19,7 +19,10 @@ public class GroupTableAdapter extends AbstractEntityTableAdapter<ImportGroupDTO
     private final GroupService groupService;
     private final JdbcTemplate jdbcTemplate;
 
-    public GroupTableAdapter(GroupService groupService, ObjectMapper objectMapper, @Qualifier("mvcValidator") Validator validator, JdbcTemplate jdbcTemplate) {
+    public GroupTableAdapter(GroupService groupService,
+                             @Qualifier("fileParsingObjectMapper") ObjectMapper objectMapper,
+                             @Qualifier("mvcValidator") Validator validator,
+                             JdbcTemplate jdbcTemplate) {
         super(objectMapper, validator, ImportGroupDTO.class);
         this.groupService = groupService;
         this.jdbcTemplate = jdbcTemplate;

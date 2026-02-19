@@ -18,7 +18,10 @@ public class TeacherTableAdapter extends AbstractEntityTableAdapter<ImportTeache
     private final TeacherService teacherService;
     private final JdbcTemplate jdbcTemplate;
 
-    public TeacherTableAdapter(TeacherService teacherService, ObjectMapper objectMapper, @Qualifier("mvcValidator") Validator validator, JdbcTemplate jdbcTemplate) {
+    public TeacherTableAdapter(TeacherService teacherService,
+                               @Qualifier("fileParsingObjectMapper") ObjectMapper objectMapper,
+                               @Qualifier("mvcValidator") Validator validator,
+                               JdbcTemplate jdbcTemplate) {
         super(objectMapper, validator, ImportTeacherDTO.class);
         this.teacherService = teacherService;
         this.jdbcTemplate = jdbcTemplate;

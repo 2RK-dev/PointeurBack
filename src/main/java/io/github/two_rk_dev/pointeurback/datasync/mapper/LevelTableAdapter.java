@@ -18,7 +18,10 @@ public class LevelTableAdapter extends AbstractEntityTableAdapter<ImportLevelDTO
     private final LevelService levelService;
     private final JdbcTemplate jdbcTemplate;
 
-    public LevelTableAdapter(LevelService levelService, ObjectMapper objectMapper, @Qualifier("mvcValidator") Validator validator, JdbcTemplate jdbcTemplate) {
+    public LevelTableAdapter(LevelService levelService,
+                             @Qualifier("fileParsingObjectMapper") ObjectMapper objectMapper,
+                             @Qualifier("mvcValidator") Validator validator,
+                             JdbcTemplate jdbcTemplate) {
         super(objectMapper, validator, ImportLevelDTO.class);
         this.levelService = levelService;
         this.jdbcTemplate = jdbcTemplate;
