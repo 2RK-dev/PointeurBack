@@ -26,13 +26,15 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         String header = request.getHeader(authProperties.apiKey().header());
-        if (header == null || header.startsWith(authProperties.apiKey().keyPrefix())) {
+        if (header != null && header.startsWith(authProperties.apiKey().keyPrefix())) {
             UserDetails userDetails = apiKeyService.getUserFromApiKey(header);
-            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
+            if (userDetails != null) {
+                SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
                     userDetails,
                     null,
                     userDetails.getAuthorities()
             ));
+            }
         }
 
         filterChain.doFilter(request, response);

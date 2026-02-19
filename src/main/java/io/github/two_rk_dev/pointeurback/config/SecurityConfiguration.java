@@ -43,6 +43,9 @@ class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/integration/**").authenticated()
                         .anyRequest().denyAll()
                 )
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
@@ -86,7 +89,7 @@ class SecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/schedule/**").hasAnyRole("ADMIN", "SUPERADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/schedule/**", "/api/v1/auth/me").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/auth/password").authenticated()
-                        .requestMatchers("/api/v1/users/**").hasRole("SUPERADMIN")
+                        .requestMatchers("/api/v1/users/**", "/api/v1/api-keys/**").hasRole("SUPERADMIN")
                         .anyRequest().denyAll()
                 )
                 .exceptionHandling(exceptions -> exceptions
