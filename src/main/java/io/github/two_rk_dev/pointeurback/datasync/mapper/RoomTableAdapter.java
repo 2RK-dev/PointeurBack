@@ -18,7 +18,10 @@ public class RoomTableAdapter extends AbstractEntityTableAdapter<ImportRoomDTO> 
     private final RoomService roomService;
     private final JdbcTemplate jdbcTemplate;
 
-    public RoomTableAdapter(RoomService roomService, ObjectMapper objectMapper, @Qualifier("mvcValidator") Validator validator, JdbcTemplate jdbcTemplate) {
+    public RoomTableAdapter(RoomService roomService,
+                            @Qualifier("fileParsingObjectMapper") ObjectMapper objectMapper,
+                            @Qualifier("mvcValidator") Validator validator,
+                            JdbcTemplate jdbcTemplate) {
         super(objectMapper, validator, ImportRoomDTO.class);
         this.roomService = roomService;
         this.jdbcTemplate = jdbcTemplate;
