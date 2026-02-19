@@ -74,12 +74,18 @@ public class ExcelCodec implements FileCodec {
         if (!rows.hasNext()) return TableData.EMPTY;
 
         List<String> headers = new ArrayList<>();
-        rows.next().forEach(c -> headers.add(c.getStringCellValue()));
+        ArrayList<Integer> headerColumnIndices = new ArrayList<>();
+        rows.next().forEach(c -> {
+            String cellValue = c.getStringCellValue();
+            if (cellValue == null || cellValue.isBlank()) return;
+            headerColumnIndices.add(c.getColumnIndex());
+            headers.add(cellValue);
+        });
 
         List<List<String>> data = new ArrayList<>();
         rows.forEachRemaining(row -> {
             List<String> rowValues = new ArrayList<>();
-            for (int i = 0; i < headers.size(); i++) {
+            for (int i : headerColumnIndices) {
                 rowValues.add(Optional.ofNullable(row.getCell(i)).map(Cell::toString).orElse(null));
             }
             data.add(rowValues);

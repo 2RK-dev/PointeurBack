@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "prof.xlsx": {
+      "Feuil1": {
+        "entityType": "teacher",
+        "headersMapping": {
+          "id": "id",
+          "Nom et prenoms": "name",
+          "abr": "abbreviation"
+        }
+      }
+    }
+  }
+}

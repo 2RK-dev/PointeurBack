@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "level_room_teacher_teaching_unit_group.xlsx": {
+      "room": {
+        "entityType": "room",
+        "headersMapping": {
+          "id": "id",
+          "name": "name",
+          "abbreviation": "abbreviation",
+          "size": "size"
+        }
+      },
+      "level": {
+        "entityType": "level",
+        "headersMapping": {
+          "id": "id",
+          "name": "name",
+          "abbreviation": "abbreviation"
+        }
+      },
+      "teacher": {
+        "entityType": "teacher",
+        "headersMapping": {
+          "id": "id",
+          "name": "name",
+          "abbreviation": "abbreviation"
+        }
+      },
+      "group": {
+        "entityType": "group",
+        "headersMapping": {
+          "id": "id",
+          "name": "name",
+          "abbreviation": "abbreviation",
+          "size": "size",
+          "levelId": "levelId",
+          "type": "type",
+          "classe": "classe"
+        }
+      },
+      "teaching_unit": {
+        "entityType": "teaching_unit",
+        "headersMapping": {
+          "id": "id",
+          "name": "name",
+          "abbreviation": "abbreviation",
+          "levelId": "levelId"
+        }
+      }
+    }
+  }
+}

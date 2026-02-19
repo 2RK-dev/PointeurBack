@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -119,7 +120,7 @@ class ImportControllerTest {
         int teachingUnitCount = 10;
         int teacherCount = 6;
         mockMvc.perform(multipart("/import/upload")
-                        .file(getExcelMetadataFile())
+                        .file(getExcelMetadataFile("level_room_teacher_teaching_unit_group.xlsx"))
                         .file(excelFile))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.entitySummary.room").value(roomCount))
@@ -148,6 +149,31 @@ class ImportControllerTest {
                 .hasSize(teachingUnitCount)
                 .extracting("abbreviation")
                 .containsExactlyInAnyOrder("PROG", "BDD", "MATH", "TRES", "LANG", "MATH", "PROG", "BDD", "TRES", "LANG");
+    }
+
+    @Test
+    void shouldEvaluateFormulasInExcelAndSkipColumnWithBlankHeader() throws Exception {
+        MockMultipartFile excelFile = new MockMultipartFile(
+                "files",
+                "prof.xlsx",
+                FileCodec.Type.EXCEL.inputMediaType().toString(),
+                new ClassPathResource("prof.xlsx").getInputStream()
+        );
+        int teacherCount = 3;
+        mockMvc.perform(multipart("/import/upload")
+                        .file(getExcelMetadataFile("prof.xlsx"))
+                        .file(excelFile))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.entitySummary.teacher").value(teacherCount));
+
+        assertThat(teacherRepository.findAll())
+                .hasSize(teacherCount)
+                .extracting("name", "abbreviation", "id")
+                .contains(
+                        tuple("TSIRIHERIVONJY Flavien", "TSF", 1L),
+                        tuple("RAKOTO François", "RKF", 2L),
+                        tuple("BOTO Keky", "BTK", 3L)
+                );
     }
 
     @Test
@@ -503,61 +529,8 @@ class ImportControllerTest {
         );
     }
 
-    private static @NotNull MockMultipartFile getExcelMetadataFile() {
-        @Language("JSON") String metadata = """
-                {
-                  "metadata": {
-                    "level_room_teacher_teaching_unit_group.xlsx": {
-                      "room": {
-                        "entityType": "room",
-                        "headersMapping": {
-                          "id": "id",
-                          "name": "name",
-                          "abbreviation": "abbreviation",
-                          "size": "size"
-                        }
-                      },
-                      "level": {
-                        "entityType": "level",
-                        "headersMapping": {
-                          "id": "id",
-                          "name": "name",
-                          "abbreviation": "abbreviation"
-                        }
-                      },
-                      "teacher": {
-                        "entityType": "teacher",
-                        "headersMapping": {
-                          "id": "id",
-                          "name": "name",
-                          "abbreviation": "abbreviation"
-                        }
-                      },
-                      "group": {
-                        "entityType": "group",
-                        "headersMapping": {
-                          "id": "id",
-                          "name": "name",
-                          "abbreviation": "abbreviation",
-                          "size": "size",
-                          "levelId": "levelId",
-                          "type": "type",
-                          "classe": "classe"
-                        }
-                      },
-                      "teaching_unit": {
-                        "entityType": "teaching_unit",
-                        "headersMapping": {
-                          "id": "id",
-                          "name": "name",
-                          "abbreviation": "abbreviation",
-                          "levelId": "levelId"
-                        }
-                      }
-                    }
-                  }
-                }
-                """;
+    private static @NotNull MockMultipartFile getExcelMetadataFile(String excelFilename) throws IOException {
+        String metadata = new ClassPathResource("__%s.json".formatted(excelFilename)).getContentAsString(StandardCharsets.UTF_8);
 
         return new MockMultipartFile(
                 "metadata",
