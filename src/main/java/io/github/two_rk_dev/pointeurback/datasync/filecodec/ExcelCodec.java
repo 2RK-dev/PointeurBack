@@ -1,9 +1,7 @@
 package io.github.two_rk_dev.pointeurback.datasync.filecodec;
 
 import io.github.two_rk_dev.pointeurback.dto.datasync.TableData;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -55,12 +53,12 @@ public class ExcelCodec implements FileCodec {
      */
     @Override
     public List<@NotNull TableData> decode(InputStream inputStream) throws IOException {
-        XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-        List<TableData> tableDataList = new ArrayList<>();
-        for (Sheet sheet : workbook) {
-            tableDataList.add(parseSheet(sheet));
+        try (Workbook workbook = WorkbookFactory.create(inputStream)) {
+            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+            List<TableData> tableDataList = new ArrayList<>();
+            for (Sheet sheet : workbook) tableDataList.add(parseSheet(sheet, evaluator));
+            return tableDataList;
         }
-        return tableDataList;
     }
 
     @Override
@@ -68,15 +66,16 @@ public class ExcelCodec implements FileCodec {
         return Type.EXCEL;
     }
 
-    @Contract("_ -> new")
-    private @NotNull TableData parseSheet(@NotNull Sheet sheet) {
+    @Contract("_, _ -> new")
+    private @NotNull TableData parseSheet(@NotNull Sheet sheet, FormulaEvaluator evaluator) {
         Iterator<Row> rows = sheet.iterator();
         if (!rows.hasNext()) return TableData.EMPTY;
 
+        DataFormatter formatter = new DataFormatter();
         List<String> headers = new ArrayList<>();
-        ArrayList<Integer> headerColumnIndices = new ArrayList<>();
+        List<Integer> headerColumnIndices = new ArrayList<>();
         rows.next().forEach(c -> {
-            String cellValue = c.getStringCellValue();
+            String cellValue = formatter.formatCellValue(c, evaluator);
             if (cellValue == null || cellValue.isBlank()) return;
             headerColumnIndices.add(c.getColumnIndex());
             headers.add(cellValue);
@@ -86,7 +85,10 @@ public class ExcelCodec implements FileCodec {
         rows.forEachRemaining(row -> {
             List<String> rowValues = new ArrayList<>();
             for (int i : headerColumnIndices) {
-                rowValues.add(Optional.ofNullable(row.getCell(i)).map(Cell::toString).orElse(null));
+                rowValues.add(Optional.ofNullable(row.getCell(i))
+                        .map(c -> formatter.formatCellValue(c, evaluator))
+                        .orElse(null)
+                );
             }
             data.add(rowValues);
         });
