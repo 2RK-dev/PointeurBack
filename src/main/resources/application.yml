@@ -33,7 +33,11 @@ app:
     jwt:
       secret: ${SPRING_JWT_SECRET_KEY}
       expiration: ${SPRING_JWT_EXPIRATION}
-    refresh-session-expiration: ${SPRING_REFRESH_SESSION_EXPIRATION}
-    cookie-secure: ${SPRING_AUTH_COOKIE_SECURE:false}
+    session:
+      refresh-expiration: ${SPRING_REFRESH_SESSION_EXPIRATION}
+      cookie-secure: ${SPRING_AUTH_COOKIE_SECURE:false}
     bootstrap-superadmin:
       username: ${SPRING_BOOTSTRAP_SUPERADMIN_USERNAME}
+    api-key:
+      header: X-Api-Key
+      key-prefix: edt_

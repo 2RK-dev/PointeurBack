@@ -1,8 +1,10 @@
 package io.github.two_rk_dev.pointeurback.config;
 
-import io.github.two_rk_dev.pointeurback.security.AppAuthenticationFilter;
+import io.github.two_rk_dev.pointeurback.security.ApiKeyAuthenticationFilter;
+import io.github.two_rk_dev.pointeurback.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,11 +32,32 @@ class SecurityConfiguration {
     }
 
     @Bean
+    @Order(1)
+    public SecurityFilterChain partnerApiSecurityFilterChain(HttpSecurity http,
+                                                             ApiKeyAuthenticationFilter apiKeyAuthenticationFilter) throws Exception {
+        http.securityMatcher("/integration/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .anonymous(AbstractHttpConfigurer::disable)
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/integration/**").authenticated()
+                        .anyRequest().denyAll()
+                )
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   AppAuthenticationFilter appAuthenticationFilter,
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter,
                                                    CorsProperties corsProperties) throws Exception {
-        http
-                .securityMatcher("/api/v1/**")
+        http.securityMatcher("/api/v1/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
@@ -72,7 +95,7 @@ class SecurityConfiguration {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
-                .addFilterBefore(appAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
