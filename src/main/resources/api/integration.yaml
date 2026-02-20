@@ -383,13 +383,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
 
-  /schedule/{scheduleId}:
+  /schedule/{scheduleItemId}:
     get:
       operationId: integration_getScheduleItem
       tags: [Schedule]
       summary: Get a schedule item
       parameters:
-        - $ref: '#/components/parameters/scheduleId'
+        - $ref: '#/components/parameters/scheduleItemId'
       responses:
         '200':
           description: Schedule item details
@@ -460,8 +460,8 @@ components:
       schema:
         type: integer
         format: int64
-    scheduleId:
-      name: scheduleId
+    scheduleItemId:
+      name: scheduleItemId
       in: path
       required: true
       description: Schedule item identifier
