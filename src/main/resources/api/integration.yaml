@@ -1,0 +1,603 @@
+openapi: 3.1.0
+info:
+  title: Pointeur Backend – Integration API
+  description: |
+    Read-only REST API for external integrations with the Pointeur scheduling
+    application.  This surface is served under `/integration` and requires an
+    API key passed via the `X-Api-Key` header.
+
+    **Constraints:**
+    - Only `GET` requests are accepted; all other HTTP methods are denied.
+    - Endpoints related to users and API key management are not available.
+  version: 2.0.0
+  contact:
+    name: 2RK-dev
+
+servers:
+  - url: http://localhost:8080/integration
+    description: Local development server
+
+security:
+  - apiKeyAuth: []
+
+tags:
+  - name: Levels
+    description: Academic levels
+  - name: Groups
+    description: Student groups within levels
+  - name: Teachers
+    description: Teacher registry
+  - name: Teaching Units
+    description: Teaching unit (subject) registry
+  - name: Rooms
+    description: Room registry
+  - name: Schedule
+    description: Schedule queries
+
+# ---------------------------------------------------------------------------
+# Paths — read-only subset
+# ---------------------------------------------------------------------------
+paths:
+
+  # ── Levels ────────────────────────────────────────────────────────────────
+  /levels:
+    get:
+      operationId: integration_listLevels
+      tags: [Levels]
+      summary: List all levels with their groups
+      responses:
+        '200':
+          description: List of levels with nested groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LevelDetailsDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /levels/{levelId}:
+    get:
+      operationId: integration_getLevel
+      tags: [Levels]
+      summary: Get a level with its groups
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+      responses:
+        '200':
+          description: Level details with groups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LevelDetailsDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Level not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  # ── Groups ────────────────────────────────────────────────────────────────
+  /levels/{levelId}/groups:
+    get:
+      operationId: integration_listGroupsByLevel
+      tags: [Groups]
+      summary: List groups in a level
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+      responses:
+        '200':
+          description: List of groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Level not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /levels/{levelId}/groups/{groupId}:
+    get:
+      operationId: integration_getGroup
+      tags: [Groups]
+      summary: Get a group
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+        - $ref: '#/components/parameters/groupId'
+      responses:
+        '200':
+          description: Group details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Group or level not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  # ── Teachers ──────────────────────────────────────────────────────────────
+  /teachers:
+    get:
+      operationId: integration_listTeachers
+      tags: [Teachers]
+      summary: List all teachers
+      responses:
+        '200':
+          description: List of teachers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeacherDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /teachers/{teacherId}:
+    get:
+      operationId: integration_getTeacher
+      tags: [Teachers]
+      summary: Get a teacher
+      parameters:
+        - $ref: '#/components/parameters/teacherId'
+      responses:
+        '200':
+          description: Teacher details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeacherDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Teacher not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  # ── Teaching Units ────────────────────────────────────────────────────────
+  /teachingUnits:
+    get:
+      operationId: integration_listTeachingUnits
+      tags: [Teaching Units]
+      summary: List all teaching units
+      responses:
+        '200':
+          description: List of teaching units
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeachingUnitDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /teachingUnits/{unitId}:
+    get:
+      operationId: integration_getTeachingUnit
+      tags: [Teaching Units]
+      summary: Get a teaching unit
+      parameters:
+        - $ref: '#/components/parameters/unitId'
+      responses:
+        '200':
+          description: Teaching unit details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeachingUnitDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Teaching unit not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /levels/{levelId}/teachingUnits:
+    get:
+      operationId: integration_listTeachingUnitsByLevel
+      tags: [Teaching Units]
+      summary: List teaching units for a level
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+      responses:
+        '200':
+          description: Teaching units taught in the level
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeachingUnitDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Level not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  # ── Rooms ─────────────────────────────────────────────────────────────────
+  /rooms:
+    get:
+      operationId: integration_listRooms
+      tags: [Rooms]
+      summary: List all rooms
+      responses:
+        '200':
+          description: List of rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoomDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rooms/{roomId}:
+    get:
+      operationId: integration_getRoom
+      tags: [Rooms]
+      summary: Get a room
+      parameters:
+        - $ref: '#/components/parameters/roomId'
+      responses:
+        '200':
+          description: Room details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /rooms/available:
+    get:
+      operationId: integration_listAvailableRooms
+      tags: [Rooms]
+      summary: List available rooms in a time range
+      description: Returns rooms that are unoccupied between the given start and end times.
+      parameters:
+        - name: startTime
+          in: query
+          required: true
+          description: Start date-time (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: endTime
+          in: query
+          required: true
+          description: End date-time (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: size
+          in: query
+          required: false
+          description: Minimum room capacity (defaults to 1)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+      responses:
+        '200':
+          description: Available rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoomDTO'
+        '400':
+          description: Invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ── Schedule ──────────────────────────────────────────────────────────────
+  /schedule:
+    get:
+      operationId: integration_getSchedule
+      tags: [Schedule]
+      summary: Query the schedule
+      description: |
+        Returns schedule items in the given date range.  Optionally filter by
+        level and/or group.
+      parameters:
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: levelId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: groupId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Matching schedule items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleItemDTO'
+        '400':
+          description: Invalid date range or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Group not found in the specified level
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /schedule/{scheduleId}:
+    get:
+      operationId: integration_getScheduleItem
+      tags: [Schedule]
+      summary: Get a schedule item
+      parameters:
+        - $ref: '#/components/parameters/scheduleId'
+      responses:
+        '200':
+          description: Schedule item details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleItemDTO'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Schedule item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+# ---------------------------------------------------------------------------
+# Components
+# ---------------------------------------------------------------------------
+components:
+
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: API key issued through the frontend API's API Keys management
+
+  # ── Reusable parameters ──────────────────────────────────────────────────
+  parameters:
+    levelId:
+      name: levelId
+      in: path
+      required: true
+      description: Level identifier
+      schema:
+        type: integer
+        format: int64
+    groupId:
+      name: groupId
+      in: path
+      required: true
+      description: Group identifier
+      schema:
+        type: integer
+        format: int64
+    teacherId:
+      name: teacherId
+      in: path
+      required: true
+      description: Teacher identifier
+      schema:
+        type: integer
+        format: int64
+    unitId:
+      name: unitId
+      in: path
+      required: true
+      description: Teaching unit identifier
+      schema:
+        type: integer
+        format: int64
+    roomId:
+      name: roomId
+      in: path
+      required: true
+      description: Room identifier
+      schema:
+        type: integer
+        format: int64
+    scheduleId:
+      name: scheduleId
+      in: path
+      required: true
+      description: Schedule item identifier
+      schema:
+        type: integer
+        format: int64
+
+  # ── Reusable responses ───────────────────────────────────────────────────
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetails'
+
+  # ── Schemas (read-only subset) ───────────────────────────────────────────
+  schemas:
+
+    LevelDTO:
+      type: object
+      required: [id, name, abbreviation]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        abbreviation:
+          type: string
+
+    LevelDetailsDTO:
+      type: object
+      required: [level, groups]
+      properties:
+        level:
+          $ref: '#/components/schemas/LevelDTO'
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupDTO'
+
+    GroupDTO:
+      type: object
+      required: [id, name, type, classe, size, level]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        type:
+          type: string
+        classe:
+          type: string
+        size:
+          type: integer
+        level:
+          $ref: '#/components/schemas/LevelDTO'
+
+    TeacherDTO:
+      type: object
+      required: [id, name, abbreviation]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        abbreviation:
+          type: string
+
+    TeachingUnitDTO:
+      type: object
+      required: [id, abbreviation, name]
+      properties:
+        id:
+          type: integer
+          format: int64
+        abbreviation:
+          type: string
+        name:
+          type: string
+        level:
+          $ref: '#/components/schemas/LevelDTO'
+          description: Associated level (may be null)
+
+    RoomDTO:
+      type: object
+      required: [id, name, abbreviation, size]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        abbreviation:
+          type: string
+        size:
+          type: integer
+
+    ScheduleItemDTO:
+      type: object
+      required: [id, groups, teacher, teachingUnit, room, startTime, endTime]
+      properties:
+        id:
+          type: integer
+          format: int64
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupDTO'
+        teacher:
+          $ref: '#/components/schemas/TeacherDTO'
+        teachingUnit:
+          $ref: '#/components/schemas/TeachingUnitDTO'
+        room:
+          $ref: '#/components/schemas/RoomDTO'
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+
+    ErrorDetails:
+      type: object
+      required: [timestamp, message, errorCode]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        details:
+          type: string
+        errorCode:
+          type: string
+          description: Machine-readable error code
