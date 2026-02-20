@@ -200,7 +200,7 @@ class UserManagerControllerTest extends AbstractRandomPortSpringBootTest {
         void withIncorrectRole_returns403() {
             User admin = createNewAdmin("an-admin", "random");
             String accessToken = Objects.requireNonNull(login("an-admin", "random").getBody()).accessToken();
-            ResponseEntity<List<UserDTO>> response = testRestTemplate.exchange(
+            ResponseEntity<Object> response = testRestTemplate.exchange(
                     url("/users"),
                     HttpMethod.GET,
                     createHttpEntity(null, accessToken),

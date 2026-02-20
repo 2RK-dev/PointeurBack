@@ -70,7 +70,7 @@ class ImportControllerTest {
         int teacherCount = 6;
         int groupCount = 4;
         int teachingUnitCount = 10;
-        mockMvc.perform(multipart("/import/upload")
+        mockMvc.perform(multipart("/api/v1/import/upload")
                         .file(getCsvMetadataFile())
                         .file(getCsvMultipartFile("room.csv"))
                         .file(getCsvMultipartFile("level.csv"))
@@ -119,7 +119,7 @@ class ImportControllerTest {
         int groupCount = 4;
         int teachingUnitCount = 10;
         int teacherCount = 6;
-        mockMvc.perform(multipart("/import/upload")
+        mockMvc.perform(multipart("/api/v1/import/upload")
                         .file(getExcelMetadataFile("level_room_teacher_teaching_unit_group.xlsx"))
                         .file(excelFile))
                 .andExpect(status().isOk())
@@ -160,7 +160,7 @@ class ImportControllerTest {
                 new ClassPathResource("prof.xlsx").getInputStream()
         );
         int teacherCount = 3;
-        mockMvc.perform(multipart("/import/upload")
+        mockMvc.perform(multipart("/api/v1/import/upload")
                         .file(getExcelMetadataFile("prof.xlsx"))
                         .file(excelFile))
                 .andExpect(status().isOk())
@@ -189,7 +189,7 @@ class ImportControllerTest {
                 "application/json",
                 new ClassPathResource("level_room_teacher_teaching_unit_group.json").getInputStream()
         );
-        mockMvc.perform(multipart("/import/upload")
+        mockMvc.perform(multipart("/api/v1/import/upload")
                         .file(getJSONMetadataFile())
                         .file(jsonFile))
                 .andExpect(status().isOk())
@@ -226,11 +226,11 @@ class ImportControllerTest {
         int roomCount = 3;
         MockMultipartFile roomCsvFile = getCsvMultipartFile("room.csv");
         MockMultipartFile anotherRoomCsvFile = getCsvMultipartFile("room_2.csv");
-        mockMvc.perform(multipart("/import/upload")
+        mockMvc.perform(multipart("/api/v1/import/upload")
                         .file(getRoomCsvMetadataFile())
                         .file(roomCsvFile))
                 .andExpect(status().isOk());
-        mockMvc.perform(multipart("/import/upload")
+        mockMvc.perform(multipart("/api/v1/import/upload")
                         .file(getRoom2CsvMetadataFile())
                         .file(anotherRoomCsvFile))
                 .andExpect(status().isOk())
@@ -247,11 +247,11 @@ class ImportControllerTest {
         int roomCount = 3;
         MockMultipartFile roomCsvFile = getCsvMultipartFile("room.csv");
         MockMultipartFile anotherRoomCsvFile = getCsvMultipartFile("room_2.csv");
-        mockMvc.perform(multipart("/import/upload")
+        mockMvc.perform(multipart("/api/v1/import/upload")
                         .file(getRoomCsvMetadataFile())
                         .file(roomCsvFile))
                 .andExpect(status().isOk());
-        mockMvc.perform(multipart("/import/upload?ignoreConflicts=false")
+        mockMvc.perform(multipart("/api/v1/import/upload?ignoreConflicts=false")
                         .file(getRoom2CsvMetadataFile())
                         .file(anotherRoomCsvFile))
                 .andExpect(status().isOk())
@@ -266,7 +266,7 @@ class ImportControllerTest {
     @Test
     void shouldSkipNonMappedFiles() throws Exception {
         MockMultipartFile roomCsvFile = getCsvMultipartFile("room.csv");
-        mockMvc.perform(multipart("/import/upload")
+        mockMvc.perform(multipart("/api/v1/import/upload")
                         .file(getRoom2CsvMetadataFile()) // room_2.csv metadata
                         .file(roomCsvFile))
                 .andExpect(status().isOk())
@@ -282,7 +282,7 @@ class ImportControllerTest {
                 "application/json",
                 new ClassPathResource("level_room_teacher_teaching_unit_group.json").getInputStream()
         );
-        mockMvc.perform(multipart("/import/upload")
+        mockMvc.perform(multipart("/api/v1/import/upload")
                         .file(getRoomOnlyJSONMetadataFile())
                         .file(jsonFile))
                 .andExpect(status().isOk())
@@ -293,7 +293,7 @@ class ImportControllerTest {
     void shouldParseCorrectlyWithDifferentHeaders() throws Exception {
         int roomCount = 2;
         MockMultipartFile room3CsvFile = getCsvMultipartFile("room_3.csv");
-        mockMvc.perform(multipart("/import/upload")
+        mockMvc.perform(multipart("/api/v1/import/upload")
                         .file(getRoom3CsvMetadataFile())
                         .file(room3CsvFile))
                 .andExpect(status().isOk())
@@ -309,7 +309,7 @@ class ImportControllerTest {
     void shouldSaveGroupTypeAndClasse() throws Exception {
         int groupCount = 4;
         MockMultipartFile groupCsvFile = getCsvMultipartFile("group_with_type_and_classe.csv");
-        mockMvc.perform(multipart("/import/upload")
+        mockMvc.perform(multipart("/api/v1/import/upload")
                         .file(getGroupWithTypeAndClasseCsvMetadataFile())
                         .file(getCsvMultipartFile("level.csv"))
                         .file(groupCsvFile))

@@ -64,7 +64,7 @@ class ScheduleControllerTest {
                   }
                 ]
                 """;
-        mockMvc.perform(post("/schedule/batch")
+        mockMvc.perform(post("/api/v1/schedule/batch")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -94,7 +94,7 @@ class ScheduleControllerTest {
                   }
                 ]
                 """;
-        mockMvc.perform(post("/schedule/batch")
+        mockMvc.perform(post("/api/v1/schedule/batch")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -124,7 +124,7 @@ class ScheduleControllerTest {
                   }
                 ]
                 """;
-        mockMvc.perform(post("/schedule/batch")
+        mockMvc.perform(post("/api/v1/schedule/batch")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -134,7 +134,7 @@ class ScheduleControllerTest {
 
     @Test
     void addScheduleItem_withNullBody_shouldReturn400() throws Exception {
-        mockMvc.perform(post("/schedule")
+        mockMvc.perform(post("/api/v1/schedule")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("null"))
                 .andExpect(status().isBadRequest());
@@ -142,7 +142,7 @@ class ScheduleControllerTest {
 
     @Test
     void addScheduleItem_withEmptyBody_shouldReturn400() throws Exception {
-        mockMvc.perform(post("/schedule")
+        mockMvc.perform(post("/api/v1/schedule")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(""))
                 .andExpect(status().isBadRequest());
@@ -150,7 +150,7 @@ class ScheduleControllerTest {
 
     @Test
     void updateSchedule_withNullBody_shouldReturn400() throws Exception {
-        mockMvc.perform(put("/schedule/1")
+        mockMvc.perform(put("/api/v1/schedule/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("null"))
                 .andExpect(status().isBadRequest());
@@ -158,7 +158,7 @@ class ScheduleControllerTest {
 
     @Test
     void updateSchedule_withEmptyBody_shouldReturn400() throws Exception {
-        mockMvc.perform(put("/schedule/1")
+        mockMvc.perform(put("/api/v1/schedule/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(""))
                 .andExpect(status().isBadRequest());

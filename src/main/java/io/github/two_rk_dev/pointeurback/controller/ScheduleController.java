@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/schedule")
+@RequestMapping({"/api/v1/schedule", "/integration/schedule"})
 @RequiredArgsConstructor
 public class ScheduleController {
 
@@ -40,7 +40,7 @@ public class ScheduleController {
     public ResponseEntity<ScheduleItemDTO> addScheduleItem(@Valid @RequestBody CreateScheduleItemDTO dto) {
         ScheduleItemDTO createdSchedule = scheduleService.addScheduleItem(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/schedule/{schedule_item_id}")
+                .path("/api/v1/schedule/{schedule_item_id}")
                 .buildAndExpand(createdSchedule.id())
                 .toUri();
         return ResponseEntity.created(location).body(createdSchedule);

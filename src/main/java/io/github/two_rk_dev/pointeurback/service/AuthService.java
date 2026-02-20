@@ -71,10 +71,10 @@ public class AuthService {
 
     private RefreshTokenDTO rotateRefreshToken(@NotNull RefreshToken refreshToken) {
         refreshToken.setToken(UUID.randomUUID().toString());
-        Duration maxAge = Duration.ofDays(authProperties.refreshSessionExpiration());
+        Duration maxAge = Duration.ofDays(authProperties.session().refreshExpiration());
         refreshToken.setExpiresAt(OffsetDateTime.now().plus(maxAge));
         refreshTokenRepository.save(refreshToken);
-        return refreshTokenMapper.toDto(refreshToken, maxAge, authProperties.cookieSecure());
+        return refreshTokenMapper.toDto(refreshToken, maxAge, authProperties.session().cookieSecure());
     }
 
     private @NotNull RefreshToken createNewRefreshToken(@NotNull User user) {

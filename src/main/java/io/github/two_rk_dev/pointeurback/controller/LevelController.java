@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/levels")
+@RequestMapping({"/api/v1/levels", "/integration/levels"})
 @RequiredArgsConstructor
 public class LevelController {
 

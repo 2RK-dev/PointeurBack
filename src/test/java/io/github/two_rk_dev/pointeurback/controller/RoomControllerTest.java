@@ -31,7 +31,7 @@ class RoomControllerTest {
 
     @Test
     void createRoom_withNullBody_shouldReturn400() throws Exception {
-        mockMvc.perform(post("/rooms")
+        mockMvc.perform(post("/api/v1/rooms")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("null"))
                 .andExpect(status().isBadRequest());
@@ -39,7 +39,7 @@ class RoomControllerTest {
 
     @Test
     void createRoom_withEmptyBody_shouldReturn400() throws Exception {
-        mockMvc.perform(post("/rooms")
+        mockMvc.perform(post("/api/v1/rooms")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(""))
                 .andExpect(status().isBadRequest());
@@ -47,7 +47,7 @@ class RoomControllerTest {
 
     @Test
     void updateRoom_withNullBody_shouldReturn400() throws Exception {
-        mockMvc.perform(put("/rooms/1")
+        mockMvc.perform(put("/api/v1/rooms/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("null"))
                 .andExpect(status().isBadRequest());
@@ -55,7 +55,7 @@ class RoomControllerTest {
 
     @Test
     void updateRoom_withEmptyBody_shouldReturn400() throws Exception {
-        mockMvc.perform(put("/rooms/1")
+        mockMvc.perform(put("/api/v1/rooms/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(""))
                 .andExpect(status().isBadRequest());
@@ -65,7 +65,7 @@ class RoomControllerTest {
     void getAvailableRooms_withNegativeSize_shouldReturn400() throws Exception {
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusDays(1);
-        mockMvc.perform(get("/rooms/available?size=-1&startTime=%s&endTime=%s".formatted(startTime.toString(), endTime.toString())))
+        mockMvc.perform(get("/api/v1/rooms/available?size=-1&startTime=%s&endTime=%s".formatted(startTime.toString(), endTime.toString())))
                 .andExpect(status().isBadRequest());
     }
 
@@ -73,7 +73,7 @@ class RoomControllerTest {
     class ValidationTests {
         @Test
         void createRoom_withoutName_shouldReturn400() throws Exception {
-            mockMvc.perform(post("/rooms")
+            mockMvc.perform(post("/api/v1/rooms")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"abbreviation\": \"S106\", \"size\": 50}"))
                     .andExpect(status().isBadRequest());
