@@ -160,7 +160,7 @@ class ImportControllerTest {
                 new ClassPathResource("prof.xlsx").getInputStream()
         );
         int teacherCount = 3;
-        mockMvc.perform(multipart("/import/upload")
+        mockMvc.perform(multipart("/api/v1/import/upload")
                         .file(getExcelMetadataFile("prof.xlsx"))
                         .file(excelFile))
                 .andExpect(status().isOk())
