@@ -1,0 +1,100 @@
+name: Publish API Docs (GitHub Pages)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/main/resources/api/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Redocly CLI
+        run: npm i -g @redocly/cli
+
+      # Bundle to eliminate cross-file $ref issues on GitHub Pages
+      - name: Bundle specs
+        run: |
+          mkdir -p dist/specs
+          redocly bundle src/main/resources/api/rest.yaml --output dist/specs/rest.bundle.yaml
+          redocly bundle src/main/resources/api/integration.yaml --output dist/specs/integration.bundle.yaml
+
+      # Build static HTML docs for both specs
+      - name: Build ReDoc HTML
+        run: |
+          mkdir -p dist
+          redocly build-docs dist/specs/rest.bundle.yaml --output dist/rest.html
+          redocly build-docs dist/specs/integration.bundle.yaml --output dist/integration.html
+
+      # Simple landing page listing both docs
+      - name: Create index.html
+        run: |
+          cat > dist/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>API Documentation</title>
+            <style>
+              body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; max-width: 820px; margin: 40px auto; padding: 0 16px; line-height: 1.5; }
+              h1 { margin-bottom: 8px; }
+              ul { padding-left: 18px; }
+              code { background: #f3f3f3; padding: 2px 6px; border-radius: 6px; }
+              .hint { color: #444; }
+            </style>
+          </head>
+          <body>
+            <h1>API Documentation</h1>
+            <p class="hint">Pick a spec:</p>
+            <ul>
+              <li><a href="./rest.html">Frontend API (rest.yaml)</a></li>
+              <li><a href="./integration.html">Integration API (integration.yaml)</a></li>
+            </ul>
+            <p class="hint">Bundled specs are also published under <code>specs/</code>.</p>
+            <ul>
+              <li><a href="./specs/rest.bundle.yaml">rest.bundle.yaml</a></li>
+              <li><a href="./specs/integration.bundle.yaml">integration.bundle.yaml</a></li>
+            </ul>
+          </body>
+          </html>
+          HTML
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
