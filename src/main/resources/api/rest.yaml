@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: Pointeur Backend - Frontend API
+  title: Pointeur Backend – Frontend API
   description: |
     REST API for the Pointeur scheduling application.
     This specification covers the **frontend-facing** surface.
@@ -293,7 +293,7 @@ paths:
       summary: Create a new API key
       description: |
         The raw token is returned **only once** in this response.  Store it
-        securely - it cannot be retrieved again.
+        securely — it cannot be retrieved again.
       requestBody:
         required: true
         content:
@@ -1562,7 +1562,7 @@ components:
           type: object
           additionalProperties:
             type: string
-          description: Source column name to entity property name
+          description: Source column name → entity property name
 
     ImportSummary:
       type: object
