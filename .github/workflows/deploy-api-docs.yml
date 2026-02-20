@@ -2,10 +2,14 @@ name: Publish API Docs (GitHub Pages)
 
 on:
   push:
-    branches: [ main ]
-    paths:
-      - 'src/main/resources/api/**'
+    tags:
+      - "v*"
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to deploy (must start with v, e.g. v1.0.0)"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -19,9 +23,24 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Use the pushed tag ref, or the manually provided tag ref
+    env:
+      REF: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.ref }}
+
     steps:
-      - name: Checkout
+      - name: Validate ref is a v* tag
+        run: |
+          echo "Ref: $REF"
+          if [[ "$REF" != refs/tags/v* ]]; then
+            echo "Ref must be a tag starting with 'v' (example: v1.0.0)."
+            exit 1
+          fi
+
+      - name: Checkout tag
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.REF }}
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
