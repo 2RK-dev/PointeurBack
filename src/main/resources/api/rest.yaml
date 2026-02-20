@@ -1,9 +1,9 @@
 openapi: 3.1.0
 info:
-  title: Pointeur Backend – Frontend API
+  title: Pointeur Backend - Frontend API
   description: |
     REST API for the Pointeur scheduling application.
-    This specification covers the **frontend-facing** surface served under `/api/v1`.
+    This specification covers the **frontend-facing** surface.
     All endpoints require JWT Bearer authentication unless stated otherwise.
   version: 2.0.0
   contact:
@@ -12,6 +12,9 @@ info:
 servers:
   - url: http://localhost:8080/api/v1
     description: Local development server
+
+security:
+  - bearerAuth: []
 
 tags:
   - name: Authentication
@@ -42,7 +45,7 @@ tags:
 # ---------------------------------------------------------------------------
 paths:
 
-  # ── Authentication ────────────────────────────────────────────────────────
+  # -- Authentication -------------------------------------------------------
   /auth/login:
     post:
       operationId: login
@@ -75,15 +78,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
 
   /auth/me:
     get:
       operationId: getCurrentUser
       tags: [Authentication]
       summary: Get the current authenticated user
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: Current user information
@@ -92,7 +93,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserInfoDTO'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: 'shared.yaml#/components/responses/Unauthorized'
 
   /auth/refresh:
     post:
@@ -125,7 +126,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LoginResponseDTO'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: 'shared.yaml#/components/responses/Unauthorized'
 
   /auth/logout:
     post:
@@ -152,8 +153,6 @@ paths:
       operationId: changePassword
       tags: [Authentication]
       summary: Change the current user's password
-      security:
-        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -172,19 +171,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: 'shared.yaml#/components/responses/Unauthorized'
 
-  # ── Users ─────────────────────────────────────────────────────────────────
+  # -- Users ----------------------------------------------------------------
   /users:
     get:
       operationId: listUsers
       tags: [Users]
       summary: List all users
       description: Returns all users except the SuperAdmin account. Requires SuperAdmin role.
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: List of users
@@ -195,7 +192,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/UserDTO'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: 'shared.yaml#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
     post:
@@ -203,8 +200,6 @@ paths:
       tags: [Users]
       summary: Create a new admin user
       description: Creates a new user with a randomly generated password. Requires SuperAdmin role.
-      security:
-        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -225,7 +220,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ValidationErrorDetails'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: 'shared.yaml#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
 
@@ -234,8 +229,6 @@ paths:
       operationId: getUser
       tags: [Users]
       summary: Get a user by ID
-      security:
-        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/userId'
       responses:
@@ -246,7 +239,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserDTO'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: 'shared.yaml#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
@@ -254,20 +247,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     delete:
       operationId: deleteUser
       tags: [Users]
       summary: Delete a user
-      security:
-        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/userId'
       responses:
         '204':
           description: User deleted
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: 'shared.yaml#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
@@ -275,16 +266,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
 
-  # ── API Keys ──────────────────────────────────────────────────────────────
+  # -- API Keys -------------------------------------------------------------
   /api-keys:
     get:
       operationId: listApiKeys
       tags: [API Keys]
       summary: List all API keys
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: List of API keys (tokens are masked)
@@ -295,7 +284,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ApiKeyResponse'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: 'shared.yaml#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
     post:
@@ -304,9 +293,7 @@ paths:
       summary: Create a new API key
       description: |
         The raw token is returned **only once** in this response.  Store it
-        securely — it cannot be retrieved again.
-      security:
-        - bearerAuth: []
+        securely - it cannot be retrieved again.
       requestBody:
         required: true
         content:
@@ -327,7 +314,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ValidationErrorDetails'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: 'shared.yaml#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
 
@@ -336,26 +323,22 @@ paths:
       operationId: deleteApiKey
       tags: [API Keys]
       summary: Revoke an API key
-      security:
-        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/apiKeyId'
       responses:
         '204':
           description: API key revoked
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: 'shared.yaml#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
 
-  # ── Levels ────────────────────────────────────────────────────────────────
+  # -- Levels ---------------------------------------------------------------
   /levels:
     get:
       operationId: listLevels
       tags: [Levels]
       summary: List all levels with their groups
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: List of levels with nested groups
@@ -364,13 +347,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/LevelDetailsDTO'
+                  $ref: 'shared.yaml#/components/schemas/LevelDetailsDTO'
     post:
       operationId: createLevel
       tags: [Levels]
       summary: Create a new level
-      security:
-        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -383,7 +364,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LevelDTO'
+                $ref: 'shared.yaml#/components/schemas/LevelDTO'
         '400':
           description: Validation error
           content:
@@ -395,38 +376,34 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
 
   /levels/{levelId}:
     get:
       operationId: getLevel
       tags: [Levels]
       summary: Get a level with its groups
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/levelId'
+        - $ref: 'shared.yaml#/components/parameters/levelId'
       responses:
         '200':
           description: Level details with groups
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LevelDetailsDTO'
+                $ref: 'shared.yaml#/components/schemas/LevelDetailsDTO'
         '404':
           description: Level not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     put:
       operationId: updateLevel
       tags: [Levels]
       summary: Update a level
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/levelId'
+        - $ref: 'shared.yaml#/components/parameters/levelId'
       requestBody:
         required: true
         content:
@@ -439,7 +416,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LevelDTO'
+                $ref: 'shared.yaml#/components/schemas/LevelDTO'
         '400':
           description: Validation error
           content:
@@ -451,35 +428,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
         '409':
           description: Level name already taken
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     delete:
       operationId: deleteLevel
       tags: [Levels]
       summary: Delete a level
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/levelId'
+        - $ref: 'shared.yaml#/components/parameters/levelId'
       responses:
         '204':
           description: Level deleted
 
-  # ── Groups (under a Level) ───────────────────────────────────────────────
+  # -- Groups (under a Level) ----------------------------------------------
   /levels/{levelId}/groups:
     get:
       operationId: listGroupsByLevel
       tags: [Groups]
       summary: List groups in a level
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/levelId'
+        - $ref: 'shared.yaml#/components/parameters/levelId'
       responses:
         '200':
           description: List of groups
@@ -488,21 +461,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GroupDTO'
+                  $ref: 'shared.yaml#/components/schemas/GroupDTO'
         '404':
           description: Level not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     post:
       operationId: createGroup
       tags: [Groups]
       summary: Create a group in a level
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/levelId'
+        - $ref: 'shared.yaml#/components/parameters/levelId'
       requestBody:
         required: true
         content:
@@ -515,7 +486,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupDTO'
+                $ref: 'shared.yaml#/components/schemas/GroupDTO'
         '400':
           description: Validation error
           content:
@@ -527,40 +498,36 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
 
   /levels/{levelId}/groups/{groupId}:
     get:
       operationId: getGroup
       tags: [Groups]
       summary: Get a group
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/levelId'
-        - $ref: '#/components/parameters/groupId'
+        - $ref: 'shared.yaml#/components/parameters/levelId'
+        - $ref: 'shared.yaml#/components/parameters/groupId'
       responses:
         '200':
           description: Group details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupDTO'
+                $ref: 'shared.yaml#/components/schemas/GroupDTO'
         '404':
           description: Group or level not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     put:
       operationId: updateGroup
       tags: [Groups]
       summary: Update a group
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/levelId'
-        - $ref: '#/components/parameters/groupId'
+        - $ref: 'shared.yaml#/components/parameters/levelId'
+        - $ref: 'shared.yaml#/components/parameters/groupId'
       requestBody:
         required: true
         content:
@@ -573,7 +540,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupDTO'
+                $ref: 'shared.yaml#/components/schemas/GroupDTO'
         '400':
           description: Validation error
           content:
@@ -585,28 +552,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     delete:
       operationId: deleteGroup
       tags: [Groups]
       summary: Delete a group
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/levelId'
-        - $ref: '#/components/parameters/groupId'
+        - $ref: 'shared.yaml#/components/parameters/levelId'
+        - $ref: 'shared.yaml#/components/parameters/groupId'
       responses:
         '204':
           description: Group deleted
 
-  # ── Teachers ──────────────────────────────────────────────────────────────
+  # -- Teachers -------------------------------------------------------------
   /teachers:
     get:
       operationId: listTeachers
       tags: [Teachers]
       summary: List all teachers
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: List of teachers
@@ -615,13 +578,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TeacherDTO'
+                  $ref: 'shared.yaml#/components/schemas/TeacherDTO'
     post:
       operationId: createTeacher
       tags: [Teachers]
       summary: Register a new teacher
-      security:
-        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -634,7 +595,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeacherDTO'
+                $ref: 'shared.yaml#/components/schemas/TeacherDTO'
         '400':
           description: Validation error
           content:
@@ -646,38 +607,34 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
 
   /teachers/{teacherId}:
     get:
       operationId: getTeacher
       tags: [Teachers]
       summary: Get a teacher
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/teacherId'
+        - $ref: 'shared.yaml#/components/parameters/teacherId'
       responses:
         '200':
           description: Teacher details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeacherDTO'
+                $ref: 'shared.yaml#/components/schemas/TeacherDTO'
         '404':
           description: Teacher not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     put:
       operationId: updateTeacher
       tags: [Teachers]
       summary: Update a teacher
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/teacherId'
+        - $ref: 'shared.yaml#/components/parameters/teacherId'
       requestBody:
         required: true
         content:
@@ -690,7 +647,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeacherDTO'
+                $ref: 'shared.yaml#/components/schemas/TeacherDTO'
         '400':
           description: Validation error
           content:
@@ -702,33 +659,29 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
         '409':
           description: Abbreviation already taken
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     delete:
       operationId: deleteTeacher
       tags: [Teachers]
       summary: Delete a teacher
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/teacherId'
+        - $ref: 'shared.yaml#/components/parameters/teacherId'
       responses:
         '204':
           description: Teacher deleted
 
-  # ── Teaching Units ────────────────────────────────────────────────────────
+  # -- Teaching Units -------------------------------------------------------
   /teachingUnits:
     get:
       operationId: listTeachingUnits
       tags: [Teaching Units]
       summary: List all teaching units
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: List of teaching units
@@ -737,13 +690,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TeachingUnitDTO'
+                  $ref: 'shared.yaml#/components/schemas/TeachingUnitDTO'
     post:
       operationId: createTeachingUnit
       tags: [Teaching Units]
       summary: Create a teaching unit
-      security:
-        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -756,7 +707,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeachingUnitDTO'
+                $ref: 'shared.yaml#/components/schemas/TeachingUnitDTO'
         '400':
           description: Validation error
           content:
@@ -768,38 +719,34 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
 
   /teachingUnits/{unitId}:
     get:
       operationId: getTeachingUnit
       tags: [Teaching Units]
       summary: Get a teaching unit
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/unitId'
+        - $ref: 'shared.yaml#/components/parameters/unitId'
       responses:
         '200':
           description: Teaching unit details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeachingUnitDTO'
+                $ref: 'shared.yaml#/components/schemas/TeachingUnitDTO'
         '404':
           description: Teaching unit not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     put:
       operationId: updateTeachingUnit
       tags: [Teaching Units]
       summary: Update a teaching unit
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/unitId'
+        - $ref: 'shared.yaml#/components/parameters/unitId'
       requestBody:
         required: true
         content:
@@ -812,7 +759,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeachingUnitDTO'
+                $ref: 'shared.yaml#/components/schemas/TeachingUnitDTO'
         '400':
           description: Validation error
           content:
@@ -824,58 +771,32 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
         '409':
           description: Abbreviation already taken
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     delete:
       operationId: deleteTeachingUnit
       tags: [Teaching Units]
       summary: Delete a teaching unit
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/unitId'
+        - $ref: 'shared.yaml#/components/parameters/unitId'
       responses:
         '204':
           description: Teaching unit deleted
 
   /levels/{levelId}/teachingUnits:
-    get:
-      operationId: listTeachingUnitsByLevel
-      tags: [Teaching Units]
-      summary: List teaching units for a level
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/levelId'
-      responses:
-        '200':
-          description: Teaching units taught in the level
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TeachingUnitDTO'
-        '404':
-          description: Level not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
+    $ref: 'shared.yaml#/components/pathItems/listTeachingUnitsByLevel'
 
-  # ── Rooms ─────────────────────────────────────────────────────────────────
+  # -- Rooms ----------------------------------------------------------------
   /rooms:
     get:
       operationId: listRooms
       tags: [Rooms]
       summary: List all rooms
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: List of rooms
@@ -884,13 +805,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/RoomDTO'
+                  $ref: 'shared.yaml#/components/schemas/RoomDTO'
     post:
       operationId: createRoom
       tags: [Rooms]
       summary: Create a room
-      security:
-        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -903,7 +822,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RoomDTO'
+                $ref: 'shared.yaml#/components/schemas/RoomDTO'
         '400':
           description: Validation error
           content:
@@ -915,38 +834,34 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
 
   /rooms/{roomId}:
     get:
       operationId: getRoom
       tags: [Rooms]
       summary: Get a room
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/roomId'
+        - $ref: 'shared.yaml#/components/parameters/roomId'
       responses:
         '200':
           description: Room details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RoomDTO'
+                $ref: 'shared.yaml#/components/schemas/RoomDTO'
         '404':
           description: Room not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     put:
       operationId: updateRoom
       tags: [Rooms]
       summary: Update a room
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/roomId'
+        - $ref: 'shared.yaml#/components/parameters/roomId'
       requestBody:
         required: true
         content:
@@ -959,7 +874,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RoomDTO'
+                $ref: 'shared.yaml#/components/schemas/RoomDTO'
         '400':
           description: Validation error
           content:
@@ -971,73 +886,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
         '409':
           description: Room name already taken
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     delete:
       operationId: deleteRoom
       tags: [Rooms]
       summary: Delete a room
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/roomId'
+        - $ref: 'shared.yaml#/components/parameters/roomId'
       responses:
         '204':
           description: Room deleted
 
   /rooms/available:
-    get:
-      operationId: listAvailableRooms
-      tags: [Rooms]
-      summary: List available rooms in a time range
-      description: Returns rooms that are unoccupied between the given start and end times.
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: startTime
-          in: query
-          required: true
-          description: Start date-time (ISO 8601)
-          schema:
-            type: string
-            format: date-time
-        - name: endTime
-          in: query
-          required: true
-          description: End date-time (ISO 8601)
-          schema:
-            type: string
-            format: date-time
-        - name: size
-          in: query
-          required: false
-          description: Minimum room capacity (defaults to 1)
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-      responses:
-        '200':
-          description: Available rooms
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/RoomDTO'
-        '400':
-          description: Invalid or missing parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
+    $ref: 'shared.yaml#/components/pathItems/listAvailableRooms'
 
-  # ── Schedule ──────────────────────────────────────────────────────────────
+  # -- Schedule -------------------------------------------------------------
   /schedule:
     get:
       operationId: getSchedule
@@ -1047,8 +916,6 @@ paths:
         Returns schedule items in the given date range.  Optionally filter by
         level and/or group.  If `groupId` is supplied without `levelId`, only
         that group's timetable is returned.
-      security:
-        - bearerAuth: []
       parameters:
         - name: startDate
           in: query
@@ -1082,25 +949,23 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ScheduleItemDTO'
+                  $ref: 'shared.yaml#/components/schemas/ScheduleItemDTO'
         '400':
           description: Invalid date range or parameters
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
         '404':
           description: Group not found in the specified level
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     post:
       operationId: createScheduleItem
       tags: [Schedule]
       summary: Create a schedule item
-      security:
-        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -1113,7 +978,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ScheduleItemDTO'
+                $ref: 'shared.yaml#/components/schemas/ScheduleItemDTO'
         '400':
           description: Validation error
           content:
@@ -1125,13 +990,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
         '409':
           description: Schedule conflict (room, teacher, or group overlap)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
 
   /schedule/batch:
     post:
@@ -1141,8 +1006,6 @@ paths:
       description: |
         Processes each item independently.  Successfully created items and
         failed items (with reasons) are returned together.
-      security:
-        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -1164,31 +1027,27 @@ paths:
       operationId: getScheduleItem
       tags: [Schedule]
       summary: Get a schedule item
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/scheduleItemId'
+        - $ref: 'shared.yaml#/components/parameters/scheduleItemId'
       responses:
         '200':
           description: Schedule item details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ScheduleItemDTO'
+                $ref: 'shared.yaml#/components/schemas/ScheduleItemDTO'
         '404':
           description: Schedule item not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     put:
       operationId: updateScheduleItem
       tags: [Schedule]
       summary: Update a schedule item
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/scheduleItemId'
+        - $ref: 'shared.yaml#/components/parameters/scheduleItemId'
       requestBody:
         required: true
         content:
@@ -1201,7 +1060,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ScheduleItemDTO'
+                $ref: 'shared.yaml#/components/schemas/ScheduleItemDTO'
         '400':
           description: Validation error
           content:
@@ -1213,26 +1072,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
         '409':
           description: Schedule conflict
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
     delete:
       operationId: deleteScheduleItem
       tags: [Schedule]
       summary: Delete a schedule item
-      security:
-        - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/scheduleItemId'
+        - $ref: 'shared.yaml#/components/parameters/scheduleItemId'
       responses:
         '204':
           description: Schedule item deleted
 
-  # ── Export ────────────────────────────────────────────────────────────────
+  # -- Export ---------------------------------------------------------------
   /export:
     get:
       operationId: exportData
@@ -1241,8 +1098,6 @@ paths:
       description: |
         Exports the requested entities in the specified format.  The response
         is a downloadable file (Excel, ZIP of CSVs, or JSON).
-      security:
-        - bearerAuth: []
       parameters:
         - name: entitiesList
           in: query
@@ -1286,9 +1141,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
 
-  # ── Import ────────────────────────────────────────────────────────────────
+  # -- Import ---------------------------------------------------------------
   /import/upload:
     post:
       operationId: importData
@@ -1297,8 +1152,6 @@ paths:
       description: |
         Accepts one or more files together with a metadata mapping that
         describes how columns map to entity fields.
-      security:
-        - bearerAuth: []
       parameters:
         - name: ignoreConflicts
           in: query
@@ -1334,70 +1187,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: 'shared.yaml#/components/schemas/ErrorDetails'
 
 # ---------------------------------------------------------------------------
-# Components
+# Components (frontend-specific definitions)
 # ---------------------------------------------------------------------------
 components:
 
   securitySchemes:
     bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: JWT access token obtained via `/auth/login`
+      $ref: 'shared.yaml#/components/securitySchemes/bearerAuth'
 
-  # ── Reusable parameters ──────────────────────────────────────────────────
   parameters:
-    levelId:
-      name: levelId
-      in: path
-      required: true
-      description: Level identifier
-      schema:
-        type: integer
-        format: int64
-    groupId:
-      name: groupId
-      in: path
-      required: true
-      description: Group identifier
-      schema:
-        type: integer
-        format: int64
-    teacherId:
-      name: teacherId
-      in: path
-      required: true
-      description: Teacher identifier
-      schema:
-        type: integer
-        format: int64
-    unitId:
-      name: unitId
-      in: path
-      required: true
-      description: Teaching unit identifier
-      schema:
-        type: integer
-        format: int64
-    roomId:
-      name: roomId
-      in: path
-      required: true
-      description: Room identifier
-      schema:
-        type: integer
-        format: int64
-    scheduleItemId:
-      name: scheduleItemId
-      in: path
-      required: true
-      description: Schedule item identifier
-      schema:
-        type: integer
-        format: int64
     userId:
       name: userId
       in: path
@@ -1415,22 +1216,14 @@ components:
         type: integer
         format: int64
 
-  # ── Reusable responses ───────────────────────────────────────────────────
   responses:
-    Unauthorized:
-      description: Authentication required or token invalid
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorDetails'
     Forbidden:
       description: Insufficient permissions
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDetails'
+            $ref: 'shared.yaml#/components/schemas/ErrorDetails'
 
-  # ── Schemas ──────────────────────────────────────────────────────────────
   schemas:
 
     # -- Auth --
@@ -1556,29 +1349,6 @@ components:
           description: Full API key value (shown only once)
 
     # -- Level --
-    LevelDTO:
-      type: object
-      required: [id, name, abbreviation]
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-        abbreviation:
-          type: string
-
-    LevelDetailsDTO:
-      type: object
-      required: [level, groups]
-      properties:
-        level:
-          $ref: '#/components/schemas/LevelDTO'
-        groups:
-          type: array
-          items:
-            $ref: '#/components/schemas/GroupDTO'
-
     CreateLevelDTO:
       type: object
       required: [name, abbreviation]
@@ -1600,24 +1370,6 @@ components:
           type: string
 
     # -- Group --
-    GroupDTO:
-      type: object
-      required: [id, name, type, classe, size, level]
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-        type:
-          type: string
-        classe:
-          type: string
-        size:
-          type: integer
-        level:
-          $ref: '#/components/schemas/LevelDTO'
-
     CreateGroupDTO:
       type: object
       required: [name, type, classe, size]
@@ -1647,18 +1399,6 @@ components:
           minimum: 1
 
     # -- Teacher --
-    TeacherDTO:
-      type: object
-      required: [id, name, abbreviation]
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-        abbreviation:
-          type: string
-
     CreateTeacherDTO:
       type: object
       required: [name, abbreviation]
@@ -1678,21 +1418,6 @@ components:
           type: string
 
     # -- Teaching Unit --
-    TeachingUnitDTO:
-      type: object
-      required: [id, abbreviation, name]
-      properties:
-        id:
-          type: integer
-          format: int64
-        abbreviation:
-          type: string
-        name:
-          type: string
-        level:
-          $ref: '#/components/schemas/LevelDTO'
-          description: Associated level (may be null)
-
     CreateTeachingUnitDTO:
       type: object
       required: [abbreviation, name]
@@ -1719,20 +1444,6 @@ components:
           description: Optional level association
 
     # -- Room --
-    RoomDTO:
-      type: object
-      required: [id, name, abbreviation, size]
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-        abbreviation:
-          type: string
-        size:
-          type: integer
-
     CreateRoomDTO:
       type: object
       required: [name, abbreviation, size]
@@ -1758,30 +1469,6 @@ components:
           minimum: 1
 
     # -- Schedule --
-    ScheduleItemDTO:
-      type: object
-      required: [id, groups, teacher, teachingUnit, room, startTime, endTime]
-      properties:
-        id:
-          type: integer
-          format: int64
-        groups:
-          type: array
-          items:
-            $ref: '#/components/schemas/GroupDTO'
-        teacher:
-          $ref: '#/components/schemas/TeacherDTO'
-        teachingUnit:
-          $ref: '#/components/schemas/TeachingUnitDTO'
-        room:
-          $ref: '#/components/schemas/RoomDTO'
-        startTime:
-          type: string
-          format: date-time
-        endTime:
-          type: string
-          format: date-time
-
     CreateScheduleItemDTO:
       type: object
       required: [groupIds, teacherId, teachingUnitId, roomId, startTime, endTime]
@@ -1838,7 +1525,7 @@ components:
         successItems:
           type: array
           items:
-            $ref: '#/components/schemas/ScheduleItemDTO'
+            $ref: 'shared.yaml#/components/schemas/ScheduleItemDTO'
         failedItems:
           type: array
           items:
@@ -1875,7 +1562,7 @@ components:
           type: object
           additionalProperties:
             type: string
-          description: Source column name → entity property name
+          description: Source column name to entity property name
 
     ImportSummary:
       type: object
@@ -1914,21 +1601,6 @@ components:
           type: string
 
     # -- Error responses --
-    ErrorDetails:
-      type: object
-      required: [timestamp, message, errorCode]
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
-        details:
-          type: string
-        errorCode:
-          type: string
-          description: Machine-readable error code
-
     ValidationErrorDetails:
       type: object
       required: [timestamp, errors, errorCode]
