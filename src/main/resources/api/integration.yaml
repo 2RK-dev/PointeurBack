@@ -1,3 +1,8 @@
+# integration.yaml — Integration API specification.
+# Read-only (GET only) subset of the frontend API.
+# Each GET method $refs the corresponding operation from shared.yaml.
+# No schemas or operations are defined locally.
+
 openapi: 3.1.0
 info:
   title: Pointeur Backend – Integration API
@@ -14,9 +19,10 @@ info:
     name: 2RK-dev
 
 servers:
-  - url: http://localhost:8080/integration
-    description: Local development server
+  - url: /integration
+    description: Integration API base path
 
+# Global security — X-Api-Key header for all endpoints.
 security:
   - apiKeyAuth: []
 
@@ -35,54 +41,68 @@ tags:
     description: Schedule queries
 
 # ---------------------------------------------------------------------------
-# Paths — read-only subset, all referenced from shared.yaml
+# Paths — GET-only subset, each method $refs the operation from shared.yaml
 # ---------------------------------------------------------------------------
 paths:
 
   /levels:
-    $ref: 'shared.yaml#/components/pathItems/listLevels'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/listLevels'
 
   /levels/{levelId}:
-    $ref: 'shared.yaml#/components/pathItems/getLevel'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/getLevel'
 
   /levels/{levelId}/groups:
-    $ref: 'shared.yaml#/components/pathItems/listGroupsByLevel'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/listGroupsByLevel'
 
   /levels/{levelId}/groups/{groupId}:
-    $ref: 'shared.yaml#/components/pathItems/getGroup'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/getGroup'
 
   /levels/{levelId}/teachingUnits:
-    $ref: 'shared.yaml#/components/pathItems/listTeachingUnitsByLevel'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/listTeachingUnitsByLevel'
 
   /teachers:
-    $ref: 'shared.yaml#/components/pathItems/listTeachers'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/listTeachers'
 
   /teachers/{teacherId}:
-    $ref: 'shared.yaml#/components/pathItems/getTeacher'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/getTeacher'
 
   /teachingUnits:
-    $ref: 'shared.yaml#/components/pathItems/listTeachingUnits'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/listTeachingUnits'
 
   /teachingUnits/{unitId}:
-    $ref: 'shared.yaml#/components/pathItems/getTeachingUnit'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/getTeachingUnit'
 
   /rooms:
-    $ref: 'shared.yaml#/components/pathItems/listRooms'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/listRooms'
 
   /rooms/{roomId}:
-    $ref: 'shared.yaml#/components/pathItems/getRoom'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/getRoom'
 
   /rooms/available:
-    $ref: 'shared.yaml#/components/pathItems/listAvailableRooms'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/listAvailableRooms'
 
   /schedule:
-    $ref: 'shared.yaml#/components/pathItems/getSchedule'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/getSchedule'
 
   /schedule/{scheduleItemId}:
-    $ref: 'shared.yaml#/components/pathItems/getScheduleItem'
+    get:
+      $ref: 'shared.yaml#/components/x-operations/getScheduleItem'
 
 # ---------------------------------------------------------------------------
-# Components
+# Components — security scheme referenced from shared.yaml
 # ---------------------------------------------------------------------------
 components:
   securitySchemes:
