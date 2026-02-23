@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "teaching_unit_table_adapter.json": {
+      "level": {
+        "entityType": "level",
+        "headersMapping": {
+          "id": "id",
+          "name": "name",
+          "abbreviation": "abbreviation"
+        }
+      },
+      "teaching_unit": {
+        "entityType": "teaching_unit",
+        "headersMapping": {
+          "id": "id",
+          "name": "name",
+          "abbreviation": "abbreviation",
+          "levelId": "levelId"
+        }
+      }
+    }
+  }
+}

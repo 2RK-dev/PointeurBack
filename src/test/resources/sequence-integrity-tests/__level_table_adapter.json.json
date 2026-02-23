@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "level_table_adapter.json": {
+      "level": {
+        "entityType": "level",
+        "headersMapping": {
+          "id": "id",
+          "name": "name",
+          "abbreviation": "abbreviation"
+        }
+      }
+    }
+  }
+}

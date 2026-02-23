@@ -1,0 +1,26 @@
+{
+  "metadata": {
+    "group_table_adapter.json": {
+      "level": {
+        "entityType": "level",
+        "headersMapping": {
+          "id": "id",
+          "name": "name",
+          "abbreviation": "abbreviation"
+        }
+      },
+      "group": {
+        "entityType": "group",
+        "headersMapping": {
+          "id": "id",
+          "name": "name",
+          "abbreviation": "abbreviation",
+          "size": "size",
+          "levelId": "levelId",
+          "type": "type",
+          "classe": "classe"
+        }
+      }
+    }
+  }
+}

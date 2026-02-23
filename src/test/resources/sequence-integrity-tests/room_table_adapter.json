@@ -1,0 +1,40 @@
+{
+  "room": [
+    {
+      "id": "5",
+      "name": "S001",
+      "abbreviation": "S001",
+      "size": "100"
+    },
+    {
+      "id": "6",
+      "name": "S002",
+      "abbreviation": "S002",
+      "size": "200"
+    },
+    {
+      "id": "7",
+      "name": "S003",
+      "abbreviation": "S003",
+      "size": "150"
+    },
+    {
+      "id": "8",
+      "name": "S101",
+      "abbreviation": "S101",
+      "size": "250"
+    },
+    {
+      "id": "1",
+      "name": "S001",
+      "abbreviation": "S001",
+      "size": "100"
+    },
+    {
+      "id": "2",
+      "name": "S002",
+      "abbreviation": "S002",
+      "size": "200"
+    }
+  ]
+}

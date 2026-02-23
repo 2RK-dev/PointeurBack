@@ -128,7 +128,7 @@ public class ImportSequenceIntegrityTest {
     }
 
     private static @NotNull MockMultipartFile getMetadataFile(String fileName) throws IOException {
-        byte[] metadata = new ClassPathResource("__%s.json".formatted(fileName)).getContentAsByteArray();
+        byte[] metadata = new ClassPathResource("sequence-integrity-tests/__%s.json".formatted(fileName)).getContentAsByteArray();
         return new MockMultipartFile("metadata", "", "application/json", metadata);
     }
 
