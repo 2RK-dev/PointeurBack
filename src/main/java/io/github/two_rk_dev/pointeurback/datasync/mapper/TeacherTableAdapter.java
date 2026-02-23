@@ -55,4 +55,9 @@ public class TeacherTableAdapter extends AbstractEntityTableAdapter<ImportTeache
                 }
         );
     }
+
+    @Override
+    protected long extractId(ImportTeacherDTO dto) {
+        return dto.id();
+    }
 }

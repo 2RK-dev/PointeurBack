@@ -63,6 +63,11 @@ public class TeachingUnitTableAdapter extends AbstractEntityTableAdapter<ImportT
         );
     }
 
+    @Override
+    protected long extractId(ImportTeachingUnitDTO dto) {
+        return dto.id();
+    }
+
     /**
      * Promote the valid staged data, return the invalid ones, and clean up the staging table.
      *

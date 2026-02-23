@@ -73,6 +73,19 @@ public interface EntityTableAdapter {
 
     @NotNull Type getEntityType();
 
+    /**
+     * Returns the maximum primary key value encountered during the last {@link #process(UUID, TableData, boolean)} call.
+     * <p>
+     * This value is used by the import pipeline to synchronize the backing sequence after insertion,
+     * preventing future auto-generated IDs from colliding with manually imported ones.
+     * <p>
+     * The returned value is reset at the beginning of each {@link #process(UUID, TableData, boolean)} call,
+     * so it always reflects the most recent import batch only.
+     *
+     * @return the maximum imported ID, or {@link Long#MIN_VALUE} if no rows were successfully staged
+     */
+    long getMaxImportedId();
+
     @Getter
     @AllArgsConstructor
     @Accessors(fluent = true)

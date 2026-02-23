@@ -56,4 +56,9 @@ public class RoomTableAdapter extends AbstractEntityTableAdapter<ImportRoomDTO> 
                 }
         );
     }
+
+    @Override
+    protected long extractId(ImportRoomDTO dto) {
+        return dto.id();
+    }
 }
