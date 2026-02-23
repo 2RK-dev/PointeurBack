@@ -77,13 +77,15 @@ public interface EntityTableAdapter {
     @AllArgsConstructor
     @Accessors(fluent = true)
     enum Type {
-        ROOM("room"),
-        TEACHER("teacher"),
-        TEACHING_UNIT("teaching_unit"),
-        GROUP("group"),
-        LEVEL("level");
+        ROOM("room", "room"),
+        TEACHER("teacher", "teacher"),
+        TEACHING_UNIT("teaching_unit", "teaching_unit"),
+        GROUP("group", "groups"),
+        LEVEL("level", "level"),
+        ;
 
         private final String entityName;
+        public final String tableName;
 
         @Contract(pure = true)
         public @NotNull String beanName() {
