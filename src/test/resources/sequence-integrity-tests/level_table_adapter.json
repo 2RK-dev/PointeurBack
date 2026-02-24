@@ -1,0 +1,19 @@
+{
+  "level": [
+    {
+      "id": "4",
+      "name": "L1",
+      "abbreviation": "L1"
+    },
+    {
+      "id": "5",
+      "name": "L2",
+      "abbreviation": "L2"
+    },
+    {
+      "id": "6",
+      "name": "L3",
+      "abbreviation": "L3"
+    }
+  ]
+}

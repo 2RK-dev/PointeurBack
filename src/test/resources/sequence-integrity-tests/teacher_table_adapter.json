@@ -1,0 +1,34 @@
+{
+  "teacher": [
+    {
+      "id": "7",
+      "name": "Alix",
+      "abbreviation": "ALX"
+    },
+    {
+      "id": "8",
+      "name": "Andry",
+      "abbreviation": "ANDR"
+    },
+    {
+      "id": "9",
+      "name": "Angelo",
+      "abbreviation": "ANG"
+    },
+    {
+      "id": "10",
+      "name": "Bertin",
+      "abbreviation": "BERT"
+    },
+    {
+      "id": "11",
+      "name": "Cyprien",
+      "abbreviation": "CYPR"
+    },
+    {
+      "id": "12",
+      "name": "Jean Christian RALAIVAO",
+      "abbreviation": "JCR"
+    }
+  ]
+}

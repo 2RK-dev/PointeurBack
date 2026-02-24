@@ -55,4 +55,9 @@ public class LevelTableAdapter extends AbstractEntityTableAdapter<ImportLevelDTO
                 }
         );
     }
+
+    @Override
+    protected long extractId(ImportLevelDTO dto) {
+        return dto.id();
+    }
 }

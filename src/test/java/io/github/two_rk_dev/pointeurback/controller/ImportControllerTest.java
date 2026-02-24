@@ -529,15 +529,9 @@ class ImportControllerTest {
         );
     }
 
-    private static @NotNull MockMultipartFile getExcelMetadataFile(String excelFilename) throws IOException {
-        String metadata = new ClassPathResource("__%s.json".formatted(excelFilename)).getContentAsString(StandardCharsets.UTF_8);
-
-        return new MockMultipartFile(
-                "metadata",
-                "",
-                "application/json",
-                metadata.getBytes(StandardCharsets.UTF_8)
-        );
+    private static @NotNull MockMultipartFile getExcelMetadataFile(String fileName) throws IOException {
+        byte[] metadata = new ClassPathResource("__%s.json".formatted(fileName)).getContentAsByteArray();
+        return new MockMultipartFile("metadata", "", "application/json", metadata);
     }
 
     private static @NotNull MockMultipartFile getJSONMetadataFile() {

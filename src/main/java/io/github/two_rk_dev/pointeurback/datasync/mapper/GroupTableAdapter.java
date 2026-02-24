@@ -110,4 +110,9 @@ public class GroupTableAdapter extends AbstractEntityTableAdapter<ImportGroupDTO
                 }
         );
     }
+
+    @Override
+    protected long extractId(ImportGroupDTO dto) {
+        return dto.id();
+    }
 }

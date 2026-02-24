@@ -19,6 +19,8 @@ public abstract class AbstractEntityTableAdapter<T extends Record> implements En
     private final Class<T> dtoClass;
     private final ObjectMapper objectMapper;
     private final Validator validator;
+    @Getter
+    private long maxImportedId = Long.MIN_VALUE;
 
     protected AbstractEntityTableAdapter(ObjectMapper objectMapper, Validator validator, Class<T> dtoClass) {
         this.objectMapper = objectMapper;
@@ -47,6 +49,7 @@ public abstract class AbstractEntityTableAdapter<T extends Record> implements En
                 errors.add(new SyncError(tableData.tableName(), r, formatValidationErrors(validationErrors), context));
                 continue;
             }
+            maxImportedId = Math.max(maxImportedId, extractId(dto));
             toInsert.add(new ImportRow<>(dto, tableData.tableName(), r, context));
         }
         stage(stageID, toInsert, ignoreConflicts);
@@ -60,6 +63,7 @@ public abstract class AbstractEntityTableAdapter<T extends Record> implements En
      */
     @Override
     public List<SyncError> finalize(UUID stageID, boolean ignoreConflicts) {
+        maxImportedId = Long.MIN_VALUE;
         return List.of();
     }
 
@@ -75,6 +79,17 @@ public abstract class AbstractEntityTableAdapter<T extends Record> implements En
      * @param ignoreConflicts if true, rows that would cause conflicts (e.g., duplicates) should be skipped, otherwise merge to existing
      */
     protected abstract void stage(UUID stageID, @NotNull List<ImportRow<T>> toStage, boolean ignoreConflicts);
+
+    /**
+     * Extracts the primary key value from the given DTO.
+     * <p>
+     * This is used by the base class to track the maximum ID encountered during import, to synchronize the backing
+     * sequence after insertion, and to prevent future auto-generated IDs from colliding with manually imported ones.
+     *
+     * @param dto a validated, parsed DTO about to be staged
+     * @return the primary key value of the given DTO
+     */
+    protected abstract long extractId(T dto);
 
     private @NotNull String formatValidationErrors(@NotNull Errors errors) {
         List<String> errorMessages = new ArrayList<>();

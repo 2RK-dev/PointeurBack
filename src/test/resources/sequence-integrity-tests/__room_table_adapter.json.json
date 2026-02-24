@@ -1,0 +1,15 @@
+{
+  "metadata": {
+    "room_table_adapter.json": {
+      "room": {
+        "entityType": "room",
+        "headersMapping": {
+          "id": "id",
+          "name": "name",
+          "abbreviation": "abbreviation",
+          "size": "size"
+        }
+      }
+    }
+  }
+}

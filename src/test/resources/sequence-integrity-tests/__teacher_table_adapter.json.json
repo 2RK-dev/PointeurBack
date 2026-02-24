@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "teacher_table_adapter.json": {
+      "teacher": {
+        "entityType": "teacher",
+        "headersMapping": {
+          "id": "id",
+          "name": "name",
+          "abbreviation": "abbreviation"
+        }
+      }
+    }
+  }
+}

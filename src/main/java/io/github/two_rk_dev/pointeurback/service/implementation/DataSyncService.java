@@ -9,6 +9,7 @@ import io.github.two_rk_dev.pointeurback.service.ImportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,7 @@ import java.util.*;
 public class DataSyncService implements ImportService, ExportService {
     private final Map<String, FileCodec> codecs;
     private final Map<String, EntityTableAdapter> entityAdapters;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Exported export(@NotNull List<String> entitiesNames, String format) throws IOException {
@@ -90,6 +92,7 @@ public class DataSyncService implements ImportService, ExportService {
                 tableData.withTableInfo(subfileFullName, newHeaders),
                 context.ignoreConflicts
         );
+        context.trackMaxImportedId(adapter, adapter.getMaxImportedId());
 
         EntityTableAdapter.@NotNull Type entityType = adapter.getEntityType();
         context.summary.errors().addAll(syncErrors);
@@ -115,17 +118,47 @@ public class DataSyncService implements ImportService, ExportService {
                     syncErrors.size(),
                     (val, newVal) -> val - newVal
             );
+            Long maxId = context.maxImportedIds.get(adapter);
+            if (maxId != null && maxId > 0) {
+                syncSequence(adapter, maxId);
+            }
         }
+    }
+
+    private void syncSequence(EntityTableAdapter adapter, long maxImportedId) {
+        String tableName = adapter.getEntityType().tableName;
+        String seqName = jdbcTemplate.queryForObject("""
+                SELECT pg_get_serial_sequence(?, (
+                        SELECT a.attname
+                        FROM pg_index i
+                        JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+                        WHERE i.indrelid = ?::regclass
+                          AND i.indisprimary
+                    ))
+                """, String.class, tableName, tableName);
+
+        if (seqName == null) log.warn("No sequence found for table {}, skipping sync", tableName);
+        else jdbcTemplate.queryForObject(
+                "SELECT setval(?, GREATEST(?, (SELECT last_value FROM " + seqName + ")))",
+                Long.class,
+                seqName,
+                maxImportedId
+        );
     }
 
     private static class ImportContext {
         private final Set<EntityTableAdapter> usedAdapters = new HashSet<>();
+        private final Map<EntityTableAdapter, Long> maxImportedIds = new HashMap<>();
         private final ImportSummary summary = new ImportSummary();
         private final boolean ignoreConflicts;
         private final UUID stageID = UUID.randomUUID();
 
         public ImportContext(boolean ignoreConflicts) {
             this.ignoreConflicts = ignoreConflicts;
+        }
+
+        public void trackMaxImportedId(EntityTableAdapter adapter, long id) {
+            maxImportedIds.merge(adapter, id, Math::max);
         }
     }
 }
